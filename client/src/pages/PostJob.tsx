@@ -56,7 +56,6 @@ const experienceOptions = [
 ];
 
 const accommodationOptions = [
-  "No accommodation",
   "Accommodation provided",
   "Partial accommodation",
   "Relocation assistance",

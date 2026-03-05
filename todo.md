@@ -49,3 +49,7 @@
 
 ## Phase 9: 버그 수정
 - [x] getJobListings 함수의 where 절 쿼리 에러 해결 (and 연산자 추가)
+
+## Phase 10: 신규 가입자 403 에러 해결 및 UI 개선
+- [x] 신규 가입자 403 에러 해결 (권한 설정)
+- [x] "No accommodation" 옵션 제거

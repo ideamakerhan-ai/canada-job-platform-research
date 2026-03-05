@@ -83,7 +83,7 @@ const sampleJobs: JobListing[] = [
     category: "Marketing & Communications",
     lmiaAvailable: false,
     visaSponsorshipAvailable: false,
-    accommodation: "No accommodation",
+    accommodation: "Accommodation provided",
   },
   {
     id: 5,
@@ -111,7 +111,7 @@ const sampleJobs: JobListing[] = [
     category: "IT Development & Data",
     lmiaAvailable: true,
     visaSponsorshipAvailable: true,
-    accommodation: "No accommodation",
+    accommodation: "Accommodation provided",
   },
   {
     id: 7,
@@ -153,7 +153,7 @@ const sampleJobs: JobListing[] = [
     category: "Education",
     lmiaAvailable: false,
     visaSponsorshipAvailable: false,
-    accommodation: "No accommodation",
+    accommodation: "Accommodation provided",
   },
   {
     id: 10,

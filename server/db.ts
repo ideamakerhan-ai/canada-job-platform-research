@@ -58,6 +58,9 @@ export async function upsertUser(user: InsertUser): Promise<void> {
     } else if (user.openId === ENV.ownerOpenId) {
       values.role = 'admin';
       updateSet.role = 'admin';
+    } else {
+      // 새 사용자는 기본값으로 'user' 역할을 가짐
+      values.role = 'user';
     }
 
     if (!values.lastSignedIn) {
