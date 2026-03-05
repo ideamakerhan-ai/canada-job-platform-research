@@ -340,9 +340,9 @@ export default function Home() {
                 />
               </div>
               <div className="md:col-span-4">
-                <label className="text-sm font-medium text-slate-700 mb-2 block">Category</label>
                 <Select value={selectedCategory} onValueChange={setSelectedCategory}>
-                  <SelectTrigger>
+                  <SelectTrigger className="flex items-center gap-2">
+                    <span className="text-sm font-medium text-slate-700">Category</span>
                     <SelectValue placeholder="All Categories" />
                   </SelectTrigger>
                 <SelectContent>
@@ -355,9 +355,9 @@ export default function Home() {
                 </Select>
               </div>
               <div className="md:col-span-4">
-                <label className="text-sm font-medium text-slate-700 mb-2 block">Location</label>
                 <Select value={selectedLocation} onValueChange={setSelectedLocation}>
-                  <SelectTrigger>
+                  <SelectTrigger className="flex items-center gap-2">
+                    <span className="text-sm font-medium text-slate-700">Location</span>
                     <SelectValue placeholder="All Locations" />
                   </SelectTrigger>
                 <SelectContent>
