@@ -8,16 +8,24 @@ import { toast } from "sonner";
 import { useLocation } from "wouter";
 
 const categories = [
-  "Technology",
-  "Healthcare",
+  "Strategy & Planning",
+  "Marketing & Communications",
+  "Accounting & Finance",
+  "HR & Training",
+  "Administration & Legal",
+  "IT Development & Data",
+  "Design",
+  "Sales & Trading",
   "Construction",
-  "Marketing",
-  "Trades",
-  "Finance",
-  "Sales",
+  "Healthcare",
+  "Research & Development",
   "Education",
-  "HR",
-  "Operations",
+  "Media & Culture",
+  "Finance & Insurance",
+  "Transportation",
+  "Service",
+  "Manufacturing",
+  "Public Service",
 ];
 
 const locations = [
@@ -34,6 +42,16 @@ const locations = [
   "Victoria, BC",
 ];
 
+const experienceOptions = [
+  "No experience required",
+  "Less than 1 year",
+  "1-2 years",
+  "2-3 years",
+  "3-5 years",
+  "5+ years",
+  "10+ years",
+];
+
 export default function PostJob() {
   const [, setLocation] = useLocation();
   const [formData, setFormData] = useState({
@@ -42,8 +60,13 @@ export default function PostJob() {
     description: "",
     category: "",
     location: "",
-    salary: "",
+    salaryType: "annual",
+    salaryMin: "",
+    salaryMax: "",
     jobType: "Full-time",
+    lmiaSponsorship: false,
+    visaSponsorship: false,
+    experienceRequired: "",
   });
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -55,6 +78,17 @@ export default function PostJob() {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
+  const handleCheckboxChange = (name: string, checked: boolean) => {
+    setFormData((prev) => ({ ...prev, [name]: checked }));
+  };
+
+  const handleSalaryChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    if (value === "" || /^\d+$/.test(value)) {
+      setFormData((prev) => ({ ...prev, [name]: value }));
+    }
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -63,28 +97,44 @@ export default function PostJob() {
       return;
     }
 
-    // 여기서 실제로 서버에 데이터를 보낼 수 있습니다
+    if (!formData.salaryMin || !formData.salaryMax) {
+      toast.error("Please enter both minimum and maximum salary");
+      return;
+    }
+
+    if (!formData.lmiaSponsorship && !formData.visaSponsorship) {
+      toast.error("Please select at least one sponsorship option");
+      return;
+    }
+
+    if (!formData.experienceRequired) {
+      toast.error("Please select required experience level");
+      return;
+    }
+
     console.log("Job posting:", formData);
     toast.success("Job posted successfully!");
 
-    // 폼 초기화
     setFormData({
       title: "",
       company: "",
       description: "",
       category: "",
       location: "",
-      salary: "",
+      salaryType: "annual",
+      salaryMin: "",
+      salaryMax: "",
       jobType: "Full-time",
+      lmiaSponsorship: false,
+      visaSponsorship: false,
+      experienceRequired: "",
     });
 
-    // 홈으로 돌아가기
     setTimeout(() => setLocation("/"), 2000);
   };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100">
-      {/* 헤더 */}
       <header className="bg-white border-b border-slate-200 sticky top-0 z-50 shadow-sm">
         <div className="container py-6">
           <div className="flex items-center justify-between">
@@ -99,7 +149,6 @@ export default function PostJob() {
         </div>
       </header>
 
-      {/* 메인 콘텐츠 */}
       <main className="container py-12">
         <Card className="max-w-2xl mx-auto">
           <CardHeader>
@@ -108,7 +157,6 @@ export default function PostJob() {
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-6">
-              {/* 직책 */}
               <div>
                 <label className="block text-sm font-medium text-slate-700 mb-2">Job Title *</label>
                 <Input
@@ -121,7 +169,6 @@ export default function PostJob() {
                 />
               </div>
 
-              {/* 회사명 */}
               <div>
                 <label className="block text-sm font-medium text-slate-700 mb-2">Company Name *</label>
                 <Input
@@ -134,7 +181,6 @@ export default function PostJob() {
                 />
               </div>
 
-              {/* 카테고리 */}
               <div>
                 <label className="block text-sm font-medium text-slate-700 mb-2">Category *</label>
                 <Select value={formData.category} onValueChange={(value) => handleSelectChange("category", value)}>
@@ -151,7 +197,6 @@ export default function PostJob() {
                 </Select>
               </div>
 
-              {/* 위치 */}
               <div>
                 <label className="block text-sm font-medium text-slate-700 mb-2">Location *</label>
                 <Select value={formData.location} onValueChange={(value) => handleSelectChange("location", value)}>
@@ -168,20 +213,58 @@ export default function PostJob() {
                 </Select>
               </div>
 
-              {/* 급여 */}
               <div>
-                <label className="block text-sm font-medium text-slate-700 mb-2">Salary Range</label>
-                <Input
-                  type="text"
-                  name="salary"
-                  placeholder="e.g., $80,000 - $120,000"
-                  value={formData.salary}
-                  onChange={handleInputChange}
-                  className="w-full"
-                />
+                <label className="block text-sm font-medium text-slate-700 mb-2">Salary Type & Range *</label>
+                <div className="flex gap-4 mb-4">
+                  <label className="flex items-center gap-2 cursor-pointer">
+                    <input
+                      type="radio"
+                      name="salaryType"
+                      value="hourly"
+                      checked={formData.salaryType === "hourly"}
+                      onChange={(e) => handleSelectChange("salaryType", e.target.value)}
+                      className="w-4 h-4"
+                    />
+                    <span className="text-sm text-slate-700">Hourly Rate ($)</span>
+                  </label>
+                  <label className="flex items-center gap-2 cursor-pointer">
+                    <input
+                      type="radio"
+                      name="salaryType"
+                      value="annual"
+                      checked={formData.salaryType === "annual"}
+                      onChange={(e) => handleSelectChange("salaryType", e.target.value)}
+                      className="w-4 h-4"
+                    />
+                    <span className="text-sm text-slate-700">Annual Salary ($)</span>
+                  </label>
+                </div>
+                <div className="flex gap-4">
+                  <div className="flex-1">
+                    <label className="block text-xs font-medium text-slate-600 mb-1">Minimum</label>
+                    <Input
+                      type="text"
+                      name="salaryMin"
+                      placeholder="e.g., 50000"
+                      value={formData.salaryMin}
+                      onChange={handleSalaryChange}
+                      className="w-full"
+                    />
+                  </div>
+                  <div className="flex-1">
+                    <label className="block text-xs font-medium text-slate-600 mb-1">Maximum</label>
+                    <Input
+                      type="text"
+                      name="salaryMax"
+                      placeholder="e.g., 120000"
+                      value={formData.salaryMax}
+                      onChange={handleSalaryChange}
+                      className="w-full"
+                    />
+                  </div>
+                </div>
               </div>
 
-              {/* 근무형태 */}
               <div>
                 <label className="block text-sm font-medium text-slate-700 mb-2">Job Type</label>
                 <Select value={formData.jobType} onValueChange={(value) => handleSelectChange("jobType", value)}>
@@ -197,7 +280,46 @@ export default function PostJob() {
                 </Select>
               </div>
 
-              {/* 설명 */}
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-2">Required Experience *</label>
+                <Select value={formData.experienceRequired} onValueChange={(value) => handleSelectChange("experienceRequired", value)}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select required experience" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {experienceOptions.map((exp) => (
+                      <SelectItem key={exp} value={exp}>
+                        {exp}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-3">Sponsorship Options *</label>
+                <div className="space-y-3">
+                  <label className="flex items-center gap-3 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={formData.lmiaSponsorship}
+                      onChange={(e) => handleCheckboxChange("lmiaSponsorship", e.target.checked)}
+                      className="w-4 h-4 rounded"
+                    />
+                    <span className="text-sm text-slate-700">LMIA Sponsorship Available</span>
+                  </label>
+                  <label className="flex items-center gap-3 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={formData.visaSponsorship}
+                      onChange={(e) => handleCheckboxChange("visaSponsorship", e.target.checked)}
+                      className="w-4 h-4 rounded"
+                    />
+                    <span className="text-sm text-slate-700">Visa Sponsorship Available</span>
+                  </label>
+                </div>
+              </div>
+
               <div>
                 <label className="block text-sm font-medium text-slate-700 mb-2">Job Description *</label>
                 <Textarea
@@ -209,7 +331,6 @@ export default function PostJob() {
                 />
               </div>
 
-              {/* 버튼 */}
               <div className="flex gap-4">
                 <Button type="submit" className="bg-blue-600 hover:bg-blue-700">
                   Post Job
