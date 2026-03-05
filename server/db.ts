@@ -1,6 +1,6 @@
 import { eq } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
-import { InsertUser, users, jobListings, savedJobs, jobApplications } from "../drizzle/schema";
+import { InsertUser, users, jobListings, savedJobs, jobApplications, InsertJobListing } from "../drizzle/schema";
 import { ENV } from './_core/env';
 
 let _db: ReturnType<typeof drizzle> | null = null;
@@ -182,4 +182,20 @@ export async function getUserApplications(userId: number) {
     .select()
     .from(jobApplications)
     .where(eq(jobApplications.userId, userId));
+}
+
+export async function createJobListing(data: InsertJobListing) {
+  const db = await getDb();
+  if (!db) {
+    console.warn("[Database] Cannot create job listing: database not available");
+    return null;
+  }
+
+  try {
+    const result = await db.insert(jobListings).values(data);
+    return result;
+  } catch (error) {
+    console.error("[Database] Failed to create job listing:", error);
+    throw error;
+  }
 }

@@ -41,3 +41,8 @@
 - [x] Post a Job 폼에 Accommodation 체크박스 추가
 - [x] 샘플 데이터에 Accommodation 정보 추가
 - [x] 공고 카드에 Accommodation 배지 표시
+
+## Phase 8: Post a Job 공고 저장 및 표시 기능
+- [x] Post a Job 폼 데이터를 데이터베이스에 저장
+- [x] 홈페이지에서 저장된 공고 표시
+- [x] 공고 필터링 시 저장된 공고 포함

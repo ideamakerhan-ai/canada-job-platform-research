@@ -6,6 +6,9 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
 import { useLocation } from "wouter";
+import { trpc } from "@/lib/trpc";
+import { useAuth } from "@/_core/hooks/useAuth";
+import { getLoginUrl } from "@/const";
 
 const categories = [
   "Strategy & Planning",
@@ -61,6 +64,7 @@ const accommodationOptions = [
 
 export default function PostJob() {
   const [, setLocation] = useLocation();
+  const { isAuthenticated } = useAuth();
   const [formData, setFormData] = useState({
     title: "",
     company: "",
@@ -75,6 +79,16 @@ export default function PostJob() {
     visaSponsorship: false,
     experienceRequired: "",
     accommodation: "",
+  });
+
+  const postJobMutation = trpc.job.postJob.useMutation({
+    onSuccess: () => {
+      toast.success("Job posted successfully!");
+      setTimeout(() => setLocation("/"), 2000);
+    },
+    onError: (error) => {
+      toast.error(error.message || "Failed to post job");
+    },
   });
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -99,6 +113,12 @@ export default function PostJob() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (!isAuthenticated) {
+      toast.error("Please log in to post a job");
+      window.location.href = getLoginUrl();
+      return;
+    }
 
     if (!formData.title || !formData.company || !formData.description || !formData.category || !formData.location) {
       toast.error("Please fill in all required fields");
@@ -125,26 +145,21 @@ export default function PostJob() {
       return;
     }
 
-    console.log("Job posting:", formData);
-    toast.success("Job posted successfully!");
-
-    setFormData({
-      title: "",
-      company: "",
-      description: "",
-      category: "",
-      location: "",
-      salaryType: "annual",
-      salaryMin: "",
-      salaryMax: "",
-      jobType: "Full-time",
-      lmiaSponsorship: false,
-      visaSponsorship: false,
-      experienceRequired: "",
-      accommodation: "",
+    postJobMutation.mutate({
+      title: formData.title,
+      company: formData.company,
+      location: formData.location,
+      category: formData.category,
+      description: formData.description,
+      salaryType: formData.salaryType as "hourly" | "annual",
+      salaryMin: parseInt(formData.salaryMin),
+      salaryMax: parseInt(formData.salaryMax),
+      jobType: formData.jobType,
+      experienceRequired: formData.experienceRequired,
+      accommodation: formData.accommodation,
+      lmiaSponsorship: formData.lmiaSponsorship,
+      visaSponsorship: formData.visaSponsorship,
     });
-
-    setTimeout(() => setLocation("/"), 2000);
   };
 
   return (
@@ -362,8 +377,12 @@ export default function PostJob() {
               </div>
 
               <div className="flex gap-4">
-                <Button type="submit" className="bg-blue-600 hover:bg-blue-700">
-                  Post Job
+                <Button 
+                  type="submit" 
+                  className="bg-blue-600 hover:bg-blue-700"
+                  disabled={postJobMutation.isPending}
+                >
+                  {postJobMutation.isPending ? "Posting..." : "Post Job"}
                 </Button>
                 <Button type="button" variant="outline" onClick={() => setLocation("/")}>
                   Cancel
