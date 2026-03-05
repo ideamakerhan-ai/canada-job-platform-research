@@ -92,6 +92,61 @@ const sampleJobs: JobListing[] = [
     postedDate: "2 days ago",
     category: "Technology",
   },
+  {
+    id: 7,
+    title: "Financial Analyst",
+    company: "Bay Street Finance",
+    location: "Toronto, ON",
+    salary: "$70,000 - $95,000",
+    jobType: "Full-time",
+    description: "Analyze financial data and provide strategic recommendations.",
+    postedDate: "1 day ago",
+    category: "Finance",
+  },
+  {
+    id: 8,
+    title: "Sales Manager",
+    company: "Global Sales Corp",
+    location: "Vancouver, BC",
+    salary: "$65,000 - $85,000",
+    jobType: "Full-time",
+    description: "Lead sales team and achieve quarterly targets.",
+    postedDate: "2 days ago",
+    category: "Sales",
+  },
+  {
+    id: 9,
+    title: "Education Coordinator",
+    company: "Learning Academy",
+    location: "Montreal, QC",
+    salary: "$45,000 - $60,000",
+    jobType: "Full-time",
+    description: "Coordinate educational programs and student services.",
+    postedDate: "3 days ago",
+    category: "Education",
+  },
+  {
+    id: 10,
+    title: "HR Manager",
+    company: "People First HR",
+    location: "Calgary, AB",
+    salary: "$60,000 - $80,000",
+    jobType: "Full-time",
+    description: "Manage human resources and employee relations.",
+    postedDate: "1 day ago",
+    category: "HR",
+  },
+  {
+    id: 11,
+    title: "Operations Manager",
+    company: "Logistics Plus",
+    location: "Edmonton, AB",
+    salary: "$55,000 - $75,000",
+    jobType: "Full-time",
+    description: "Oversee operations and optimize efficiency.",
+    postedDate: "2 days ago",
+    category: "Operations",
+  },
 ];
 
 export default function Home() {
@@ -214,7 +269,7 @@ export default function Home() {
     );
   };
 
-  const categories = ["all", ...Array.from(new Set(sampleJobs.map((job) => job.category)))];
+  const categories = ["all", "Technology", "Healthcare", "Construction", "Marketing", "Trades", "Finance", "Sales", "Education", "HR", "Operations"];
   const locations = [
     "all",
     "Toronto, ON",
@@ -315,9 +370,9 @@ export default function Home() {
 
       {/* 메인 콘텐츠 */}
       <main className="container py-12">
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
-          {/* 사이드바 - 필터 */}
-          <aside className="lg:col-span-1">
+        <div className="grid grid-cols-1 gap-8">
+          {/* 사이드바 - 필터 (숨김) */}
+          <aside className="lg:col-span-1 hidden">
             <Card>
               <CardHeader>
                 <CardTitle>Filters</CardTitle>
@@ -359,11 +414,10 @@ export default function Home() {
                   </div>
                 </div>
               </CardContent>
-            </Card>
+             </Card>
           </aside>
-
-          {/* 메인 - 공고 리스트 */}
-          <div className="lg:col-span-3">
+          {/* 공고 리스트 */}
+          <section className="lg:col-span-4">
             <div className="mb-6">
               <p className="text-slate-600">Showing {filteredJobs.length} jobs</p>
             </div>
@@ -443,7 +497,7 @@ export default function Home() {
                 </Card>
               ))}
             </div>
-          </div>
+          </section>
         </div>
       </main>
 
