@@ -525,7 +525,7 @@ export default function Home() {
               <h4 className="font-semibold text-white mb-4">For Job Seekers</h4>
               <ul className="space-y-2 text-sm">
                 <li><button onClick={() => window.scrollTo(0, 0)} className="hover:text-white cursor-pointer">Browse Jobs</button></li>
-                <li><button onClick={() => toast.info("Career Advice section coming soon!")} className="hover:text-white cursor-pointer">Career Advice</button></li>
+                <li><button onClick={() => navigate("/occupations")} className="hover:text-white cursor-pointer">NOC Occupations</button></li>
                 <li><button onClick={() => toast.info("Salary Guide coming soon!")} className="hover:text-white cursor-pointer">Salary Guide</button></li>
               </ul>
             </div>
