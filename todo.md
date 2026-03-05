@@ -25,3 +25,8 @@
 - [x] NOC Occupations 페이지 구현
 - [x] Post a Job 기능 구현
 - [x] Profile 페이지 구현
+
+## Phase 5: LMIA 및 비자 스폰서십 배지 추가
+- [x] 샘플 데이터에 LMIA 및 비자 스폰서십 정보 추가
+- [x] 공고 카드에 LMIA/비자 스폰서십 배지 표시
+- [x] 배지 스타일 및 위치 최적화

@@ -22,6 +22,8 @@ interface JobListing {
   postedDate: string;
   category: string;
   isSaved?: boolean;
+  lmiaAvailable?: boolean;
+  visaSponsorshipAvailable?: boolean;
 }
 
 // 샘플 데이터
@@ -36,6 +38,8 @@ const sampleJobs: JobListing[] = [
     description: "Looking for experienced software engineer with 5+ years in backend development.",
     postedDate: "2 days ago",
     category: "IT Development & Data",
+    lmiaAvailable: true,
+    visaSponsorshipAvailable: true,
   },
   {
     id: 2,
@@ -47,6 +51,8 @@ const sampleJobs: JobListing[] = [
     description: "Seeking compassionate nurses for our emergency department.",
     postedDate: "1 day ago",
     category: "Healthcare",
+    lmiaAvailable: true,
+    visaSponsorshipAvailable: true,
   },
   {
     id: 3,
@@ -58,6 +64,8 @@ const sampleJobs: JobListing[] = [
     description: "Lead construction projects from conception to completion.",
     postedDate: "3 days ago",
     category: "Construction",
+    lmiaAvailable: false,
+    visaSponsorshipAvailable: true,
   },
   {
     id: 4,
@@ -69,6 +77,8 @@ const sampleJobs: JobListing[] = [
     description: "Create and execute marketing strategies for growing tech company.",
     postedDate: "1 day ago",
     category: "Marketing & Communications",
+    lmiaAvailable: false,
+    visaSponsorshipAvailable: false,
   },
   {
     id: 5,
@@ -80,6 +90,8 @@ const sampleJobs: JobListing[] = [
     description: "Join our team and learn from experienced electricians.",
     postedDate: "4 days ago",
     category: "Construction",
+    lmiaAvailable: true,
+    visaSponsorshipAvailable: true,
   },
   {
     id: 6,
@@ -91,6 +103,8 @@ const sampleJobs: JobListing[] = [
     description: "Analyze complex datasets and provide insights for business decisions.",
     postedDate: "2 days ago",
     category: "IT Development & Data",
+    lmiaAvailable: true,
+    visaSponsorshipAvailable: true,
   },
   {
     id: 7,
@@ -102,6 +116,8 @@ const sampleJobs: JobListing[] = [
     description: "Analyze financial data and provide strategic recommendations.",
     postedDate: "1 day ago",
     category: "Accounting & Finance",
+    lmiaAvailable: false,
+    visaSponsorshipAvailable: true,
   },
   {
     id: 8,
@@ -113,6 +129,8 @@ const sampleJobs: JobListing[] = [
     description: "Sell enterprise software solutions to corporate clients.",
     postedDate: "3 days ago",
     category: "Sales & Trading",
+    lmiaAvailable: false,
+    visaSponsorshipAvailable: true,
   },
   {
     id: 9,
@@ -124,6 +142,8 @@ const sampleJobs: JobListing[] = [
     description: "Coordinate educational programs and student services.",
     postedDate: "3 days ago",
     category: "Education",
+    lmiaAvailable: false,
+    visaSponsorshipAvailable: false,
   },
   {
     id: 10,
@@ -135,6 +155,8 @@ const sampleJobs: JobListing[] = [
     description: "Manage human resources and employee relations.",
     postedDate: "1 day ago",
     category: "HR & Training",
+    lmiaAvailable: true,
+    visaSponsorshipAvailable: true,
   },
   {
     id: 11,
@@ -146,6 +168,8 @@ const sampleJobs: JobListing[] = [
     description: "Oversee operations and optimize efficiency.",
     postedDate: "2 days ago",
     category: "Administration & Legal",
+    lmiaAvailable: false,
+    visaSponsorshipAvailable: true,
   },
 ];
 
@@ -475,7 +499,15 @@ export default function Home() {
                           </div>
                         </div>
 
-                        <Badge variant="secondary">{job.category}</Badge>
+                        <div className="flex flex-wrap gap-2">
+                          <Badge variant="secondary">{job.category}</Badge>
+                          {job.lmiaAvailable && (
+                            <Badge className="bg-green-100 text-green-800 hover:bg-green-100">LMIA Sponsorship Available</Badge>
+                          )}
+                          {job.visaSponsorshipAvailable && (
+                            <Badge className="bg-blue-100 text-blue-800 hover:bg-blue-100">Visa Sponsorship Available</Badge>
+                          )}
+                        </div>
                       </div>
 
                       <div className="flex flex-col gap-2 ml-4">
