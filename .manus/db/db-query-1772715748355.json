@@ -1,0 +1,52 @@
+{
+  "query": "SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'job_listings' ORDER BY ORDINAL_POSITION;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway03.us-east-1.prod.aws.tidbcloud.com --port 4000 --user fQwVepicp87dA79.root --database VZVQodcZ4m7Z3xWgpwxEsJ --execute SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'job_listings' ORDER BY ORDINAL_POSITION;",
+  "rows": [
+    {
+      "COLUMN_NAME": "id"
+    },
+    {
+      "COLUMN_NAME": "title"
+    },
+    {
+      "COLUMN_NAME": "company"
+    },
+    {
+      "COLUMN_NAME": "location"
+    },
+    {
+      "COLUMN_NAME": "salary"
+    },
+    {
+      "COLUMN_NAME": "job_type"
+    },
+    {
+      "COLUMN_NAME": "category"
+    },
+    {
+      "COLUMN_NAME": "description"
+    },
+    {
+      "COLUMN_NAME": "requirements"
+    },
+    {
+      "COLUMN_NAME": "posted_by"
+    },
+    {
+      "COLUMN_NAME": "is_active"
+    },
+    {
+      "COLUMN_NAME": "created_at"
+    },
+    {
+      "COLUMN_NAME": "updated_at"
+    },
+    {
+      "COLUMN_NAME": "status"
+    }
+  ],
+  "messages": [],
+  "stdout": "COLUMN_NAME\nid\ntitle\ncompany\nlocation\nsalary\njob_type\ncategory\ndescription\nrequirements\nposted_by\nis_active\ncreated_at\nupdated_at\nstatus\n",
+  "stderr": "",
+  "execution_time_ms": 351
+}
