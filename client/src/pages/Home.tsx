@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useAuth } from "@/_core/hooks/useAuth";
-import { useLocation } from "wouter";
+import { useLocation as useWouterLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -151,7 +151,7 @@ const sampleJobs: JobListing[] = [
 
 export default function Home() {
   const { user, loading, error, isAuthenticated, logout } = useAuth();
-  const [, navigate] = useLocation();
+  const [, navigate] = useWouterLocation();
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [selectedLocation, setSelectedLocation] = useState("all");
@@ -246,7 +246,7 @@ export default function Home() {
     const text = `Check out this job: ${jobTitle} at ${jobCompany}`;
     if (navigator.share) {
       navigator.share({
-        title: "CanadaJobs",
+        title: "LMIAJobsCanada",
         text: text,
         url: window.location.href,
       });
@@ -299,8 +299,8 @@ export default function Home() {
               setSelectedSalaryRange([]);
               navigate("/");
             }}>
-              <h1 className="text-2xl font-bold text-slate-900 hover:text-blue-600 transition-colors">CanadaJobs</h1>
-              <p className="text-sm text-slate-600">Find Your Perfect Job in Canada</p>
+              <h1 className="text-2xl font-bold text-slate-900 hover:text-blue-600 transition-colors">LMIAJobsCanada</h1>
+              <p className="text-sm text-slate-600">LMIA & Visa Sponsorship Jobs</p>
             </div>
             <div className="flex gap-3">
               {isAuthenticated ? (
@@ -323,9 +323,9 @@ export default function Home() {
       {/* 히어로 섹션 */}
       <section className="bg-gradient-to-r from-blue-600 to-blue-700 text-white py-12">
         <div className="container">
-          <h2 className="text-4xl font-bold mb-4">Find Your Next Opportunity</h2>
+          <h2 className="text-4xl font-bold mb-4">Find LMIA & Visa Sponsorship Jobs</h2>
           <p className="text-blue-100 mb-8 text-lg">
-            Browse thousands of job listings from top Canadian employers
+            Discover job opportunities in Canada with LMIA and visa sponsorship support
           </p>
 
           {/* 검색 바 */}

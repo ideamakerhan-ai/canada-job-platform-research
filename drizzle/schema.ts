@@ -25,26 +25,73 @@ export const users = mysqlTable("users", {
 export type User = typeof users.$inferSelect;
 export type InsertUser = typeof users.$inferInsert;
 
-// TODO: Add your tables here
+// NOC Occupations Table
+export const nocOccupations = mysqlTable("noc_occupations", {
+  id: int("id").autoincrement().primaryKey(),
+  title: varchar("title", { length: 255 }).notNull(),
+  nocCode: varchar("noc_code", { length: 10 }).notNull().unique(),
+  teerLevel: int("teer_level").notNull(),
+  description: text("description"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+export type NocOccupation = typeof nocOccupations.$inferSelect;
+export type InsertNocOccupation = typeof nocOccupations.$inferInsert;
+
+// Cities Table
+export const cities = mysqlTable("cities", {
+  id: int("id").autoincrement().primaryKey(),
+  name: varchar("name", { length: 100 }).notNull(),
+  province: varchar("province", { length: 50 }).notNull(),
+  slug: varchar("slug", { length: 100 }).notNull().unique(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+export type City = typeof cities.$inferSelect;
+export type InsertCity = typeof cities.$inferInsert;
+
 // Job Listings Table
 export const jobListings = mysqlTable("job_listings", {
   id: int("id").autoincrement().primaryKey(),
   title: varchar("title", { length: 255 }).notNull(),
   company: varchar("company", { length: 255 }).notNull(),
-  location: varchar("location", { length: 255 }).notNull(),
+  city: varchar("city", { length: 100 }).notNull(),
+  province: varchar("province", { length: 50 }).notNull(),
   salary: varchar("salary", { length: 255 }),
   jobType: varchar("job_type", { length: 50 }).notNull(),
   category: varchar("category", { length: 100 }).notNull(),
   description: text("description").notNull(),
   requirements: text("requirements"),
+  nocCode: varchar("noc_code", { length: 10 }),
+  teerLevel: int("teer_level"),
+  lmiaAvailable: int("lmia_available").default(0).notNull(),
+  visaSponsorship: int("visa_sponsorship").default(0).notNull(),
+  applicationMethod: varchar("application_method", { length: 50 }).notNull(),
+  applicationEmail: varchar("application_email", { length: 320 }),
+  applicationLink: varchar("application_link", { length: 500 }),
   postedBy: int("posted_by").notNull(),
-  isActive: int("is_active").default(1).notNull(),
+  status: varchar("status", { length: 50 }).default("active").notNull(),
+  expiresAt: timestamp("expires_at"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().onUpdateNow().notNull(),
 });
 
 export type JobListing = typeof jobListings.$inferSelect;
 export type InsertJobListing = typeof jobListings.$inferInsert;
+
+// Job Reports Table (Scam Prevention)
+export const jobReports = mysqlTable("job_reports", {
+  id: int("id").autoincrement().primaryKey(),
+  jobId: int("job_id").notNull(),
+  userId: int("user_id"),
+  reason: varchar("reason", { length: 100 }).notNull(),
+  description: text("description"),
+  status: varchar("status", { length: 50 }).default("pending").notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+export type JobReport = typeof jobReports.$inferSelect;
+export type InsertJobReport = typeof jobReports.$inferInsert;
 
 // Saved Jobs Table
 export const savedJobs = mysqlTable("saved_jobs", {

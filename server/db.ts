@@ -106,14 +106,14 @@ export async function getJobListings(filters?: {
   const db = await getDb();
   if (!db) return [];
 
-  const conditions = [eq(jobListings.isActive, 1)];
+  const conditions = [eq(jobListings.status, "active")];
 
   if (filters?.category && filters.category !== "all") {
     conditions.push(eq(jobListings.category, filters.category));
   }
 
   if (filters?.location && filters.location !== "all") {
-    conditions.push(eq(jobListings.location, filters.location));
+    conditions.push(eq(jobListings.city, filters.location));
   }
 
   return await db
