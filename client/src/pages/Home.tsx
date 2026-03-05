@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useAuth } from "@/_core/hooks/useAuth";
+import { useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -9,7 +10,6 @@ import { MapPin, Briefcase, DollarSign, Clock, Heart, Share2, Search, CheckCircl
 import { getLoginUrl } from "@/const";
 import { trpc } from "@/lib/trpc";
 import { toast } from "sonner";
-import { useLocation } from "wouter";
 
 interface JobListing {
   id: number;
@@ -330,8 +330,8 @@ export default function Home() {
 
           {/* 검색 바 */}
           <div className="bg-white rounded-lg p-6 shadow-lg">
-            <div className="grid grid-cols-1 md:grid-cols-12 gap-4">
-              <div className="md:col-span-4">
+            <div className="grid grid-cols-1 md:grid-cols-12 gap-3">
+              <div className="md:col-span-6">
                 <Input
                   placeholder="Job title or company..."
                   value={searchTerm}
@@ -339,7 +339,7 @@ export default function Home() {
                   className="w-full text-base text-slate-900 placeholder:text-slate-400 border-2 border-slate-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
                 />
               </div>
-              <div className="md:col-span-4">
+              <div className="md:col-span-3">
                 <Select value={selectedCategory} onValueChange={setSelectedCategory}>
                   <SelectTrigger className="flex items-center gap-2 text-slate-900">
                     <span className="text-slate-900">{selectedCategory === "all" ? "All Categories" : selectedCategory}</span>
@@ -353,7 +353,7 @@ export default function Home() {
                 </SelectContent>
                 </Select>
               </div>
-              <div className="md:col-span-4">
+              <div className="md:col-span-3">
                 <Select value={selectedLocation} onValueChange={setSelectedLocation}>
                   <SelectTrigger className="flex items-center gap-2 text-slate-900">
                     <span className="text-slate-900">{selectedLocation === "all" ? "All Locations" : selectedLocation}</span>
@@ -516,7 +516,7 @@ export default function Home() {
             <div>
               <h4 className="font-semibold text-white mb-4">For Employers</h4>
               <ul className="space-y-2 text-sm">
-                <li><button onClick={() => toast.info("Post a Job feature coming soon!")} className="hover:text-white cursor-pointer">Post a Job</button></li>
+                <li><button onClick={() => navigate("/post-job")} className="hover:text-white cursor-pointer">Post a Job</button></li>
                 <li><button onClick={() => toast.info("Pricing information coming soon!")} className="hover:text-white cursor-pointer">Pricing</button></li>
                 <li><button onClick={() => toast.info("Company Page feature coming soon!")} className="hover:text-white cursor-pointer">Company Page</button></li>
               </ul>
