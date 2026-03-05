@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState, useEffect } from "react";
 import { useAuth } from "@/_core/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -9,6 +9,7 @@ import { MapPin, Briefcase, DollarSign, Clock, Heart, Share2, Search, CheckCircl
 import { getLoginUrl } from "@/const";
 import { trpc } from "@/lib/trpc";
 import { toast } from "sonner";
+import { useLocation } from "wouter";
 
 interface JobListing {
   id: number;
@@ -94,7 +95,8 @@ const sampleJobs: JobListing[] = [
 ];
 
 export default function Home() {
-  const { user, isAuthenticated } = useAuth();
+  const { user, loading, error, isAuthenticated, logout } = useAuth();
+  const [, navigate] = useLocation();
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [selectedLocation, setSelectedLocation] = useState("all");
@@ -151,15 +153,16 @@ export default function Home() {
     setFilteredJobs(filtered);
   }, [searchTerm, selectedCategory, selectedLocation, selectedJobType, selectedSalaryRange]);
 
-  const toggleSaveJob = (jobId: number) => {
+  const handleSaveJob = (jobId: number) => {
     setSavedJobs((prev) => {
-      const newSaved = prev.includes(jobId) ? prev.filter((id) => id !== jobId) : [...prev, jobId];
-      if (newSaved.includes(jobId)) {
-        toast.success("Job saved!");
+      if (prev.includes(jobId)) {
+        toast.success("Job removed from saved");
+        return prev.filter((id) => id !== jobId);
       } else {
-        toast.info("Job removed from saved");
+        toast.success("Job saved!");
+        return [...prev, jobId];
       }
-      return newSaved;
+
     });
   };
 
@@ -223,7 +226,7 @@ export default function Home() {
               {isAuthenticated ? (
                 <div className="flex items-center gap-3">
                   <span className="text-sm text-slate-700">Welcome, {user?.name || "User"}</span>
-                  <Button variant="outline" size="sm">
+                  <Button variant="outline" size="sm" onClick={() => navigate("/profile")}>
                     Profile
                   </Button>
                 </div>
@@ -249,19 +252,16 @@ export default function Home() {
           <div className="bg-white rounded-lg p-6 shadow-lg">
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
               <div className="md:col-span-2">
-                <div className="relative">
-                  <Search className="absolute left-3 top-3.5 w-4 h-4 text-slate-400" />
-                  <Input
-                    placeholder="Job title or company..."
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    className="h-12 pl-10"
-                  />
-                </div>
+                <Input
+                  placeholder="Job title or company..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="w-full"
+                />
               </div>
               <Select value={selectedCategory} onValueChange={setSelectedCategory}>
-                <SelectTrigger className="h-12">
-                  <SelectValue placeholder="Category" />
+                <SelectTrigger>
+                  <SelectValue placeholder="All Categories" />
                 </SelectTrigger>
                 <SelectContent>
                   {categories.map((cat) => (
@@ -272,8 +272,8 @@ export default function Home() {
                 </SelectContent>
               </Select>
               <Select value={selectedLocation} onValueChange={setSelectedLocation}>
-                <SelectTrigger className="h-12">
-                  <SelectValue placeholder="Location" />
+                <SelectTrigger>
+                  <SelectValue placeholder="All Locations" />
                 </SelectTrigger>
                 <SelectContent>
                   {locations.map((loc) => (
@@ -290,74 +290,96 @@ export default function Home() {
 
       {/* 메인 콘텐츠 */}
       <main className="container py-12">
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
           {/* 사이드바 - 필터 */}
-          <div className="lg:col-span-1">
-            <Card className="border-slate-200 shadow-md sticky top-24">
+          <aside className="lg:col-span-1">
+            <Card>
               <CardHeader>
-                <CardTitle className="text-lg">Filters</CardTitle>
+                <CardTitle>Filters</CardTitle>
               </CardHeader>
-              <CardContent className="space-y-4">
+              <CardContent className="space-y-6">
+                {/* 직종 필터 */}
                 <div>
-                  <label className="text-sm font-medium text-slate-700 mb-2 block">Job Type</label>
+                  <h3 className="font-semibold text-slate-900 mb-3">Job Type</h3>
                   <div className="space-y-2">
                     {["Full-time", "Part-time", "Contract"].map((type) => (
                       <label key={type} className="flex items-center gap-2 cursor-pointer">
                         <input
                           type="checkbox"
-                          className="rounded"
                           checked={selectedJobType.includes(type)}
                           onChange={() => toggleJobType(type)}
+                          className="w-4 h-4"
                         />
-                        <span className="text-sm text-slate-600">{type}</span>
+                        <span className="text-sm text-slate-700">{type}</span>
                       </label>
                     ))}
                   </div>
                 </div>
+
+                {/* 급여 범위 필터 */}
                 <div>
-                  <label className="text-sm font-medium text-slate-700 mb-2 block">Salary Range</label>
+                  <h3 className="font-semibold text-slate-900 mb-3">Salary Range</h3>
                   <div className="space-y-2">
                     {["$0 - $50K", "$50K - $100K", "$100K+"].map((range) => (
                       <label key={range} className="flex items-center gap-2 cursor-pointer">
                         <input
                           type="checkbox"
-                          className="rounded"
                           checked={selectedSalaryRange.includes(range)}
                           onChange={() => toggleSalaryRange(range)}
+                          className="w-4 h-4"
                         />
-                        <span className="text-sm text-slate-600">{range}</span>
+                        <span className="text-sm text-slate-700">{range}</span>
                       </label>
                     ))}
                   </div>
                 </div>
               </CardContent>
             </Card>
-          </div>
+          </aside>
 
           {/* 메인 - 공고 리스트 */}
           <div className="lg:col-span-3">
-            <div className="mb-4 flex items-center justify-between">
-              <p className="text-slate-600">
-                Showing <span className="font-semibold">{filteredJobs.length}</span> jobs
-              </p>
+            <div className="mb-6">
+              <p className="text-slate-600">Showing {filteredJobs.length} jobs</p>
             </div>
 
             <div className="space-y-4">
-              {filteredJobs.length > 0 ? (
-                filteredJobs.map((job) => (
-                  <Card
-                    key={job.id}
-                    className="border-slate-200 shadow-md hover:shadow-lg transition-shadow"
-                  >
-                    <CardContent className="p-6">
-                      <div className="flex items-start justify-between mb-4">
-                        <div className="flex-1">
-                          <h3 className="text-xl font-bold text-slate-900 mb-1">{job.title}</h3>
-                          <p className="text-slate-600 font-medium">{job.company}</p>
+              {filteredJobs.map((job) => (
+                <Card key={job.id} className="hover:shadow-lg transition-shadow">
+                  <CardContent className="p-6">
+                    <div className="flex items-start justify-between">
+                      <div className="flex-1">
+                        <h3 className="text-xl font-semibold text-slate-900 mb-1">{job.title}</h3>
+                        <p className="text-slate-600 mb-3">{job.company}</p>
+                        <p className="text-slate-700 text-sm mb-4">{job.description}</p>
+
+                        <div className="flex flex-wrap gap-4 mb-4 text-sm text-slate-600">
+                          <div className="flex items-center gap-1">
+                            <MapPin className="w-4 h-4" />
+                            {job.location}
+                          </div>
+                          <div className="flex items-center gap-1">
+                            <DollarSign className="w-4 h-4" />
+                            {job.salary}
+                          </div>
+                          <div className="flex items-center gap-1">
+                            <Briefcase className="w-4 h-4" />
+                            {job.jobType}
+                          </div>
+                          <div className="flex items-center gap-1">
+                            <Clock className="w-4 h-4" />
+                            {job.postedDate}
+                          </div>
                         </div>
-                        <button
-                          onClick={() => toggleSaveJob(job.id)}
-                          className="p-2 hover:bg-slate-100 rounded-lg transition"
+
+                        <Badge variant="secondary">{job.category}</Badge>
+                      </div>
+
+                      <div className="flex flex-col gap-2 ml-4">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => handleSaveJob(job.id)}
                           title="Save job"
                         >
                           <Heart
@@ -367,100 +389,66 @@ export default function Home() {
                                 : "text-slate-400"
                             }`}
                           />
-                        </button>
-                      </div>
-
-                      <p className="text-slate-700 mb-4">{job.description}</p>
-
-                      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
-                        <div className="flex items-center gap-2 text-slate-600">
-                          <MapPin className="w-4 h-4 text-blue-600" />
-                          <span className="text-sm">{job.location}</span>
-                        </div>
-                        <div className="flex items-center gap-2 text-slate-600">
-                          <DollarSign className="w-4 h-4 text-green-600" />
-                          <span className="text-sm">{job.salary}</span>
-                        </div>
-                        <div className="flex items-center gap-2 text-slate-600">
-                          <Briefcase className="w-4 h-4 text-purple-600" />
-                          <span className="text-sm">{job.jobType}</span>
-                        </div>
-                        <div className="flex items-center gap-2 text-slate-600">
-                          <Clock className="w-4 h-4 text-amber-600" />
-                          <span className="text-sm">{job.postedDate}</span>
-                        </div>
-                      </div>
-
-                      <div className="flex items-center justify-between">
-                        <Badge variant="secondary">{job.category}</Badge>
-                        <div className="flex gap-2">
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            className="gap-2"
-                            onClick={() => handleShareJob(job.title, job.company)}
-                          >
-                            <Share2 className="w-4 h-4" />
-                            Share
-                          </Button>
+                        </Button>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => handleShareJob(job.title, job.company)}
+                        >
+                          <Share2 className="w-4 h-4" />
+                          Share
+                        </Button>
+                        <Button
+                          size="sm"
+                          onClick={() => handleApplyJob(job.id, job.title)}
+                          disabled={appliedJobs.includes(job.id)}
+                        >
                           {appliedJobs.includes(job.id) ? (
-                            <Button size="sm" disabled className="gap-2">
-                              <CheckCircle className="w-4 h-4" />
+                            <>
+                              <CheckCircle className="w-4 h-4 mr-1" />
                               Applied
-                            </Button>
+                            </>
                           ) : (
-                            <Button
-                              size="sm"
-                              onClick={() => handleApplyJob(job.id, job.title)}
-                            >
-                              Apply Now
-                            </Button>
+                            "Apply Now"
                           )}
-                        </div>
+                        </Button>
                       </div>
-                    </CardContent>
-                  </Card>
-                ))
-              ) : (
-                <Card className="border-slate-200 shadow-md">
-                  <CardContent className="p-12 text-center">
-                    <p className="text-slate-600 text-lg">No jobs found matching your criteria.</p>
-                    <p className="text-slate-500 text-sm mt-2">Try adjusting your search filters.</p>
+                    </div>
                   </CardContent>
                 </Card>
-              )}
+              ))}
             </div>
           </div>
         </div>
       </main>
 
       {/* 푸터 */}
-      <footer className="bg-slate-900 text-slate-300 mt-16 py-8">
+      <footer className="bg-slate-900 text-slate-300 py-12 mt-16">
         <div className="container">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
             <div>
-              <h4 className="font-bold text-white mb-4">About CanadaJobs</h4>
+              <h4 className="font-semibold text-white mb-4">About CanadaJobs</h4>
               <p className="text-sm">Your trusted platform for finding jobs across Canada.</p>
             </div>
             <div>
-              <h4 className="font-bold text-white mb-4">For Employers</h4>
-              <ul className="text-sm space-y-2">
+              <h4 className="font-semibold text-white mb-4">For Employers</h4>
+              <ul className="space-y-2 text-sm">
                 <li><a href="#" className="hover:text-white">Post a Job</a></li>
                 <li><a href="#" className="hover:text-white">Pricing</a></li>
                 <li><a href="#" className="hover:text-white">Company Page</a></li>
               </ul>
             </div>
             <div>
-              <h4 className="font-bold text-white mb-4">For Job Seekers</h4>
-              <ul className="text-sm space-y-2">
+              <h4 className="font-semibold text-white mb-4">For Job Seekers</h4>
+              <ul className="space-y-2 text-sm">
                 <li><a href="#" className="hover:text-white">Browse Jobs</a></li>
                 <li><a href="#" className="hover:text-white">Career Advice</a></li>
                 <li><a href="#" className="hover:text-white">Salary Guide</a></li>
               </ul>
             </div>
             <div>
-              <h4 className="font-bold text-white mb-4">Contact</h4>
-              <ul className="text-sm space-y-2">
+              <h4 className="font-semibold text-white mb-4">Company</h4>
+              <ul className="space-y-2 text-sm">
                 <li><a href="#" className="hover:text-white">Help Center</a></li>
                 <li><a href="#" className="hover:text-white">Contact Us</a></li>
                 <li><a href="#" className="hover:text-white">Privacy Policy</a></li>
