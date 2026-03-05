@@ -1,4 +1,4 @@
-import { eq } from "drizzle-orm";
+import { eq, and } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
 import { InsertUser, users, jobListings, savedJobs, jobApplications, InsertJobListing } from "../drizzle/schema";
 import { ENV } from './_core/env';
@@ -119,7 +119,7 @@ export async function getJobListings(filters?: {
   return await db
     .select()
     .from(jobListings)
-    .where(conditions.length > 1 ? conditions[0] : conditions[0])
+    .where(conditions.length > 1 ? and(...conditions) : conditions[0])
     .limit(50);
 }
 
