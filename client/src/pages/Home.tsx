@@ -330,8 +330,8 @@ export default function Home() {
 
           {/* 검색 바 */}
           <div className="bg-white rounded-lg p-6 shadow-lg">
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-              <div className="md:col-span-2">
+            <div className="grid grid-cols-1 md:grid-cols-12 gap-4">
+              <div className="md:col-span-4">
                 <Input
                   placeholder="Job title or company..."
                   value={searchTerm}
@@ -339,10 +339,12 @@ export default function Home() {
                   className="w-full text-base text-slate-900 placeholder:text-slate-400 border-2 border-slate-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
                 />
               </div>
-              <Select value={selectedCategory} onValueChange={setSelectedCategory}>
-                <SelectTrigger>
-                  <SelectValue placeholder="All Categories" />
-                </SelectTrigger>
+              <div className="md:col-span-4">
+                <label className="text-sm font-medium text-slate-700 mb-2 block">Category</label>
+                <Select value={selectedCategory} onValueChange={setSelectedCategory}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="All Categories" />
+                  </SelectTrigger>
                 <SelectContent>
                   {categories.map((cat) => (
                     <SelectItem key={cat} value={cat}>
@@ -350,11 +352,14 @@ export default function Home() {
                     </SelectItem>
                   ))}
                 </SelectContent>
-              </Select>
-              <Select value={selectedLocation} onValueChange={setSelectedLocation}>
-                <SelectTrigger>
-                  <SelectValue placeholder="All Locations" />
-                </SelectTrigger>
+                </Select>
+              </div>
+              <div className="md:col-span-4">
+                <label className="text-sm font-medium text-slate-700 mb-2 block">Location</label>
+                <Select value={selectedLocation} onValueChange={setSelectedLocation}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="All Locations" />
+                  </SelectTrigger>
                 <SelectContent>
                   {locations.map((loc) => (
                     <SelectItem key={loc} value={loc}>
@@ -362,7 +367,8 @@ export default function Home() {
                     </SelectItem>
                   ))}
                 </SelectContent>
-              </Select>
+                </Select>
+              </div>
             </div>
           </div>
         </div>
