@@ -336,7 +336,7 @@ export default function Home() {
                   placeholder="Job title or company..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="w-full"
+                  className="w-full text-base text-slate-900 placeholder:text-slate-400 border-2 border-slate-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
                 />
               </div>
               <Select value={selectedCategory} onValueChange={setSelectedCategory}>
