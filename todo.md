@@ -36,3 +36,8 @@
 - [x] 시급/연봉 입력 필드 추가 (숫자만 입력 가능)
 - [x] 경력 요구사항 선택 기능 추가
 - [x] 폼 유효성 검사 및 필수 필드 설정
+
+## Phase 7: Accommodation (숭박) 옵션 추가
+- [x] Post a Job 폼에 Accommodation 체크박스 추가
+- [x] 샘플 데이터에 Accommodation 정보 추가
+- [x] 공고 카드에 Accommodation 배지 표시

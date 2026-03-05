@@ -52,6 +52,13 @@ const experienceOptions = [
   "10+ years",
 ];
 
+const accommodationOptions = [
+  "No accommodation",
+  "Accommodation provided",
+  "Partial accommodation",
+  "Relocation assistance",
+];
+
 export default function PostJob() {
   const [, setLocation] = useLocation();
   const [formData, setFormData] = useState({
@@ -67,6 +74,7 @@ export default function PostJob() {
     lmiaSponsorship: false,
     visaSponsorship: false,
     experienceRequired: "",
+    accommodation: "",
   });
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -112,6 +120,11 @@ export default function PostJob() {
       return;
     }
 
+    if (!formData.accommodation) {
+      toast.error("Please select accommodation option");
+      return;
+    }
+
     console.log("Job posting:", formData);
     toast.success("Job posted successfully!");
 
@@ -128,6 +141,7 @@ export default function PostJob() {
       lmiaSponsorship: false,
       visaSponsorship: false,
       experienceRequired: "",
+      accommodation: "",
     });
 
     setTimeout(() => setLocation("/"), 2000);
@@ -290,6 +304,22 @@ export default function PostJob() {
                     {experienceOptions.map((exp) => (
                       <SelectItem key={exp} value={exp}>
                         {exp}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-2">Accommodation *</label>
+                <Select value={formData.accommodation} onValueChange={(value) => handleSelectChange("accommodation", value)}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select accommodation option" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {accommodationOptions.map((acc) => (
+                      <SelectItem key={acc} value={acc}>
+                        {acc}
                       </SelectItem>
                     ))}
                   </SelectContent>

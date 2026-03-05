@@ -24,6 +24,7 @@ interface JobListing {
   isSaved?: boolean;
   lmiaAvailable?: boolean;
   visaSponsorshipAvailable?: boolean;
+  accommodation?: string;
 }
 
 // 샘플 데이터
@@ -40,6 +41,7 @@ const sampleJobs: JobListing[] = [
     category: "IT Development & Data",
     lmiaAvailable: true,
     visaSponsorshipAvailable: true,
+    accommodation: "Accommodation provided",
   },
   {
     id: 2,
@@ -53,6 +55,7 @@ const sampleJobs: JobListing[] = [
     category: "Healthcare",
     lmiaAvailable: true,
     visaSponsorshipAvailable: true,
+    accommodation: "Relocation assistance",
   },
   {
     id: 3,
@@ -66,6 +69,7 @@ const sampleJobs: JobListing[] = [
     category: "Construction",
     lmiaAvailable: false,
     visaSponsorshipAvailable: true,
+    accommodation: "Partial accommodation",
   },
   {
     id: 4,
@@ -79,6 +83,7 @@ const sampleJobs: JobListing[] = [
     category: "Marketing & Communications",
     lmiaAvailable: false,
     visaSponsorshipAvailable: false,
+    accommodation: "No accommodation",
   },
   {
     id: 5,
@@ -92,6 +97,7 @@ const sampleJobs: JobListing[] = [
     category: "Construction",
     lmiaAvailable: true,
     visaSponsorshipAvailable: true,
+    accommodation: "Accommodation provided",
   },
   {
     id: 6,
@@ -105,6 +111,7 @@ const sampleJobs: JobListing[] = [
     category: "IT Development & Data",
     lmiaAvailable: true,
     visaSponsorshipAvailable: true,
+    accommodation: "No accommodation",
   },
   {
     id: 7,
@@ -118,6 +125,7 @@ const sampleJobs: JobListing[] = [
     category: "Accounting & Finance",
     lmiaAvailable: false,
     visaSponsorshipAvailable: true,
+    accommodation: "Partial accommodation",
   },
   {
     id: 8,
@@ -131,6 +139,7 @@ const sampleJobs: JobListing[] = [
     category: "Sales & Trading",
     lmiaAvailable: false,
     visaSponsorshipAvailable: true,
+    accommodation: "Relocation assistance",
   },
   {
     id: 9,
@@ -144,6 +153,7 @@ const sampleJobs: JobListing[] = [
     category: "Education",
     lmiaAvailable: false,
     visaSponsorshipAvailable: false,
+    accommodation: "No accommodation",
   },
   {
     id: 10,
@@ -157,6 +167,7 @@ const sampleJobs: JobListing[] = [
     category: "HR & Training",
     lmiaAvailable: true,
     visaSponsorshipAvailable: true,
+    accommodation: "Accommodation provided",
   },
   {
     id: 11,
@@ -170,6 +181,7 @@ const sampleJobs: JobListing[] = [
     category: "Administration & Legal",
     lmiaAvailable: false,
     visaSponsorshipAvailable: true,
+    accommodation: "Partial accommodation",
   },
 ];
 
@@ -506,6 +518,9 @@ export default function Home() {
                           )}
                           {job.visaSponsorshipAvailable && (
                             <Badge className="bg-blue-100 text-blue-800 hover:bg-blue-100">Visa Sponsorship Available</Badge>
+                          )}
+                          {job.accommodation && (
+                            <Badge className="bg-purple-100 text-purple-800 hover:bg-purple-100">{job.accommodation}</Badge>
                           )}
                         </div>
                       </div>
