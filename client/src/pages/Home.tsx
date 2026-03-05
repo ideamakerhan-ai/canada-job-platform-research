@@ -5,9 +5,10 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
-import { MapPin, Briefcase, DollarSign, Clock, Heart, Share2, Search } from "lucide-react";
+import { MapPin, Briefcase, DollarSign, Clock, Heart, Share2, Search, CheckCircle } from "lucide-react";
 import { getLoginUrl } from "@/const";
 import { trpc } from "@/lib/trpc";
+import { toast } from "sonner";
 
 interface JobListing {
   id: number;
@@ -97,13 +98,18 @@ export default function Home() {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [selectedLocation, setSelectedLocation] = useState("all");
+  const [selectedJobType, setSelectedJobType] = useState<string[]>([]);
+  const [selectedSalaryRange, setSelectedSalaryRange] = useState<string[]>([]);
   const [filteredJobs, setFilteredJobs] = useState<JobListing[]>(sampleJobs);
   const [savedJobs, setSavedJobs] = useState<number[]>([]);
+  const [appliedJobs, setAppliedJobs] = useState<number[]>([]);
 
+  // 필터 업데이트 함수
   useEffect(() => {
     let filtered = sampleJobs;
 
-    if (searchTerm) {
+    // 검색어 필터링
+    if (searchTerm.trim()) {
       filtered = filtered.filter(
         (job) =>
           job.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -111,20 +117,92 @@ export default function Home() {
       );
     }
 
+    // 카테고리 필터링
     if (selectedCategory !== "all") {
       filtered = filtered.filter((job) => job.category === selectedCategory);
     }
 
+    // 위치 필터링
     if (selectedLocation !== "all") {
       filtered = filtered.filter((job) => job.location.includes(selectedLocation));
     }
 
+    // 직종 필터링
+    if (selectedJobType.length > 0) {
+      filtered = filtered.filter((job) => selectedJobType.includes(job.jobType));
+    }
+
+    // 급여 범위 필터링
+    if (selectedSalaryRange.length > 0) {
+      filtered = filtered.filter((job) => {
+        const salaryStr = job.salary.replace(/[$,]/g, "");
+        const [minStr] = salaryStr.split("-");
+        const minSalary = parseInt(minStr.trim());
+
+        return selectedSalaryRange.some((range) => {
+          if (range === "$0 - $50K") return minSalary <= 50000;
+          if (range === "$50K - $100K") return minSalary >= 50000 && minSalary <= 100000;
+          if (range === "$100K+") return minSalary >= 100000;
+          return false;
+        });
+      });
+    }
+
     setFilteredJobs(filtered);
-  }, [searchTerm, selectedCategory, selectedLocation]);
+  }, [searchTerm, selectedCategory, selectedLocation, selectedJobType, selectedSalaryRange]);
 
   const toggleSaveJob = (jobId: number) => {
-    setSavedJobs((prev) =>
-      prev.includes(jobId) ? prev.filter((id) => id !== jobId) : [...prev, jobId]
+    setSavedJobs((prev) => {
+      const newSaved = prev.includes(jobId) ? prev.filter((id) => id !== jobId) : [...prev, jobId];
+      if (newSaved.includes(jobId)) {
+        toast.success("Job saved!");
+      } else {
+        toast.info("Job removed from saved");
+      }
+      return newSaved;
+    });
+  };
+
+  const handleApplyJob = (jobId: number, jobTitle: string) => {
+    if (!isAuthenticated) {
+      toast.error("Please log in to apply for jobs");
+      window.location.href = getLoginUrl();
+      return;
+    }
+
+    setAppliedJobs((prev) => {
+      if (!prev.includes(jobId)) {
+        toast.success(`Applied for ${jobTitle}!`);
+        return [...prev, jobId];
+      }
+      return prev;
+    });
+  };
+
+  const handleShareJob = (jobTitle: string, jobCompany: string) => {
+    const text = `Check out this job: ${jobTitle} at ${jobCompany}`;
+    if (navigator.share) {
+      navigator.share({
+        title: "CanadaJobs",
+        text: text,
+        url: window.location.href,
+      });
+    } else {
+      // Fallback: copy to clipboard
+      navigator.clipboard.writeText(text);
+      toast.success("Job link copied to clipboard!");
+    }
+  };
+
+  const toggleJobType = (type: string) => {
+    setSelectedJobType((prev) =>
+      prev.includes(type) ? prev.filter((t) => t !== type) : [...prev, type]
+    );
+  };
+
+  const toggleSalaryRange = (range: string) => {
+    setSelectedSalaryRange((prev) =>
+      prev.includes(range) ? prev.filter((r) => r !== range) : [...prev, range]
     );
   };
 
@@ -225,7 +303,12 @@ export default function Home() {
                   <div className="space-y-2">
                     {["Full-time", "Part-time", "Contract"].map((type) => (
                       <label key={type} className="flex items-center gap-2 cursor-pointer">
-                        <input type="checkbox" className="rounded" />
+                        <input
+                          type="checkbox"
+                          className="rounded"
+                          checked={selectedJobType.includes(type)}
+                          onChange={() => toggleJobType(type)}
+                        />
                         <span className="text-sm text-slate-600">{type}</span>
                       </label>
                     ))}
@@ -236,7 +319,12 @@ export default function Home() {
                   <div className="space-y-2">
                     {["$0 - $50K", "$50K - $100K", "$100K+"].map((range) => (
                       <label key={range} className="flex items-center gap-2 cursor-pointer">
-                        <input type="checkbox" className="rounded" />
+                        <input
+                          type="checkbox"
+                          className="rounded"
+                          checked={selectedSalaryRange.includes(range)}
+                          onChange={() => toggleSalaryRange(range)}
+                        />
                         <span className="text-sm text-slate-600">{range}</span>
                       </label>
                     ))}
@@ -259,7 +347,7 @@ export default function Home() {
                 filteredJobs.map((job) => (
                   <Card
                     key={job.id}
-                    className="border-slate-200 shadow-md hover:shadow-lg transition-shadow cursor-pointer"
+                    className="border-slate-200 shadow-md hover:shadow-lg transition-shadow"
                   >
                     <CardContent className="p-6">
                       <div className="flex items-start justify-between mb-4">
@@ -270,6 +358,7 @@ export default function Home() {
                         <button
                           onClick={() => toggleSaveJob(job.id)}
                           className="p-2 hover:bg-slate-100 rounded-lg transition"
+                          title="Save job"
                         >
                           <Heart
                             className={`w-5 h-5 ${
@@ -305,11 +394,28 @@ export default function Home() {
                       <div className="flex items-center justify-between">
                         <Badge variant="secondary">{job.category}</Badge>
                         <div className="flex gap-2">
-                          <Button variant="outline" size="sm" className="gap-2">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            className="gap-2"
+                            onClick={() => handleShareJob(job.title, job.company)}
+                          >
                             <Share2 className="w-4 h-4" />
                             Share
                           </Button>
-                          <Button size="sm">Apply Now</Button>
+                          {appliedJobs.includes(job.id) ? (
+                            <Button size="sm" disabled className="gap-2">
+                              <CheckCircle className="w-4 h-4" />
+                              Applied
+                            </Button>
+                          ) : (
+                            <Button
+                              size="sm"
+                              onClick={() => handleApplyJob(job.id, job.title)}
+                            >
+                              Apply Now
+                            </Button>
+                          )}
                         </div>
                       </div>
                     </CardContent>
