@@ -126,7 +126,12 @@ export default function Home() {
 
     // 위치 필터링
     if (selectedLocation !== "all") {
-      filtered = filtered.filter((job) => job.location.includes(selectedLocation));
+      filtered = filtered.filter((job) => {
+        if (selectedLocation === "Remote") {
+          return job.location === "Remote";
+        }
+        return job.location.includes(selectedLocation.split(",")[0]);
+      });
     }
 
     // 직종 필터링
@@ -210,7 +215,20 @@ export default function Home() {
   };
 
   const categories = ["all", ...Array.from(new Set(sampleJobs.map((job) => job.category)))];
-  const locations = ["all", "Toronto", "Vancouver", "Calgary", "Montreal", "Edmonton", "Remote"];
+  const locations = [
+    "all",
+    "Toronto, ON",
+    "Vancouver, BC",
+    "Calgary, AB",
+    "Montreal, QC",
+    "Edmonton, AB",
+    "Ottawa, ON",
+    "Winnipeg, MB",
+    "Halifax, NS",
+    "Quebec City, QC",
+    "Victoria, BC",
+    "Remote",
+  ];
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100">
@@ -218,8 +236,8 @@ export default function Home() {
       <header className="bg-white border-b border-slate-200 sticky top-0 z-50 shadow-sm">
         <div className="container py-4">
           <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-2xl font-bold text-slate-900">CanadaJobs</h1>
+            <div className="cursor-pointer" onClick={() => navigate("/")}>
+              <h1 className="text-2xl font-bold text-slate-900 hover:text-blue-600 transition-colors">CanadaJobs</h1>
               <p className="text-sm text-slate-600">Find Your Perfect Job in Canada</p>
             </div>
             <div className="flex gap-3">
@@ -433,25 +451,25 @@ export default function Home() {
             <div>
               <h4 className="font-semibold text-white mb-4">For Employers</h4>
               <ul className="space-y-2 text-sm">
-                <li><a href="#" className="hover:text-white">Post a Job</a></li>
-                <li><a href="#" className="hover:text-white">Pricing</a></li>
-                <li><a href="#" className="hover:text-white">Company Page</a></li>
+                <li><button onClick={() => toast.info("Post a Job feature coming soon!")} className="hover:text-white cursor-pointer">Post a Job</button></li>
+                <li><button onClick={() => toast.info("Pricing information coming soon!")} className="hover:text-white cursor-pointer">Pricing</button></li>
+                <li><button onClick={() => toast.info("Company Page feature coming soon!")} className="hover:text-white cursor-pointer">Company Page</button></li>
               </ul>
             </div>
             <div>
               <h4 className="font-semibold text-white mb-4">For Job Seekers</h4>
               <ul className="space-y-2 text-sm">
-                <li><a href="#" className="hover:text-white">Browse Jobs</a></li>
-                <li><a href="#" className="hover:text-white">Career Advice</a></li>
-                <li><a href="#" className="hover:text-white">Salary Guide</a></li>
+                <li><button onClick={() => window.scrollTo(0, 0)} className="hover:text-white cursor-pointer">Browse Jobs</button></li>
+                <li><button onClick={() => toast.info("Career Advice section coming soon!")} className="hover:text-white cursor-pointer">Career Advice</button></li>
+                <li><button onClick={() => toast.info("Salary Guide coming soon!")} className="hover:text-white cursor-pointer">Salary Guide</button></li>
               </ul>
             </div>
             <div>
               <h4 className="font-semibold text-white mb-4">Company</h4>
               <ul className="space-y-2 text-sm">
-                <li><a href="#" className="hover:text-white">Help Center</a></li>
-                <li><a href="#" className="hover:text-white">Contact Us</a></li>
-                <li><a href="#" className="hover:text-white">Privacy Policy</a></li>
+                <li><button onClick={() => toast.info("Help Center coming soon!")} className="hover:text-white cursor-pointer">Help Center</button></li>
+                <li><button onClick={() => toast.info("Contact Us feature coming soon!")} className="hover:text-white cursor-pointer">Contact Us</button></li>
+                <li><button onClick={() => toast.info("Privacy Policy coming soon!")} className="hover:text-white cursor-pointer">Privacy Policy</button></li>
               </ul>
             </div>
           </div>
