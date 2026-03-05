@@ -35,7 +35,7 @@ const sampleJobs: JobListing[] = [
     jobType: "Full-time",
     description: "Looking for experienced software engineer with 5+ years in backend development.",
     postedDate: "2 days ago",
-    category: "Technology",
+    category: "IT Development & Data",
   },
   {
     id: 2,
@@ -68,7 +68,7 @@ const sampleJobs: JobListing[] = [
     jobType: "Full-time",
     description: "Create and execute marketing strategies for growing tech company.",
     postedDate: "1 day ago",
-    category: "Marketing",
+    category: "Marketing & Communications",
   },
   {
     id: 5,
@@ -79,7 +79,7 @@ const sampleJobs: JobListing[] = [
     jobType: "Full-time",
     description: "Join our team and learn from experienced electricians.",
     postedDate: "4 days ago",
-    category: "Trades",
+    category: "Construction",
   },
   {
     id: 6,
@@ -90,7 +90,7 @@ const sampleJobs: JobListing[] = [
     jobType: "Full-time",
     description: "Analyze complex datasets and provide insights for business decisions.",
     postedDate: "2 days ago",
-    category: "Technology",
+    category: "IT Development & Data",
   },
   {
     id: 7,
@@ -101,18 +101,18 @@ const sampleJobs: JobListing[] = [
     jobType: "Full-time",
     description: "Analyze financial data and provide strategic recommendations.",
     postedDate: "1 day ago",
-    category: "Finance",
+    category: "Accounting & Finance",
   },
   {
     id: 8,
-    title: "Sales Manager",
-    company: "Global Sales Corp",
+    title: "Sales Representative",
+    company: "Global Trade Solutions",
     location: "Vancouver, BC",
-    salary: "$65,000 - $85,000",
+    salary: "$50,000 - $80,000",
     jobType: "Full-time",
-    description: "Lead sales team and achieve quarterly targets.",
-    postedDate: "2 days ago",
-    category: "Sales",
+    description: "Sell enterprise software solutions to corporate clients.",
+    postedDate: "3 days ago",
+    category: "Sales & Trading",
   },
   {
     id: 9,
@@ -134,7 +134,7 @@ const sampleJobs: JobListing[] = [
     jobType: "Full-time",
     description: "Manage human resources and employee relations.",
     postedDate: "1 day ago",
-    category: "HR",
+    category: "HR & Training",
   },
   {
     id: 11,
@@ -145,7 +145,7 @@ const sampleJobs: JobListing[] = [
     jobType: "Full-time",
     description: "Oversee operations and optimize efficiency.",
     postedDate: "2 days ago",
-    category: "Operations",
+    category: "Administration & Legal",
   },
 ];
 
@@ -269,7 +269,27 @@ export default function Home() {
     );
   };
 
-  const categories = ["all", "Technology", "Healthcare", "Construction", "Marketing", "Trades", "Finance", "Sales", "Education", "HR", "Operations"];
+  const categories = [
+    "all",
+    "Strategy & Planning",
+    "Marketing & Communications",
+    "Accounting & Finance",
+    "HR & Training",
+    "Administration & Legal",
+    "IT Development & Data",
+    "Design",
+    "Sales & Trading",
+    "Construction",
+    "Healthcare",
+    "Research & Development",
+    "Education",
+    "Media & Culture",
+    "Finance & Insurance",
+    "Transportation",
+    "Service",
+    "Manufacturing",
+    "Public Service"
+  ];
   const locations = [
     "all",
     "Toronto, ON",
