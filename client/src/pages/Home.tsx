@@ -236,7 +236,14 @@ export default function Home() {
       <header className="bg-white border-b border-slate-200 sticky top-0 z-50 shadow-sm">
         <div className="container py-4">
           <div className="flex items-center justify-between">
-            <div className="cursor-pointer" onClick={() => navigate("/")}>
+            <div className="cursor-pointer" onClick={() => {
+              setSearchTerm("");
+              setSelectedCategory("all");
+              setSelectedLocation("all");
+              setSelectedJobType([]);
+              setSelectedSalaryRange([]);
+              navigate("/");
+            }}>
               <h1 className="text-2xl font-bold text-slate-900 hover:text-blue-600 transition-colors">CanadaJobs</h1>
               <p className="text-sm text-slate-600">Find Your Perfect Job in Canada</p>
             </div>
