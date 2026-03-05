@@ -341,9 +341,8 @@ export default function Home() {
               </div>
               <div className="md:col-span-4">
                 <Select value={selectedCategory} onValueChange={setSelectedCategory}>
-                  <SelectTrigger className="flex items-center gap-2">
-                    <span className="text-sm font-medium text-slate-700">Category</span>
-                    <SelectValue placeholder="All Categories" />
+                  <SelectTrigger className="flex items-center gap-2 text-slate-900">
+                    <span className="text-slate-900">{selectedCategory === "all" ? "All Categories" : selectedCategory}</span>
                   </SelectTrigger>
                 <SelectContent>
                   {categories.map((cat) => (
@@ -356,9 +355,8 @@ export default function Home() {
               </div>
               <div className="md:col-span-4">
                 <Select value={selectedLocation} onValueChange={setSelectedLocation}>
-                  <SelectTrigger className="flex items-center gap-2">
-                    <span className="text-sm font-medium text-slate-700">Location</span>
-                    <SelectValue placeholder="All Locations" />
+                  <SelectTrigger className="flex items-center gap-2 text-slate-900">
+                    <span className="text-slate-900">{selectedLocation === "all" ? "All Locations" : selectedLocation}</span>
                   </SelectTrigger>
                 <SelectContent>
                   {locations.map((loc) => (
