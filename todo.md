@@ -58,3 +58,9 @@
 - [x] Featured Jobs 섬션 UI 디자인 (3열 그리드)
 - [x] Featured 배지 및 NOC 코드 표시
 - [x] "View All Jobs" 링크 추가
+
+## Phase 12: 상단 네비게이션 및 히어로 섹션 리디자인
+- [ ] 상단 네비게이션 바 추가 (로고, 메뉴, 프로필)
+- [ ] 다크 블루 배경 히어로 섹션 구현
+- [ ] 검색 바 및 카테고리 필터 버튼 추가
+- [ ] 통계 섹션 추가 (Active Jobs, Cities, LMIA Verified, Free)

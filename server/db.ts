@@ -4,14 +4,24 @@ import { InsertUser, users, jobListings, savedJobs, jobApplications, InsertJobLi
 import { ENV } from './_core/env';
 
 let _db: ReturnType<typeof drizzle> | null = null;
+let _lastDbUrl: string | undefined;
 
 // Lazily create the drizzle instance so local tooling can run without a DB.
 export async function getDb() {
-  if (!_db && process.env.DATABASE_URL) {
+  const currentUrl = process.env.DATABASE_URL;
+  
+  // Recreate connection if DATABASE_URL changed (handles dev env changes)
+  if (_lastDbUrl !== currentUrl) {
+    _db = null;
+    _lastDbUrl = currentUrl;
+  }
+  
+  if (!_db && currentUrl) {
     try {
-      _db = drizzle(process.env.DATABASE_URL);
+      _db = drizzle(currentUrl);
+      console.log("[Database] Connected successfully");
     } catch (error) {
-      console.warn("[Database] Failed to connect:", error);
+      console.error("[Database] Failed to connect:", error);
       _db = null;
     }
   }

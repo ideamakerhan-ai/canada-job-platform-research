@@ -198,29 +198,10 @@ export default function Home() {
   const [appliedJobs, setAppliedJobs] = useState<number[]>([]);
   const [allJobs, setAllJobs] = useState<JobListing[]>(sampleJobs);
 
-  // tRPC 쿼리로 공고 데이터 가져오기
-  const { data: dbJobs } = trpc.job.search.useQuery({});
-
-  // 데이터베이스 공고와 샘플 공고 합치기
+  // 초기화: 샘플 데이터만 사용
   useEffect(() => {
-    if (dbJobs && dbJobs.length > 0) {
-      const combinedJobs: JobListing[] = dbJobs.map((job: any) => ({
-        id: job.id,
-        title: job.title,
-        company: job.company,
-        location: `${job.city}, ${job.province}`,
-        salary: `$${job.salaryMin?.toLocaleString() || "0"} - $${job.salaryMax?.toLocaleString() || "0"}`,
-        jobType: job.jobType,
-        description: job.description,
-        postedDate: "Recently posted",
-        category: job.category,
-        lmiaAvailable: job.lmiaAvailable === 1,
-        visaSponsorshipAvailable: job.visaSponsorship === 1,
-        accommodation: job.accommodation,
-      }));
-      setAllJobs([...combinedJobs, ...sampleJobs]);
-    }
-  }, [dbJobs]);
+    setAllJobs(sampleJobs);
+  }, []);
 
   // 필터 업데이트 함수
   useEffect(() => {
