@@ -453,6 +453,73 @@ export default function Home() {
         </div>
       </section>
 
+      {/* Featured Jobs 섹션 */}
+      <section className="bg-white border-b border-slate-200 py-12">
+        <div className="container">
+          <div className="flex items-center justify-between mb-8">
+            <div>
+              <h2 className="text-3xl font-bold text-slate-900 mb-2">Featured Jobs</h2>
+              <p className="text-slate-600">Latest LMIA-approved opportunities</p>
+            </div>
+            <Button variant="outline" onClick={() => navigate("/")}>
+              View All Jobs <span className="ml-2">→</span>
+            </Button>
+          </div>
+
+          {/* Featured Jobs Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {allJobs.slice(0, 6).map((job) => (
+              <Card key={job.id} className="hover:shadow-lg transition-shadow border-l-4 border-l-red-300 bg-red-50">
+                <CardContent className="p-6">
+                  <div className="flex items-center gap-2 mb-3">
+                    <Badge className="bg-red-100 text-red-800 hover:bg-red-100">
+                      ⭐ Featured
+                    </Badge>
+                  </div>
+                  
+                  <h3 className="text-lg font-bold text-slate-900 mb-1">{job.title}</h3>
+                  <p className="text-slate-600 text-sm mb-4">{job.company}</p>
+                  
+                  <div className="space-y-2 mb-4 text-sm text-slate-600">
+                    <div className="flex items-center gap-2">
+                      <MapPin className="w-4 h-4" />
+                      {job.location}
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <DollarSign className="w-4 h-4" />
+                      {job.salary}
+                    </div>
+                  </div>
+
+                  <div className="flex flex-wrap gap-2 mb-4">
+                    {job.lmiaAvailable && (
+                      <Badge className="bg-green-100 text-green-800 hover:bg-green-100 text-xs">✓ LMIA</Badge>
+                    )}
+                    {job.visaSponsorshipAvailable && (
+                      <Badge className="bg-blue-100 text-blue-800 hover:bg-blue-100 text-xs">⊕ Visa Sponsor</Badge>
+                    )}
+                    {job.accommodation && (
+                      <Badge className="bg-purple-100 text-purple-800 hover:bg-purple-100 text-xs">🏠 {job.accommodation.split(' ')[0]}</Badge>
+                    )}
+                  </div>
+
+                  <p className="text-xs text-slate-500 mb-4">NOC 72200</p>
+                  <p className="text-xs text-slate-500 mb-4">{job.postedDate}</p>
+
+                  <Button 
+                    className="w-full" 
+                    onClick={() => handleApplyJob(job.id, job.title)}
+                    disabled={appliedJobs.includes(job.id)}
+                  >
+                    {appliedJobs.includes(job.id) ? "Applied" : "Apply Now"}
+                  </Button>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* 메인 콘텐츠 */}
       <main className="container py-12">
         <div className="grid grid-cols-1 gap-8">

@@ -53,3 +53,8 @@
 ## Phase 10: 신규 가입자 403 에러 해결 및 UI 개선
 - [x] 신규 가입자 403 에러 해결 (권한 설정)
 - [x] "No accommodation" 옵션 제거
+
+## Phase 11: Featured Jobs 섬션 추가
+- [x] Featured Jobs 섬션 UI 디자인 (3열 그리드)
+- [x] Featured 배지 및 NOC 코드 표시
+- [x] "View All Jobs" 링크 추가
