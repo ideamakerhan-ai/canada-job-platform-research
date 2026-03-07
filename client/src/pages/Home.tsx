@@ -450,7 +450,7 @@ export default function Home() {
           {/* Featured Jobs Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {allJobs.slice(0, 6).map((job) => (
-              <Card key={job.id} className="hover:shadow-lg transition-shadow border-l-4 border-l-red-300 bg-red-50">
+              <Card key={job.id} className="hover:shadow-lg transition-shadow border-l-4 border-l-red-300 bg-white">
                 <CardContent className="p-6">
                   <div className="flex items-center gap-2 mb-3">
                     <Badge className="bg-red-100 text-red-800 hover:bg-red-100">
@@ -557,7 +557,7 @@ export default function Home() {
 
             <div className="space-y-4">
               {filteredJobs.map((job) => (
-                <Card key={job.id} className="hover:shadow-lg transition-shadow cursor-pointer" onClick={() => navigate(`/job/${job.id}`)}>
+                <Card key={job.id} className="hover:shadow-lg transition-shadow cursor-pointer bg-white" onClick={() => navigate(`/job/${job.id}`)}>
                   <CardContent className="p-6">
                     <div className="flex items-start justify-between">
                       <div className="flex-1">
