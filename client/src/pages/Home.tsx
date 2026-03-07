@@ -557,7 +557,7 @@ export default function Home() {
 
             <div className="space-y-4">
               {filteredJobs.map((job) => (
-                <Card key={job.id} className="hover:shadow-lg transition-shadow">
+                <Card key={job.id} className="hover:shadow-lg transition-shadow cursor-pointer" onClick={() => navigate(`/job/${job.id}`)}>
                   <CardContent className="p-6">
                     <div className="flex items-start justify-between">
                       <div className="flex-1">
@@ -598,7 +598,7 @@ export default function Home() {
                         </div>
                       </div>
 
-                      <div className="flex flex-col gap-2 ml-4">
+                      <div className="flex flex-col gap-2 ml-4" onClick={(e) => e.stopPropagation()}>
                         <Button
                           variant="ghost"
                           size="sm"
@@ -620,20 +620,6 @@ export default function Home() {
                         >
                           <Share2 className="w-4 h-4" />
                           Share
-                        </Button>
-                        <Button
-                          size="sm"
-                          onClick={() => handleApplyJob(job.id, job.title)}
-                          disabled={appliedJobs.includes(job.id)}
-                        >
-                          {appliedJobs.includes(job.id) ? (
-                            <>
-                              <CheckCircle className="w-4 h-4 mr-1" />
-                              Applied
-                            </>
-                          ) : (
-                            "Apply Now"
-                          )}
                         </Button>
                       </div>
                     </div>

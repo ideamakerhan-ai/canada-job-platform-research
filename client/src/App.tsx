@@ -5,15 +5,18 @@ import { Route, Switch } from "wouter";
 import ErrorBoundary from "./components/ErrorBoundary";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import Home from "./pages/Home";
+import { useLocation } from "wouter";
 import Profile from "./pages/Profile";
 import PostJob from "./pages/PostJob";
 import Occupations from "./pages/Occupations";
+import JobDetail from "./pages/JobDetail";
 
 function Router() {
   // make sure to consider if you need authentication for certain routes
   return (
     <Switch>
       <Route path={"/"} component={Home} />
+      <Route path={"/job/:id"} component={JobDetail} />
       <Route path={"/profile"} component={Profile} />
       <Route path={"/post-job"} component={PostJob} />
       <Route path={"/occupations"} component={Occupations} />
