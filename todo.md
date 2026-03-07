@@ -74,3 +74,12 @@
 ## Phase 14: 공고 카드 배경색 변경
 - [x] Featured Jobs 카드 배경색을 흰색으로 변경
 - [x] 일반 공고 목록 카드 배경색을 흰색으로 변경
+
+
+## Phase 15: 헤더 및 히어로 섹션 리디자인
+- [x] 상단 네비게이션 헤더 구성 (LMIAJobs 로고, Find Jobs/Post a Job/LMIA Guide, 프로필 아이콘)
+- [x] 다크 네이비 배경 히어로 섹션 구현
+- [x] "Find LMIA-Approved Jobs in Canada" 제목 (LMIA-Approved는 빨간색)
+- [x] 검색 바 및 "Search Jobs" 빨간색 버튼
+- [x] 필터 버튼 추가 (LMIA Jobs, Visa Sponsorship, Nursing Jobs, Truck Driver Jobs)
+- [x] 통계 섹션 추가 (Active Jobs, Cities, LMIA Verified, Free)

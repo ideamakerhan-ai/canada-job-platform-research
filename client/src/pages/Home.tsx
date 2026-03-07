@@ -353,7 +353,7 @@ export default function Home() {
       <header className="bg-white border-b border-slate-200 sticky top-0 z-50 shadow-sm">
         <div className="container py-4">
           <div className="flex items-center justify-between">
-            <div className="cursor-pointer" onClick={() => {
+            <div className="cursor-pointer flex items-center gap-2" onClick={() => {
               setSearchTerm("");
               setSelectedCategory("all");
               setSelectedLocation("all");
@@ -361,15 +361,19 @@ export default function Home() {
               setSelectedSalaryRange([]);
               navigate("/");
             }}>
-              <h1 className="text-2xl font-bold text-slate-900 hover:text-blue-600 transition-colors">LMIAJobsCanada</h1>
-              <p className="text-sm text-slate-600">LMIA & Visa Sponsorship Jobs</p>
+              <div className="bg-red-600 text-white rounded-md p-2 font-bold">LJ</div>
+              <h1 className="text-xl font-bold text-slate-900 hover:text-blue-600 transition-colors">LMIAJobs</h1>
             </div>
+            <nav className="flex items-center gap-8">
+              <a href="#" className="text-slate-700 hover:text-slate-900 font-medium">Find Jobs</a>
+              <a href="#" className="text-slate-700 hover:text-slate-900 font-medium" onClick={() => navigate("/post-job")}>Post a Job</a>
+              <a href="#" className="text-slate-700 hover:text-slate-900 font-medium">LMIA Guide</a>
+            </nav>
             <div className="flex gap-3">
               {isAuthenticated ? (
                 <div className="flex items-center gap-3">
-                  <span className="text-sm text-slate-700">Welcome, {user?.name || "User"}</span>
-                  <Button variant="outline" size="sm" onClick={() => navigate("/profile")}>
-                    Profile
+                  <Button variant="ghost" size="sm" onClick={() => navigate("/profile")}>
+                    <div className="w-8 h-8 bg-red-200 rounded-full flex items-center justify-center text-red-600 font-bold">I</div>
                   </Button>
                 </div>
               ) : (
@@ -383,52 +387,76 @@ export default function Home() {
       </header>
 
       {/* 히어로 섹션 */}
-      <section className="bg-gradient-to-r from-blue-600 to-blue-700 text-white py-12">
-        <div className="container">
-          <h2 className="text-4xl font-bold mb-4">Find LMIA & Visa Sponsorship Jobs</h2>
-          <p className="text-blue-100 mb-8 text-lg">
-            Discover job opportunities in Canada with LMIA and visa sponsorship support
-          </p>
+      <section className="bg-slate-900 text-white py-16 relative overflow-hidden">
+        <div className="absolute inset-0 opacity-10"></div>
+        <div className="container relative z-10">
+          <div className="text-center mb-12">
+            <div className="inline-block mb-4 px-4 py-2 border border-red-500 rounded-full text-sm text-red-400">
+              ✓ Trusted LMIA Job Platform
+            </div>
+            <h2 className="text-5xl font-bold mb-4">
+              Find <span className="text-red-500">LMIA-Approved</span> Jobs<br/>in Canada
+            </h2>
+            <p className="text-slate-300 text-lg max-w-2xl mx-auto">
+              Browse verified job listings with Labour Market Impact Assessment approval and visa sponsorship from Canadian employers.
+            </p>
+          </div>
 
           {/* 검색 바 */}
-          <div className="bg-white rounded-lg p-6 shadow-lg">
-            <div className="grid grid-cols-1 md:grid-cols-12 gap-3">
-              <div className="md:col-span-6">
+          <div className="max-w-2xl mx-auto mb-8">
+            <div className="flex gap-2">
+              <div className="flex-1 relative">
+                <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-slate-400" />
                 <Input
-                  placeholder="Job title or company..."
+                  placeholder="Job title, NOC code, or keyword..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="w-full text-base text-slate-900 placeholder:text-slate-400 border-2 border-slate-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
+                  className="w-full pl-12 py-3 text-base text-slate-900 placeholder:text-slate-400 border-0 rounded-lg"
                 />
               </div>
-              <div className="md:col-span-3">
-                <Select value={selectedCategory} onValueChange={setSelectedCategory}>
-                  <SelectTrigger className="flex items-center gap-2 text-slate-900">
-                    <span className="text-slate-900">{selectedCategory === "all" ? "All Categories" : selectedCategory}</span>
-                  </SelectTrigger>
-                <SelectContent>
-                  {categories.map((cat) => (
-                    <SelectItem key={cat} value={cat}>
-                      {cat === "all" ? "All Categories" : cat}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-                </Select>
-              </div>
-              <div className="md:col-span-3">
-                <Select value={selectedLocation} onValueChange={setSelectedLocation}>
-                  <SelectTrigger className="flex items-center gap-2 text-slate-900">
-                    <span className="text-slate-900">{selectedLocation === "all" ? "All Locations" : selectedLocation}</span>
-                  </SelectTrigger>
-                <SelectContent>
-                  {locations.map((loc) => (
-                    <SelectItem key={loc} value={loc}>
-                      {loc === "all" ? "All Locations" : loc}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-                </Select>
-              </div>
+              <Button className="bg-red-600 hover:bg-red-700 text-white px-8 py-3 rounded-lg font-medium">
+                Search Jobs
+              </Button>
+            </div>
+          </div>
+
+          {/* 필터 버튼 */}
+          <div className="flex flex-wrap justify-center gap-3">
+            <Button variant="outline" className="bg-slate-800 border-slate-700 text-white hover:bg-slate-700">
+              ✓ LMIA Jobs
+            </Button>
+            <Button variant="outline" className="bg-slate-800 border-slate-700 text-white hover:bg-slate-700">
+              ⊕ Visa Sponsorship
+            </Button>
+            <Button variant="outline" className="bg-slate-800 border-slate-700 text-white hover:bg-slate-700">
+              🏥 Nursing Jobs
+            </Button>
+            <Button variant="outline" className="bg-slate-800 border-slate-700 text-white hover:bg-slate-700">
+              🚚 Truck Driver Jobs
+            </Button>
+          </div>
+        </div>
+      </section>
+
+      {/* 통계 섹션 */}
+      <section className="bg-slate-100 py-12 border-b border-slate-200">
+        <div className="container">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+            <div className="text-center">
+              <div className="text-4xl font-bold text-slate-900 mb-2">8+</div>
+              <div className="text-slate-600">Active Jobs</div>
+            </div>
+            <div className="text-center">
+              <div className="text-4xl font-bold text-slate-900 mb-2">8+</div>
+              <div className="text-slate-600">Cities</div>
+            </div>
+            <div className="text-center">
+              <div className="text-4xl font-bold text-green-600 mb-2">100%</div>
+              <div className="text-slate-600">LMIA Verified</div>
+            </div>
+            <div className="text-center">
+              <div className="text-4xl font-bold text-blue-600 mb-2">Free</div>
+              <div className="text-slate-600">For Job Seekers</div>
             </div>
           </div>
         </div>
