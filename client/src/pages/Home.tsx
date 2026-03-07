@@ -197,6 +197,7 @@ export default function Home() {
   const [savedJobs, setSavedJobs] = useState<number[]>([]);
   const [appliedJobs, setAppliedJobs] = useState<number[]>([]);
   const [allJobs, setAllJobs] = useState<JobListing[]>(sampleJobs);
+  const [selectedFilters, setSelectedFilters] = useState<string[]>([]);
 
   // 초기화: 샘플 데이터만 사용
   useEffect(() => {
@@ -252,8 +253,21 @@ export default function Home() {
       });
     }
 
+    // 히어로 섹션 필터 적용
+    if (selectedFilters.length > 0) {
+      filtered = filtered.filter((job) => {
+        for (const filter of selectedFilters) {
+          if (filter === "LMIA Jobs" && job.lmiaAvailable) return true;
+          if (filter === "Visa Sponsorship" && job.visaSponsorshipAvailable) return true;
+          if (filter === "Nursing Jobs" && job.category === "Healthcare") return true;
+          if (filter === "Truck Driver Jobs" && job.category === "Transportation") return true;
+        }
+        return false;
+      });
+    }
+
     setFilteredJobs(filtered);
-  }, [searchTerm, selectedCategory, selectedLocation, selectedJobType, selectedSalaryRange]);
+  }, [searchTerm, selectedCategory, selectedLocation, selectedJobType, selectedSalaryRange, selectedFilters]);
 
   const handleSaveJob = (jobId: number) => {
     setSavedJobs((prev) => {
@@ -308,6 +322,12 @@ export default function Home() {
   const toggleSalaryRange = (range: string) => {
     setSelectedSalaryRange((prev) =>
       prev.includes(range) ? prev.filter((r) => r !== range) : [...prev, range]
+    );
+  };
+
+  const toggleFilter = (filterName: string) => {
+    setSelectedFilters((prev) =>
+      prev.includes(filterName) ? prev.filter((f) => f !== filterName) : [...prev, filterName]
     );
   };
 
@@ -422,16 +442,48 @@ export default function Home() {
 
           {/* 필터 버튼 */}
           <div className="flex flex-wrap justify-center gap-3">
-            <Button variant="outline" className="bg-slate-800 border-slate-700 text-white hover:bg-slate-700">
+            <Button 
+              onClick={() => toggleFilter("LMIA Jobs")}
+              className={`${
+                selectedFilters.includes("LMIA Jobs")
+                  ? "bg-red-600 border-red-600 text-white hover:bg-red-700"
+                  : "bg-slate-800 border-slate-700 text-white hover:bg-slate-700"
+              }`}
+              variant="outline"
+            >
               ✓ LMIA Jobs
             </Button>
-            <Button variant="outline" className="bg-slate-800 border-slate-700 text-white hover:bg-slate-700">
+            <Button 
+              onClick={() => toggleFilter("Visa Sponsorship")}
+              className={`${
+                selectedFilters.includes("Visa Sponsorship")
+                  ? "bg-red-600 border-red-600 text-white hover:bg-red-700"
+                  : "bg-slate-800 border-slate-700 text-white hover:bg-slate-700"
+              }`}
+              variant="outline"
+            >
               ⊕ Visa Sponsorship
             </Button>
-            <Button variant="outline" className="bg-slate-800 border-slate-700 text-white hover:bg-slate-700">
+            <Button 
+              onClick={() => toggleFilter("Nursing Jobs")}
+              className={`${
+                selectedFilters.includes("Nursing Jobs")
+                  ? "bg-red-600 border-red-600 text-white hover:bg-red-700"
+                  : "bg-slate-800 border-slate-700 text-white hover:bg-slate-700"
+              }`}
+              variant="outline"
+            >
               🏥 Nursing Jobs
             </Button>
-            <Button variant="outline" className="bg-slate-800 border-slate-700 text-white hover:bg-slate-700">
+            <Button 
+              onClick={() => toggleFilter("Truck Driver Jobs")}
+              className={`${
+                selectedFilters.includes("Truck Driver Jobs")
+                  ? "bg-red-600 border-red-600 text-white hover:bg-red-700"
+                  : "bg-slate-800 border-slate-700 text-white hover:bg-slate-700"
+              }`}
+              variant="outline"
+            >
               🚚 Truck Driver Jobs
             </Button>
           </div>

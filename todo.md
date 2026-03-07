@@ -83,3 +83,10 @@
 - [x] 검색 바 및 "Search Jobs" 빨간색 버튼
 - [x] 필터 버튼 추가 (LMIA Jobs, Visa Sponsorship, Nursing Jobs, Truck Driver Jobs)
 - [x] 통계 섹션 추가 (Active Jobs, Cities, LMIA Verified, Free)
+
+
+## Phase 16: 필터 버튼 기능 구현
+- [x] 필터 상태 관리 (LMIA Jobs, Visa Sponsorship, Nursing Jobs, Truck Driver Jobs)
+- [x] 필터 버튼 클릭 핸들러 구현
+- [x] 필터 로직 적용 및 공고 필터링
+- [x] 필터 상태 표시 (선택된 필터 강조)
