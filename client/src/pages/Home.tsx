@@ -384,10 +384,13 @@ export default function Home() {
               <div className="bg-red-600 text-white rounded-md p-2 font-bold">LJ</div>
               <h1 className="text-xl font-bold text-slate-900 hover:text-blue-600 transition-colors">LMIAJobs</h1>
             </div>
-            <nav className="flex items-center gap-8">
+            <nav className="hidden md:flex items-center gap-8">
               <a href="#" className="text-slate-700 hover:text-slate-900 font-medium">Find Jobs</a>
               <a href="#" className="text-slate-700 hover:text-slate-900 font-medium" onClick={() => navigate("/post-job")}>Post a Job</a>
               <a href="#" className="text-slate-700 hover:text-slate-900 font-medium">LMIA Guide</a>
+            </nav>
+            <nav className="md:hidden flex items-center gap-4">
+              <a href="#" className="text-slate-700 hover:text-slate-900 font-medium text-sm" onClick={() => navigate("/post-job")}>Post a Job</a>
             </nav>
             <div className="flex gap-3">
               {isAuthenticated ? (
@@ -487,28 +490,66 @@ export default function Home() {
               🚚 Truck Driver Jobs
             </Button>
           </div>
+
+          {/* 검색 통계 섹션 */}
+          <div className="mt-12 grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div className="bg-white bg-opacity-10 rounded-lg p-6 backdrop-blur-sm">
+              <h3 className="text-lg font-semibold mb-4 text-white">Most Searched Jobs</h3>
+              <div className="space-y-2">
+                <div className="flex justify-between items-center text-slate-200">
+                  <span>Healthcare Professionals</span>
+                  <span className="text-red-400 font-semibold">1,234</span>
+                </div>
+                <div className="flex justify-between items-center text-slate-200">
+                  <span>Software Developers</span>
+                  <span className="text-red-400 font-semibold">892</span>
+                </div>
+                <div className="flex justify-between items-center text-slate-200">
+                  <span>Truck Drivers</span>
+                  <span className="text-red-400 font-semibold">756</span>
+                </div>
+              </div>
+            </div>
+            <div className="bg-white bg-opacity-10 rounded-lg p-6 backdrop-blur-sm">
+              <h3 className="text-lg font-semibold mb-4 text-white">Most Posted Jobs</h3>
+              <div className="space-y-2">
+                <div className="flex justify-between items-center text-slate-200">
+                  <span>Retail & Sales</span>
+                  <span className="text-red-400 font-semibold">456</span>
+                </div>
+                <div className="flex justify-between items-center text-slate-200">
+                  <span>Hospitality</span>
+                  <span className="text-red-400 font-semibold">389</span>
+                </div>
+                <div className="flex justify-between items-center text-slate-200">
+                  <span>Construction</span>
+                  <span className="text-red-400 font-semibold">312</span>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </section>
 
       {/* 통계 섹션 */}
       <section className="bg-slate-100 py-12 border-b border-slate-200">
         <div className="container">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-8">
             <div className="text-center">
-              <div className="text-4xl font-bold text-slate-900 mb-2">8+</div>
-              <div className="text-slate-600">Active Jobs</div>
+              <div className="text-3xl md:text-4xl font-bold text-slate-900 mb-2">8+</div>
+              <div className="text-sm md:text-base text-slate-600">Active Jobs</div>
             </div>
             <div className="text-center">
-              <div className="text-4xl font-bold text-slate-900 mb-2">8+</div>
-              <div className="text-slate-600">Cities</div>
+              <div className="text-3xl md:text-4xl font-bold text-slate-900 mb-2">8+</div>
+              <div className="text-sm md:text-base text-slate-600">Cities</div>
             </div>
             <div className="text-center">
-              <div className="text-4xl font-bold text-green-600 mb-2">100%</div>
-              <div className="text-slate-600">LMIA Verified</div>
+              <div className="text-3xl md:text-4xl font-bold text-green-600 mb-2">100%</div>
+              <div className="text-sm md:text-base text-slate-600">LMIA Verified</div>
             </div>
             <div className="text-center">
-              <div className="text-4xl font-bold text-blue-600 mb-2">Free</div>
-              <div className="text-slate-600">For Job Seekers</div>
+              <div className="text-3xl md:text-4xl font-bold text-blue-600 mb-2">Free</div>
+              <div className="text-sm md:text-base text-slate-600">For Job Seekers</div>
             </div>
           </div>
         </div>
@@ -733,6 +774,7 @@ export default function Home() {
                 <li><button onClick={() => window.scrollTo(0, 0)} className="hover:text-white cursor-pointer">Browse Jobs</button></li>
                 <li><button onClick={() => navigate("/occupations")} className="hover:text-white cursor-pointer">NOC Occupations</button></li>
                 <li><button onClick={() => toast.info("Salary Guide coming soon!")} className="hover:text-white cursor-pointer">Salary Guide</button></li>
+                <li><button onClick={() => toast.info("LMIA Guide coming soon!")} className="hover:text-white cursor-pointer">LMIA Guide</button></li>
               </ul>
             </div>
             <div>
