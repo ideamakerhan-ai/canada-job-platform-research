@@ -493,37 +493,61 @@ export default function Home() {
 
           {/* 검색 통계 섹션 */}
           <div className="mt-12 grid grid-cols-1 md:grid-cols-2 gap-8">
-            <div className="bg-white bg-opacity-10 rounded-lg p-6 backdrop-blur-sm">
-              <h3 className="text-lg font-semibold mb-4 text-white">Most Searched Jobs</h3>
-              <div className="space-y-2">
-                <div className="flex justify-between items-center text-slate-200">
-                  <span>Healthcare Professionals</span>
-                  <span className="text-red-400 font-semibold">1,234</span>
+            <div className="bg-white bg-opacity-15 rounded-lg p-6 backdrop-blur-sm border border-white border-opacity-20">
+              <h3 className="text-lg font-bold mb-4 text-white">Most Searched Jobs</h3>
+              <div className="space-y-3">
+                <div className="flex justify-between items-center">
+                  <span className="text-white font-medium">Healthcare Professionals</span>
+                  <span className="text-red-400 font-bold text-lg">1,234</span>
                 </div>
-                <div className="flex justify-between items-center text-slate-200">
-                  <span>Software Developers</span>
-                  <span className="text-red-400 font-semibold">892</span>
+                <div className="flex justify-between items-center">
+                  <span className="text-white font-medium">Software Developers</span>
+                  <span className="text-red-400 font-bold text-lg">892</span>
                 </div>
-                <div className="flex justify-between items-center text-slate-200">
-                  <span>Truck Drivers</span>
-                  <span className="text-red-400 font-semibold">756</span>
+                <div className="flex justify-between items-center">
+                  <span className="text-white font-medium">Truck Drivers</span>
+                  <span className="text-red-400 font-bold text-lg">756</span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-white font-medium">Nurses</span>
+                  <span className="text-red-400 font-bold text-lg">645</span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-white font-medium">Electricians</span>
+                  <span className="text-red-400 font-bold text-lg">534</span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-white font-medium">Welders</span>
+                  <span className="text-red-400 font-bold text-lg">423</span>
                 </div>
               </div>
             </div>
-            <div className="bg-white bg-opacity-10 rounded-lg p-6 backdrop-blur-sm">
-              <h3 className="text-lg font-semibold mb-4 text-white">Most Posted Jobs</h3>
-              <div className="space-y-2">
-                <div className="flex justify-between items-center text-slate-200">
-                  <span>Retail & Sales</span>
-                  <span className="text-red-400 font-semibold">456</span>
+            <div className="bg-white bg-opacity-15 rounded-lg p-6 backdrop-blur-sm border border-white border-opacity-20">
+              <h3 className="text-lg font-bold mb-4 text-white">Most Posted Jobs</h3>
+              <div className="space-y-3">
+                <div className="flex justify-between items-center">
+                  <span className="text-white font-medium">Retail & Sales</span>
+                  <span className="text-red-400 font-bold text-lg">456</span>
                 </div>
-                <div className="flex justify-between items-center text-slate-200">
-                  <span>Hospitality</span>
-                  <span className="text-red-400 font-semibold">389</span>
+                <div className="flex justify-between items-center">
+                  <span className="text-white font-medium">Hospitality</span>
+                  <span className="text-red-400 font-bold text-lg">389</span>
                 </div>
-                <div className="flex justify-between items-center text-slate-200">
-                  <span>Construction</span>
-                  <span className="text-red-400 font-semibold">312</span>
+                <div className="flex justify-between items-center">
+                  <span className="text-white font-medium">Construction</span>
+                  <span className="text-red-400 font-bold text-lg">312</span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-white font-medium">Manufacturing</span>
+                  <span className="text-red-400 font-bold text-lg">298</span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-white font-medium">Transportation</span>
+                  <span className="text-red-400 font-bold text-lg">267</span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-white font-medium">Administration</span>
+                  <span className="text-red-400 font-bold text-lg">245</span>
                 </div>
               </div>
             </div>
@@ -571,52 +595,50 @@ export default function Home() {
           {/* Featured Jobs Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {allJobs.slice(0, 6).map((job) => (
-              <Card key={job.id} className="hover:shadow-lg transition-shadow border-l-4 border-l-red-300 bg-white">
-                <CardContent className="p-6">
-                  <div className="flex items-center gap-2 mb-3">
-                    <Badge className="bg-red-100 text-red-800 hover:bg-red-100">
-                      ⭐ Featured
-                    </Badge>
-                  </div>
-                  
-                  <h3 className="text-lg font-bold text-slate-900 mb-1">{job.title}</h3>
-                  <p className="text-slate-600 text-sm mb-4">{job.company}</p>
-                  
-                  <div className="space-y-2 mb-4 text-sm text-slate-600">
-                    <div className="flex items-center gap-2">
-                      <MapPin className="w-4 h-4" />
-                      {job.location}
+              <div
+                key={job.id}
+                onClick={() => navigate(`/job/${job.id}`)}
+                className="cursor-pointer group"
+              >
+                <Card className="hover:shadow-lg transition-shadow border-l-4 border-l-red-300 bg-white h-full group-hover:bg-slate-50">
+                  <CardContent className="p-6">
+                    <div className="flex items-center gap-2 mb-3">
+                      <Badge className="bg-red-100 text-red-800 hover:bg-red-100">
+                        ⭐ Featured
+                      </Badge>
                     </div>
-                    <div className="flex items-center gap-2">
-                      <DollarSign className="w-4 h-4" />
-                      {job.salary}
+                    
+                    <h3 className="text-lg font-bold text-slate-900 mb-1 group-hover:text-red-600 transition-colors">{job.title}</h3>
+                    <p className="text-slate-600 text-sm mb-4">{job.company}</p>
+                    
+                    <div className="space-y-2 mb-4 text-sm text-slate-600">
+                      <div className="flex items-center gap-2">
+                        <MapPin className="w-4 h-4" />
+                        {job.location}
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <DollarSign className="w-4 h-4" />
+                        {job.salary}
+                      </div>
                     </div>
-                  </div>
 
-                  <div className="flex flex-wrap gap-2 mb-4">
-                    {job.lmiaAvailable && (
-                      <Badge className="bg-green-100 text-green-800 hover:bg-green-100 text-xs">✓ LMIA</Badge>
-                    )}
-                    {job.visaSponsorshipAvailable && (
-                      <Badge className="bg-blue-100 text-blue-800 hover:bg-blue-100 text-xs">⊕ Visa Sponsor</Badge>
-                    )}
-                    {job.accommodation && (
-                      <Badge className="bg-purple-100 text-purple-800 hover:bg-purple-100 text-xs">🏠 {job.accommodation.split(' ')[0]}</Badge>
-                    )}
-                  </div>
+                    <div className="flex flex-wrap gap-2 mb-4">
+                      {job.lmiaAvailable && (
+                        <Badge className="bg-green-100 text-green-800 hover:bg-green-100 text-xs">✓ LMIA</Badge>
+                      )}
+                      {job.visaSponsorshipAvailable && (
+                        <Badge className="bg-blue-100 text-blue-800 hover:bg-blue-100 text-xs">⊕ Visa Sponsor</Badge>
+                      )}
+                      {job.accommodation && (
+                        <Badge className="bg-purple-100 text-purple-800 hover:bg-purple-100 text-xs">🏠 {job.accommodation.split(' ')[0]}</Badge>
+                      )}
+                    </div>
 
-                  <p className="text-xs text-slate-500 mb-4">NOC 72200</p>
-                  <p className="text-xs text-slate-500 mb-4">{job.postedDate}</p>
-
-                  <Button 
-                    className="w-full" 
-                    onClick={() => handleApplyJob(job.id, job.title)}
-                    disabled={appliedJobs.includes(job.id)}
-                  >
-                    {appliedJobs.includes(job.id) ? "Applied" : "Apply Now"}
-                  </Button>
-                </CardContent>
-              </Card>
+                    <p className="text-xs text-slate-500 mb-2">NOC 72200</p>
+                    <p className="text-xs text-slate-500">Click to view details →</p>
+                  </CardContent>
+                </Card>
+              </div>
             ))}
           </div>
         </div>
