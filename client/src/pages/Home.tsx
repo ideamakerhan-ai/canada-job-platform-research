@@ -492,61 +492,61 @@ export default function Home() {
 
           {/* 검색 통계 섹션 */}
           <div className="mt-12 grid grid-cols-1 md:grid-cols-2 gap-8">
-            <div className="bg-white bg-opacity-20 rounded-lg p-6 backdrop-blur-sm border border-white border-opacity-30">
+            <div className="bg-slate-900 bg-opacity-70 rounded-lg p-6 backdrop-blur-sm border border-white border-opacity-40">
               <h3 className="text-lg font-bold mb-4 text-white">Most Searched Jobs</h3>
               <div className="space-y-3">
                 <div className="flex justify-between items-center">
-                  <span className="text-white font-bold text-base">Healthcare Professionals</span>
-                  <span className="text-red-500 font-bold text-xl">1,234</span>
+                  <span className="text-white font-bold text-lg">Healthcare Professionals</span>
+                  <span className="text-red-400 font-bold text-2xl">1,234</span>
                 </div>
                 <div className="flex justify-between items-center">
-                  <span className="text-white font-bold text-base">Software Developers</span>
-                  <span className="text-red-500 font-bold text-xl">892</span>
+                  <span className="text-white font-bold text-lg">Software Developers</span>
+                  <span className="text-red-400 font-bold text-2xl">892</span>
                 </div>
                 <div className="flex justify-between items-center">
-                  <span className="text-white font-bold text-base">Truck Drivers</span>
-                  <span className="text-red-500 font-bold text-xl">756</span>
+                  <span className="text-white font-bold text-lg">Truck Drivers</span>
+                  <span className="text-red-400 font-bold text-2xl">756</span>
                 </div>
                 <div className="flex justify-between items-center">
-                  <span className="text-white font-bold text-base">Nurses</span>
-                  <span className="text-red-500 font-bold text-xl">645</span>
+                  <span className="text-white font-bold text-lg">Nurses</span>
+                  <span className="text-red-400 font-bold text-2xl">645</span>
                 </div>
                 <div className="flex justify-between items-center">
-                  <span className="text-white font-bold text-base">Electricians</span>
-                  <span className="text-red-500 font-bold text-xl">534</span>
+                  <span className="text-white font-bold text-lg">Electricians</span>
+                  <span className="text-red-400 font-bold text-2xl">534</span>
                 </div>
                 <div className="flex justify-between items-center">
-                  <span className="text-white font-bold text-base">Welders</span>
-                  <span className="text-red-500 font-bold text-xl">423</span>
+                  <span className="text-white font-bold text-lg">Welders</span>
+                  <span className="text-red-400 font-bold text-2xl">423</span>
                 </div>
               </div>
             </div>
-            <div className="bg-white bg-opacity-20 rounded-lg p-6 backdrop-blur-sm border border-white border-opacity-30">
+            <div className="bg-slate-900 bg-opacity-70 rounded-lg p-6 backdrop-blur-sm border border-white border-opacity-40">
               <h3 className="text-lg font-bold mb-4 text-white">Most Posted Jobs</h3>
               <div className="space-y-3">
                 <div className="flex justify-between items-center">
-                  <span className="text-white font-bold text-base">Retail & Sales</span>
-                  <span className="text-red-500 font-bold text-xl">456</span>
+                  <span className="text-white font-bold text-lg">Retail & Sales</span>
+                  <span className="text-red-400 font-bold text-2xl">456</span>
                 </div>
                 <div className="flex justify-between items-center">
-                  <span className="text-white font-bold text-base">Hospitality</span>
-                  <span className="text-red-500 font-bold text-xl">389</span>
+                  <span className="text-white font-bold text-lg">Hospitality</span>
+                  <span className="text-red-400 font-bold text-2xl">389</span>
                 </div>
                 <div className="flex justify-between items-center">
-                  <span className="text-white font-bold text-base">Construction</span>
-                  <span className="text-red-500 font-bold text-xl">312</span>
+                  <span className="text-white font-bold text-lg">Construction</span>
+                  <span className="text-red-400 font-bold text-2xl">312</span>
                 </div>
                 <div className="flex justify-between items-center">
-                  <span className="text-white font-bold text-base">Manufacturing</span>
-                  <span className="text-red-500 font-bold text-xl">298</span>
+                  <span className="text-white font-bold text-lg">Manufacturing</span>
+                  <span className="text-red-400 font-bold text-2xl">298</span>
                 </div>
                 <div className="flex justify-between items-center">
-                  <span className="text-white font-bold text-base">Transportation</span>
-                  <span className="text-red-500 font-bold text-xl">267</span>
+                  <span className="text-white font-bold text-lg">Transportation</span>
+                  <span className="text-red-400 font-bold text-2xl">267</span>
                 </div>
                 <div className="flex justify-between items-center">
-                  <span className="text-white font-bold text-base">Administration</span>
-                  <span className="text-red-500 font-bold text-xl">245</span>
+                  <span className="text-white font-bold text-lg">Administration</span>
+                  <span className="text-red-400 font-bold text-2xl">245</span>
                 </div>
               </div>
             </div>
