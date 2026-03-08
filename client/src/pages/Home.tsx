@@ -256,13 +256,12 @@ export default function Home() {
     // 히어로 섹션 필터 적용
     if (selectedFilters.length > 0) {
       filtered = filtered.filter((job) => {
-        for (const filter of selectedFilters) {
-          if (filter === "LMIA Jobs" && job.lmiaAvailable) return true;
-          if (filter === "Visa Sponsorship" && job.visaSponsorshipAvailable) return true;
-          if (filter === "Nursing Jobs" && job.category === "Healthcare") return true;
-          if (filter === "Truck Driver Jobs" && job.category === "Transportation") return true;
-        }
-        return false;
+        let meetsLMIA = !selectedFilters.includes("LMIA Jobs") || job.lmiaAvailable;
+        let meetsNursing = !selectedFilters.includes("Nursing Jobs") || (job.lmiaAvailable && job.category === "Healthcare");
+        let meetsTruck = !selectedFilters.includes("Truck Driver Jobs") || (job.lmiaAvailable && job.category === "Transportation");
+        let meetsVisa = !selectedFilters.includes("Visa Sponsorship") || job.visaSponsorshipAvailable;
+        
+        return meetsLMIA && meetsNursing && meetsTruck && meetsVisa;
       });
     }
 
@@ -493,61 +492,61 @@ export default function Home() {
 
           {/* 검색 통계 섹션 */}
           <div className="mt-12 grid grid-cols-1 md:grid-cols-2 gap-8">
-            <div className="bg-white bg-opacity-15 rounded-lg p-6 backdrop-blur-sm border border-white border-opacity-20">
+            <div className="bg-white bg-opacity-20 rounded-lg p-6 backdrop-blur-sm border border-white border-opacity-30">
               <h3 className="text-lg font-bold mb-4 text-white">Most Searched Jobs</h3>
               <div className="space-y-3">
                 <div className="flex justify-between items-center">
-                  <span className="text-white font-medium">Healthcare Professionals</span>
-                  <span className="text-red-400 font-bold text-lg">1,234</span>
+                  <span className="text-white font-bold text-base">Healthcare Professionals</span>
+                  <span className="text-red-500 font-bold text-xl">1,234</span>
                 </div>
                 <div className="flex justify-between items-center">
-                  <span className="text-white font-medium">Software Developers</span>
-                  <span className="text-red-400 font-bold text-lg">892</span>
+                  <span className="text-white font-bold text-base">Software Developers</span>
+                  <span className="text-red-500 font-bold text-xl">892</span>
                 </div>
                 <div className="flex justify-between items-center">
-                  <span className="text-white font-medium">Truck Drivers</span>
-                  <span className="text-red-400 font-bold text-lg">756</span>
+                  <span className="text-white font-bold text-base">Truck Drivers</span>
+                  <span className="text-red-500 font-bold text-xl">756</span>
                 </div>
                 <div className="flex justify-between items-center">
-                  <span className="text-white font-medium">Nurses</span>
-                  <span className="text-red-400 font-bold text-lg">645</span>
+                  <span className="text-white font-bold text-base">Nurses</span>
+                  <span className="text-red-500 font-bold text-xl">645</span>
                 </div>
                 <div className="flex justify-between items-center">
-                  <span className="text-white font-medium">Electricians</span>
-                  <span className="text-red-400 font-bold text-lg">534</span>
+                  <span className="text-white font-bold text-base">Electricians</span>
+                  <span className="text-red-500 font-bold text-xl">534</span>
                 </div>
                 <div className="flex justify-between items-center">
-                  <span className="text-white font-medium">Welders</span>
-                  <span className="text-red-400 font-bold text-lg">423</span>
+                  <span className="text-white font-bold text-base">Welders</span>
+                  <span className="text-red-500 font-bold text-xl">423</span>
                 </div>
               </div>
             </div>
-            <div className="bg-white bg-opacity-15 rounded-lg p-6 backdrop-blur-sm border border-white border-opacity-20">
+            <div className="bg-white bg-opacity-20 rounded-lg p-6 backdrop-blur-sm border border-white border-opacity-30">
               <h3 className="text-lg font-bold mb-4 text-white">Most Posted Jobs</h3>
               <div className="space-y-3">
                 <div className="flex justify-between items-center">
-                  <span className="text-white font-medium">Retail & Sales</span>
-                  <span className="text-red-400 font-bold text-lg">456</span>
+                  <span className="text-white font-bold text-base">Retail & Sales</span>
+                  <span className="text-red-500 font-bold text-xl">456</span>
                 </div>
                 <div className="flex justify-between items-center">
-                  <span className="text-white font-medium">Hospitality</span>
-                  <span className="text-red-400 font-bold text-lg">389</span>
+                  <span className="text-white font-bold text-base">Hospitality</span>
+                  <span className="text-red-500 font-bold text-xl">389</span>
                 </div>
                 <div className="flex justify-between items-center">
-                  <span className="text-white font-medium">Construction</span>
-                  <span className="text-red-400 font-bold text-lg">312</span>
+                  <span className="text-white font-bold text-base">Construction</span>
+                  <span className="text-red-500 font-bold text-xl">312</span>
                 </div>
                 <div className="flex justify-between items-center">
-                  <span className="text-white font-medium">Manufacturing</span>
-                  <span className="text-red-400 font-bold text-lg">298</span>
+                  <span className="text-white font-bold text-base">Manufacturing</span>
+                  <span className="text-red-500 font-bold text-xl">298</span>
                 </div>
                 <div className="flex justify-between items-center">
-                  <span className="text-white font-medium">Transportation</span>
-                  <span className="text-red-400 font-bold text-lg">267</span>
+                  <span className="text-white font-bold text-base">Transportation</span>
+                  <span className="text-red-500 font-bold text-xl">267</span>
                 </div>
                 <div className="flex justify-between items-center">
-                  <span className="text-white font-medium">Administration</span>
-                  <span className="text-red-400 font-bold text-lg">245</span>
+                  <span className="text-white font-bold text-base">Administration</span>
+                  <span className="text-red-500 font-bold text-xl">245</span>
                 </div>
               </div>
             </div>

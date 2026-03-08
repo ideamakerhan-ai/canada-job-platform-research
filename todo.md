@@ -103,3 +103,10 @@
 - [x] 검색 통계 항목 5-6개로 확대
 - [x] Featured Jobs 카드에서 Apply 버튼 제거
 - [x] Featured Jobs 카드 전체를 클릭 가능하게 변경 (상세보기 페이지로 이동)
+
+
+## Phase 19: 필터 기능 완성 및 글씨 가시성 개선
+- [x] LMIA Jobs 필터: LMIA 공고만 표시
+- [x] Nursing Jobs 필터: LMIA + Nursing 공고 표시
+- [x] Truck Driver Jobs 필터: LMIA + Truck Driver 공고 표시
+- [x] 검색 통계 섹션 직업명 글씨 더 크고 진하게 표시
