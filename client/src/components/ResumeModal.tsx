@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { trpc } from "@/lib/trpc";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -15,6 +15,14 @@ interface ResumeModalProps {
 
 export function ResumeModal({ open, onOpenChange, jobId, onApplySuccess }: ResumeModalProps) {
   const [step, setStep] = useState<"check" | "register" | "select">("check");
+
+  // 모달이 열릴 때마다 상태 초기화
+  useEffect(() => {
+    if (open) {
+      setStep("check");
+      setSelectedResumeId(null);
+    }
+  }, [open]);
   const [formData, setFormData] = useState({
     title: "",
     fullName: "",
@@ -32,6 +40,7 @@ export function ResumeModal({ open, onOpenChange, jobId, onApplySuccess }: Resum
   const resumesQuery = trpc.resume.myResumes.useQuery();
   const createResumeMutation = trpc.resume.create.useMutation({
     onSuccess: () => {
+      // 이력서 목록 새로고침
       resumesQuery.refetch();
       setFormData({
         title: "",
@@ -44,7 +53,10 @@ export function ResumeModal({ open, onOpenChange, jobId, onApplySuccess }: Resum
         education: "",
         skills: "",
       });
-      setStep("select");
+      // 약간의 지연 후 select 단계로 이동 (데이터 로드 완료 대기)
+      setTimeout(() => {
+        setStep("select");
+      }, 500);
     },
   });
 
@@ -61,6 +73,7 @@ export function ResumeModal({ open, onOpenChange, jobId, onApplySuccess }: Resum
     },
   });
 
+  // 이력서 데이터 새로고침
   const resumes = resumesQuery.data || [];
   const hasResumes = resumes.length > 0;
   const canAddMore = resumes.length < 5;
@@ -324,13 +337,13 @@ export function ResumeModal({ open, onOpenChange, jobId, onApplySuccess }: Resum
                   >
                     <div className="flex items-start justify-between">
                       <div className="flex-1">
-                        <p className="font-semibold text-slate-900">{resume.title}</p>
-                        <p className="text-sm text-slate-600">{resume.fullName}</p>
-                        <p className="text-sm text-slate-500">{resume.email}</p>
-                        {resume.location && (
-                          <p className="text-sm text-slate-500">{resume.location}</p>
-                        )}
-                      </div>
+                      <p className="font-semibold text-slate-900">{resume.title}</p>
+                      <p className="text-sm text-slate-600">{resume.fullName}</p>
+                      <p className="text-sm text-slate-500">{resume.email}</p>
+                      {resume.location && (
+                        <p className="text-sm text-slate-500">{resume.location}</p>
+                      )}
+                    </div>
                       <div className="flex items-center gap-2">
                         {resume.isDefault && (
                           <span className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded">

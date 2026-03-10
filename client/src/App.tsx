@@ -7,6 +7,7 @@ import { ThemeProvider } from "./contexts/ThemeContext";
 import Home from "./pages/Home";
 import { useLocation } from "wouter";
 import Profile from "./pages/Profile";
+import ProfilePage from "./pages/ProfilePage";
 import PostJob from "./pages/PostJob";
 import Occupations from "./pages/Occupations";
 import JobDetail from "./pages/JobDetail";
@@ -17,8 +18,9 @@ function Router() {
   return (
     <Switch>
       <Route path={"/"} component={Home} />
-      <Route path={"/job/:id"} component={JobDetail} />
+          <Route path={"/job/:id"} component={JobDetail} />
       <Route path={"/profile"} component={Profile} />
+      <Route path={"/my-profile"} component={ProfilePage} />
       <Route path={"/post-job"} component={PostJob} />
       <Route path={"/occupations"} component={Occupations} />
       <Route path={"/admin"} component={AdminDashboard} />

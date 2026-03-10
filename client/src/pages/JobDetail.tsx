@@ -2,7 +2,7 @@ import { useParams, useLocation as useWouterLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { MapPin, DollarSign, Briefcase, Clock, Heart, Share2, ArrowLeft, CheckCircle } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { toast } from "sonner";
 import { ResumeModal } from "@/components/ResumeModal";
 
@@ -87,6 +87,11 @@ export default function JobDetail() {
   const [isSaved, setIsSaved] = useState(false);
   const [showResumeModal, setShowResumeModal] = useState(false);
 
+  // 페이지 로드 시 스크롤을 최상단으로 초기화
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [id]);
+
   const job = sampleJobs.find((j) => j.id === parseInt(id || "0"));
 
   if (!job) {
@@ -120,6 +125,7 @@ export default function JobDetail() {
 
   const handleApplySuccess = () => {
     setIsApplied(true);
+    setShowResumeModal(false);
     toast.success("Application submitted successfully");
   };
 
@@ -130,8 +136,8 @@ export default function JobDetail() {
         <div className="container py-4">
           <div className="flex items-center justify-between">
             <div className="cursor-pointer" onClick={() => navigate("/")}>
-              <h1 className="text-2xl font-bold text-slate-900 hover:text-blue-600 transition-colors">CanadaJobs</h1>
-              <p className="text-sm text-slate-600">Find Your Perfect Job in Canada</p>
+              <h1 className="text-2xl font-bold text-slate-900 hover:text-blue-600 transition-colors">CJ</h1>
+              <p className="text-sm text-slate-600">Canada Job Platform</p>
             </div>
             <Button variant="ghost" onClick={() => navigate("/")}>
               <ArrowLeft className="w-4 h-4 mr-2" />
@@ -245,12 +251,15 @@ export default function JobDetail() {
               )}
             </Button>
 
-            <ResumeModal
-              open={showResumeModal}
-              onOpenChange={setShowResumeModal}
-              jobId={job.id}
-              onApplySuccess={handleApplySuccess}
-            />
+            {showResumeModal && (
+              <ResumeModal
+                key={`resume-modal-${Date.now()}`}
+                open={showResumeModal}
+                onOpenChange={setShowResumeModal}
+                jobId={job.id}
+                onApplySuccess={handleApplySuccess}
+              />
+            )}
           </div>
 
           {/* 추가 정보 */}
