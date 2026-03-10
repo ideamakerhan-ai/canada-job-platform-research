@@ -257,7 +257,7 @@ export default function Home() {
     // 히어로 섹션 필터 적용
     if (selectedFilters.length > 0) {
       filtered = filtered.filter((job) => {
-        let meetsLMIA = !selectedFilters.includes("LMIA Jobs") || job.lmiaAvailable;
+        let meetsLMIA = !selectedFilters.includes("LMIA Approved") || job.lmiaAvailable;
         let meetsNursing = !selectedFilters.includes("Nursing Jobs") || (job.lmiaAvailable && job.category === "Healthcare");
         let meetsTruck = !selectedFilters.includes("Truck Driver Jobs") || (job.lmiaAvailable && job.category === "Transportation");
         let meetsVisa = !selectedFilters.includes("Visa Sponsorship") || job.visaSponsorshipAvailable;
@@ -404,13 +404,13 @@ export default function Home() {
               setSelectedSalaryRange([]);
               navigate("/");
             }}>
-              <div className="bg-red-600 text-white rounded-md p-2 font-bold">LJ</div>
-              <h1 className="text-xl font-bold text-slate-900 hover:text-blue-600 transition-colors">LMIAJobs</h1>
+              <div className="bg-red-600 text-white rounded-md p-2 font-bold">CJ</div>
+              <h1 className="text-xl font-bold text-slate-900 hover:text-blue-600 transition-colors">CanadaJobs</h1>
             </div>
             <nav className="hidden md:flex items-center gap-8">
               <a href="#" className="text-slate-700 hover:text-slate-900 font-medium">Find Jobs</a>
               <a href="#" className="text-slate-700 hover:text-slate-900 font-medium" onClick={() => navigate("/post-job")}>Post a Job</a>
-              <a href="#" className="text-slate-700 hover:text-slate-900 font-medium">LMIA Guide</a>
+              <a href="#" className="text-slate-700 hover:text-slate-900 font-medium">Job Guide</a>
             </nav>
             <nav className="md:hidden flex items-center gap-4">
               <a href="#" className="text-slate-700 hover:text-slate-900 font-medium text-sm" onClick={() => navigate("/post-job")}>Post a Job</a>
@@ -438,13 +438,13 @@ export default function Home() {
         <div className="container relative z-10">
           <div className="text-center mb-12">
             <div className="inline-block mb-4 px-4 py-2 border border-red-500 rounded-full text-sm text-red-400">
-              ✓ Trusted LMIA Job Platform
+              ✓ Canada's Job Platform
             </div>
             <h2 className="text-5xl font-bold mb-4">
-              Find <span className="text-red-500">LMIA-Approved</span> Jobs<br/>in Canada
+              Find Your <span className="text-red-500">Perfect Job</span><br/>in Canada
             </h2>
             <p className="text-slate-300 text-lg max-w-2xl mx-auto">
-              Browse verified job listings with Labour Market Impact Assessment approval and visa sponsorship from Canadian employers.
+              Browse verified job listings from Canadian employers. Find positions with visa sponsorship, LMIA approval, and accommodation support.
             </p>
           </div>
 
@@ -469,15 +469,15 @@ export default function Home() {
           {/* 필터 버튼 */}
           <div className="flex flex-wrap justify-center gap-3">
             <Button 
-              onClick={() => toggleFilter("LMIA Jobs")}
+              onClick={() => toggleFilter("LMIA Approved")}
               className={`${
-                selectedFilters.includes("LMIA Jobs")
+                selectedFilters.includes("LMIA Approved")
                   ? "bg-red-600 border-red-600 text-white hover:bg-red-700"
                   : "bg-slate-800 border-slate-700 text-white hover:bg-slate-700"
               }`}
               variant="outline"
             >
-              ✓ LMIA Jobs
+              ✓ LMIA Approved
             </Button>
             <Button 
               onClick={() => toggleFilter("Visa Sponsorship")}

@@ -121,3 +121,15 @@
 ## Phase 21: 공고 카드 배지 단순화
 - [x] 공고 카드에서 Visa Sponsorship Available 텍스트 제거
 - [x] LMIA 배지만 표시되도록 수정
+
+## Phase 22: 사이트 리브래단딩 (LMIA → 일반 채용 플래폰)
+- [x] 사이트 이름 변경 (LMIAJobs → CanadaJobs)
+- [x] 헤더 네비게이션 업데이트 (LMIA Guide → Job Guide)
+- [x] 히어로 섹션 제목 및 설명 변경
+- [x] 필터 버튼 이름 업데이트 (LMIA Jobs → LMIA Approved)
+- [x] 필터 로직 업데이트
+
+
+## Phase 23: 모바일 필터 버튼 레이아웃 개선
+- [ ] 필터 버튼을 2줄 배치로 변경 (모바일에서 2x2 그리드)
+- [ ] 데스크톱에서는 기존 1줄 배치 유지
