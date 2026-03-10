@@ -212,3 +212,122 @@ export async function createJobListing(data: InsertJobListing) {
     throw error;
   }
 }
+
+
+// Resume Management Functions
+import { resumes, InsertResume, Resume } from "../drizzle/schema";
+
+export async function createResume(data: InsertResume): Promise<Resume | null> {
+  const db = await getDb();
+  if (!db) return null;
+
+  try {
+    const result = await db.insert(resumes).values(data);
+    return data as Resume;
+  } catch (error) {
+    console.error("Failed to create resume:", error);
+    return null;
+  }
+}
+
+export async function getUserResumes(userId: number): Promise<Resume[]> {
+  const db = await getDb();
+  if (!db) return [];
+
+  try {
+    return await db
+      .select()
+      .from(resumes)
+      .where(eq(resumes.userId, userId));
+  } catch (error) {
+    console.error("Failed to get user resumes:", error);
+    return [];
+  }
+}
+
+export async function getResumeById(resumeId: number): Promise<Resume | null> {
+  const db = await getDb();
+  if (!db) return null;
+
+  try {
+    const result = await db
+      .select()
+      .from(resumes)
+      .where(eq(resumes.id, resumeId))
+      .limit(1);
+    return result[0] || null;
+  } catch (error) {
+    console.error("Failed to get resume:", error);
+    return null;
+  }
+}
+
+export async function updateResume(resumeId: number, data: Partial<InsertResume>): Promise<boolean> {
+  const db = await getDb();
+  if (!db) return false;
+
+  try {
+    await db
+      .update(resumes)
+      .set(data)
+      .where(eq(resumes.id, resumeId));
+    return true;
+  } catch (error) {
+    console.error("Failed to update resume:", error);
+    return false;
+  }
+}
+
+export async function deleteResume(resumeId: number): Promise<boolean> {
+  const db = await getDb();
+  if (!db) return false;
+
+  try {
+    await db
+      .delete(resumes)
+      .where(eq(resumes.id, resumeId));
+    return true;
+  } catch (error) {
+    console.error("Failed to delete resume:", error);
+    return false;
+  }
+}
+
+export async function setDefaultResume(userId: number, resumeId: number): Promise<boolean> {
+  const db = await getDb();
+  if (!db) return false;
+
+  try {
+    // Reset all resumes for this user
+    await db
+      .update(resumes)
+      .set({ isDefault: 0 })
+      .where(eq(resumes.userId, userId));
+
+    // Set the selected resume as default
+    await db
+      .update(resumes)
+      .set({ isDefault: 1 })
+      .where(eq(resumes.id, resumeId));
+
+    return true;
+  } catch (error) {
+    console.error("Failed to set default resume:", error);
+    return false;
+  }
+}
+
+export async function applyForJobWithResume(userId: number, jobId: number, resumeId: number) {
+  const db = await getDb();
+  if (!db) return false;
+
+  try {
+    await db
+      .insert(jobApplications)
+      .values({ userId, jobId, resumeId, status: "applied" });
+    return true;
+  } catch (error) {
+    console.error("Failed to apply for job:", error);
+    return false;
+  }
+}

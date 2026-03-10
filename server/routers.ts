@@ -3,8 +3,8 @@ import { getSessionCookieOptions } from "./_core/cookies";
 import { systemRouter } from "./_core/systemRouter";
 import { publicProcedure, router } from "./_core/trpc";
 import { z } from "zod";
-import { getJobListings, getJobById, saveJob, applyForJob, getSavedJobs, getUserApplications, createJobListing, getDb } from "./db";
-import { users, jobApplications, jobListings } from "../drizzle/schema";
+import { getJobListings, getJobById, saveJob, applyForJob, getSavedJobs, getUserApplications, createJobListing, getDb, createResume, getUserResumes, updateResume, deleteResume, setDefaultResume, applyForJobWithResume } from "./db";
+import { users, jobApplications, jobListings, resumes } from "../drizzle/schema";
 import { eq } from "drizzle-orm";
 
 // Admin procedure - checks if user is admin
@@ -179,6 +179,100 @@ export const appRouter = router({
           .set({ status: input.status })
           .where(eq(jobListings.id, input.jobId));
         return { success: true };
+      }),
+  }),
+
+  resume: router({
+    // Get user's resumes
+    myResumes: publicProcedure.query(async ({ ctx }) => {
+      if (!ctx.user) return [];
+      return await getUserResumes(ctx.user.id);
+    }),
+
+    // Create new resume
+    create: publicProcedure
+      .input(z.object({
+        title: z.string(),
+        fullName: z.string(),
+        email: z.string(),
+        phone: z.string().optional(),
+        location: z.string().optional(),
+        summary: z.string().optional(),
+        experience: z.string().optional(),
+        education: z.string().optional(),
+        skills: z.string().optional(),
+      }))
+      .mutation(async ({ input, ctx }) => {
+        if (!ctx.user) throw new Error("Not authenticated");
+        
+        // Check resume count (max 5)
+        const existingResumes = await getUserResumes(ctx.user.id);
+        if (existingResumes.length >= 5) {
+          throw new Error("Maximum 5 resumes allowed");
+        }
+
+        return await createResume({
+          userId: ctx.user.id,
+          title: input.title,
+          fullName: input.fullName,
+          email: input.email,
+          phone: input.phone,
+          location: input.location,
+          summary: input.summary,
+          experience: input.experience,
+          education: input.education,
+          skills: input.skills,
+          isDefault: existingResumes.length === 0 ? 1 : 0,
+        });
+      }),
+
+    // Update resume
+    update: publicProcedure
+      .input(z.object({
+        resumeId: z.number(),
+        title: z.string().optional(),
+        fullName: z.string().optional(),
+        email: z.string().optional(),
+        phone: z.string().optional(),
+        location: z.string().optional(),
+        summary: z.string().optional(),
+        experience: z.string().optional(),
+        education: z.string().optional(),
+        skills: z.string().optional(),
+      }))
+      .mutation(async ({ input, ctx }) => {
+        if (!ctx.user) throw new Error("Not authenticated");
+        const { resumeId, ...data } = input;
+        return await updateResume(resumeId, data);
+      }),
+
+    // Delete resume
+    delete: publicProcedure
+      .input(z.number())
+      .mutation(async ({ input: resumeId, ctx }) => {
+        if (!ctx.user) throw new Error("Not authenticated");
+        return await deleteResume(resumeId);
+      }),
+
+    // Set default resume
+    setDefault: publicProcedure
+      .input(z.number())
+      .mutation(async ({ input: resumeId, ctx }) => {
+        if (!ctx.user) throw new Error("Not authenticated");
+        return await setDefaultResume(ctx.user.id, resumeId);
+      }),
+  }),
+
+  application: router({
+    // Apply for job with resume selection
+    applyWithResume: publicProcedure
+      .input(z.object({
+        jobId: z.number(),
+        resumeId: z.number(),
+      }))
+      .mutation(async ({ input, ctx }) => {
+        if (!ctx.user) throw new Error("Not authenticated");
+        return await applyForJobWithResume(ctx.user.id, input.jobId, input.resumeId);
       }),
   }),
 });

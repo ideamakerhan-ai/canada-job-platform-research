@@ -4,6 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import { MapPin, DollarSign, Briefcase, Clock, Heart, Share2, ArrowLeft, CheckCircle } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
+import { ResumeModal } from "@/components/ResumeModal";
 
 // 샘플 데이터 (Home.tsx와 동일)
 const sampleJobs = [
@@ -82,8 +83,9 @@ const sampleJobs = [
 export default function JobDetail() {
   const { id } = useParams();
   const [, navigate] = useWouterLocation();
-  const [isSaved, setIsSaved] = useState(false);
   const [isApplied, setIsApplied] = useState(false);
+  const [isSaved, setIsSaved] = useState(false);
+  const [showResumeModal, setShowResumeModal] = useState(false);
 
   const job = sampleJobs.find((j) => j.id === parseInt(id || "0"));
 
@@ -113,6 +115,10 @@ export default function JobDetail() {
   };
 
   const handleApply = () => {
+    setShowResumeModal(true);
+  };
+
+  const handleApplySuccess = () => {
     setIsApplied(true);
     toast.success("Application submitted successfully");
   };
@@ -124,8 +130,8 @@ export default function JobDetail() {
         <div className="container py-4">
           <div className="flex items-center justify-between">
             <div className="cursor-pointer" onClick={() => navigate("/")}>
-              <h1 className="text-2xl font-bold text-slate-900 hover:text-blue-600 transition-colors">LMIAJobsCanada</h1>
-              <p className="text-sm text-slate-600">LMIA & Visa Sponsorship Jobs</p>
+              <h1 className="text-2xl font-bold text-slate-900 hover:text-blue-600 transition-colors">CanadaJobs</h1>
+              <p className="text-sm text-slate-600">Find Your Perfect Job in Canada</p>
             </div>
             <Button variant="ghost" onClick={() => navigate("/")}>
               <ArrowLeft className="w-4 h-4 mr-2" />
@@ -238,6 +244,13 @@ export default function JobDetail() {
                 "Apply Now"
               )}
             </Button>
+
+            <ResumeModal
+              open={showResumeModal}
+              onOpenChange={setShowResumeModal}
+              jobId={job.id}
+              onApplySuccess={handleApplySuccess}
+            />
           </div>
 
           {/* 추가 정보 */}
@@ -256,7 +269,7 @@ export default function JobDetail() {
       {/* 푸터 */}
       <footer className="bg-slate-900 text-slate-300 py-12 mt-16">
         <div className="container">
-          <p className="text-center text-sm">© 2026 LMIAJobsCanada. All rights reserved.</p>
+          <p className="text-center text-sm">© 2026 CanadaJobs. All rights reserved.</p>
         </div>
       </footer>
     </div>
