@@ -110,3 +110,9 @@
 - [x] Nursing Jobs 필터: LMIA + Nursing 공고 표시
 - [x] Truck Driver Jobs 필터: LMIA + Truck Driver 공고 표시
 - [x] 검색 통계 섹션 직업명 글씨 더 크고 진하게 표시
+
+
+## Phase 20: 검색 통계 직업명 클릭 필터링
+- [x] 검색 통계 직업명을 클릭 가능하게 변경
+- [x] 직업명 클릭 시 해당 로직 구현
+- [x] 선택된 직업명 강조 표시

@@ -198,6 +198,7 @@ export default function Home() {
   const [appliedJobs, setAppliedJobs] = useState<number[]>([]);
   const [allJobs, setAllJobs] = useState<JobListing[]>(sampleJobs);
   const [selectedFilters, setSelectedFilters] = useState<string[]>([]);
+  const [selectedJobTitle, setSelectedJobTitle] = useState<string | null>(null);
 
   // 초기화: 샘플 데이터만 사용
   useEffect(() => {
@@ -265,8 +266,31 @@ export default function Home() {
       });
     }
 
+    // 검색 통계 직업명 필터 적용
+    if (selectedJobTitle) {
+      const jobTitleMap: { [key: string]: string } = {
+        "Healthcare Professionals": "Healthcare",
+        "Software Developers": "IT Development & Data",
+        "Truck Drivers": "Transportation",
+        "Nurses": "Healthcare",
+        "Electricians": "Trades & Construction",
+        "Welders": "Trades & Construction",
+        "Retail & Sales": "Retail & Sales",
+        "Hospitality": "Hospitality & Tourism",
+        "Construction": "Trades & Construction",
+        "Manufacturing": "Manufacturing & Production",
+        "Transportation": "Transportation",
+        "Administration": "Administration & Legal",
+      };
+      const categoryToFilter = jobTitleMap[selectedJobTitle];
+      if (categoryToFilter) {
+        filtered = filtered.filter((job) => job.category === categoryToFilter);
+      }
+    }
+
     setFilteredJobs(filtered);
-  }, [searchTerm, selectedCategory, selectedLocation, selectedJobType, selectedSalaryRange, selectedFilters]);
+  }, [searchTerm, selectedCategory, selectedLocation, selectedJobType, selectedSalaryRange, selectedFilters, selectedJobTitle]);
+
 
   const handleSaveJob = (jobId: number) => {
     setSavedJobs((prev) => {
@@ -495,59 +519,47 @@ export default function Home() {
             <div className="bg-slate-900 bg-opacity-70 rounded-lg p-6 backdrop-blur-sm border border-white border-opacity-40">
               <h3 className="text-lg font-bold mb-4 text-white">Most Searched Jobs</h3>
               <div className="space-y-3">
-                <div className="flex justify-between items-center">
-                  <span className="text-white font-bold text-lg">Healthcare Professionals</span>
-                  <span className="text-red-400 font-bold text-2xl">1,234</span>
-                </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-white font-bold text-lg">Software Developers</span>
-                  <span className="text-red-400 font-bold text-2xl">892</span>
-                </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-white font-bold text-lg">Truck Drivers</span>
-                  <span className="text-red-400 font-bold text-2xl">756</span>
-                </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-white font-bold text-lg">Nurses</span>
-                  <span className="text-red-400 font-bold text-2xl">645</span>
-                </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-white font-bold text-lg">Electricians</span>
-                  <span className="text-red-400 font-bold text-2xl">534</span>
-                </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-white font-bold text-lg">Welders</span>
-                  <span className="text-red-400 font-bold text-2xl">423</span>
-                </div>
+                {["Healthcare Professionals", "Software Developers", "Truck Drivers", "Nurses", "Electricians", "Welders"].map((job) => {
+                  const jobCounts: { [key: string]: string } = {
+                    "Healthcare Professionals": "1,234",
+                    "Software Developers": "892",
+                    "Truck Drivers": "756",
+                    "Nurses": "645",
+                    "Electricians": "534",
+                    "Welders": "423"
+                  };
+                  return (
+                    <div key={job} className="flex justify-between items-center cursor-pointer hover:opacity-80 transition-opacity" onClick={() => setSelectedJobTitle(selectedJobTitle === job ? null : job)}>
+                      <span className={`font-bold text-lg ${
+                        selectedJobTitle === job ? "text-red-400" : "text-white"
+                      }`}>{job}</span>
+                      <span className="text-red-400 font-bold text-2xl">{jobCounts[job]}</span>
+                    </div>
+                  );
+                })}
               </div>
             </div>
             <div className="bg-slate-900 bg-opacity-70 rounded-lg p-6 backdrop-blur-sm border border-white border-opacity-40">
               <h3 className="text-lg font-bold mb-4 text-white">Most Posted Jobs</h3>
               <div className="space-y-3">
-                <div className="flex justify-between items-center">
-                  <span className="text-white font-bold text-lg">Retail & Sales</span>
-                  <span className="text-red-400 font-bold text-2xl">456</span>
-                </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-white font-bold text-lg">Hospitality</span>
-                  <span className="text-red-400 font-bold text-2xl">389</span>
-                </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-white font-bold text-lg">Construction</span>
-                  <span className="text-red-400 font-bold text-2xl">312</span>
-                </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-white font-bold text-lg">Manufacturing</span>
-                  <span className="text-red-400 font-bold text-2xl">298</span>
-                </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-white font-bold text-lg">Transportation</span>
-                  <span className="text-red-400 font-bold text-2xl">267</span>
-                </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-white font-bold text-lg">Administration</span>
-                  <span className="text-red-400 font-bold text-2xl">245</span>
-                </div>
+                {["Retail & Sales", "Hospitality", "Construction", "Manufacturing", "Transportation", "Administration"].map((job) => {
+                  const jobCounts: { [key: string]: string } = {
+                    "Retail & Sales": "456",
+                    "Hospitality": "389",
+                    "Construction": "312",
+                    "Manufacturing": "298",
+                    "Transportation": "267",
+                    "Administration": "245"
+                  };
+                  return (
+                    <div key={job} className="flex justify-between items-center cursor-pointer hover:opacity-80 transition-opacity" onClick={() => setSelectedJobTitle(selectedJobTitle === job ? null : job)}>
+                      <span className={`font-bold text-lg ${
+                        selectedJobTitle === job ? "text-red-400" : "text-white"
+                      }`}>{job}</span>
+                      <span className="text-red-400 font-bold text-2xl">{jobCounts[job]}</span>
+                    </div>
+                  );
+                })}
               </div>
             </div>
           </div>
