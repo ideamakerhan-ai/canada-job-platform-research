@@ -467,7 +467,7 @@ export default function Home() {
           </div>
 
           {/* 필터 버튼 */}
-          <div className="flex flex-wrap justify-center gap-3">
+          <div className="grid grid-cols-2 md:flex md:flex-wrap justify-center gap-3 max-w-md mx-auto">
             <Button 
               onClick={() => toggleFilter("LMIA Approved")}
               className={`${
