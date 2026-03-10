@@ -126,7 +126,7 @@ export async function getJobListings(filters?: {
   }
 
   if (filters?.location && filters.location !== "all") {
-    conditions.push(eq(jobListings.city, filters.location));
+    conditions.push(eq(jobListings.location, filters.location));
   }
 
   return await db

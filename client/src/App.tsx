@@ -10,6 +10,7 @@ import Profile from "./pages/Profile";
 import PostJob from "./pages/PostJob";
 import Occupations from "./pages/Occupations";
 import JobDetail from "./pages/JobDetail";
+import AdminDashboard from "./pages/AdminDashboard";
 
 function Router() {
   // make sure to consider if you need authentication for certain routes
@@ -20,6 +21,7 @@ function Router() {
       <Route path={"/profile"} component={Profile} />
       <Route path={"/post-job"} component={PostJob} />
       <Route path={"/occupations"} component={Occupations} />
+      <Route path={"/admin"} component={AdminDashboard} />
       <Route path={"/404"} component={NotFound} />
       {/* Final fallback route */}
       <Route component={NotFound} />

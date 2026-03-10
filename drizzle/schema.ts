@@ -55,8 +55,7 @@ export const jobListings = mysqlTable("job_listings", {
   id: int("id").autoincrement().primaryKey(),
   title: varchar("title", { length: 255 }).notNull(),
   company: varchar("company", { length: 255 }).notNull(),
-  city: varchar("city", { length: 100 }).notNull(),
-  province: varchar("province", { length: 50 }).notNull(),
+  location: varchar("location", { length: 100 }).notNull(),
   salary: varchar("salary", { length: 255 }),
   salaryMin: int("salary_min"),
   salaryMax: int("salary_max"),
@@ -114,6 +113,7 @@ export const jobApplications = mysqlTable("job_applications", {
   id: int("id").autoincrement().primaryKey(),
   userId: int("user_id").notNull(),
   jobId: int("job_id").notNull(),
+  resumeId: int("resume_id"),
   status: varchar("status", { length: 50 }).default("applied").notNull(),
   appliedAt: timestamp("applied_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().onUpdateNow().notNull(),
@@ -139,3 +139,36 @@ export const userProfiles = mysqlTable("user_profiles", {
 
 export type UserProfile = typeof userProfiles.$inferSelect;
 export type InsertUserProfile = typeof userProfiles.$inferInsert;
+
+// Resumes Table - Store multiple resumes per user
+export const resumes = mysqlTable("resumes", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("user_id").notNull(),
+  title: varchar("title", { length: 255 }).notNull(),
+  fullName: varchar("full_name", { length: 255 }).notNull(),
+  email: varchar("email", { length: 320 }).notNull(),
+  phone: varchar("phone", { length: 20 }),
+  location: varchar("location", { length: 255 }),
+  summary: text("summary"),
+  experience: text("experience"),
+  education: text("education"),
+  skills: text("skills"),
+  resumeUrl: varchar("resume_url", { length: 500 }),
+  isDefault: int("is_default").default(0).notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().onUpdateNow().notNull(),
+});
+
+export type Resume = typeof resumes.$inferSelect;
+export type InsertResume = typeof resumes.$inferInsert;
+
+// Recently Viewed Jobs Table
+export const recentlyViewedJobs = mysqlTable("recently_viewed_jobs", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("user_id").notNull(),
+  jobId: int("job_id").notNull(),
+  viewedAt: timestamp("viewed_at").defaultNow().notNull(),
+});
+
+export type RecentlyViewedJob = typeof recentlyViewedJobs.$inferSelect;
+export type InsertRecentlyViewedJob = typeof recentlyViewedJobs.$inferInsert;

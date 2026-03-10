@@ -3,7 +3,17 @@ import { getSessionCookieOptions } from "./_core/cookies";
 import { systemRouter } from "./_core/systemRouter";
 import { publicProcedure, router } from "./_core/trpc";
 import { z } from "zod";
-import { getJobListings, getJobById, saveJob, applyForJob, getSavedJobs, getUserApplications, createJobListing } from "./db";
+import { getJobListings, getJobById, saveJob, applyForJob, getSavedJobs, getUserApplications, createJobListing, getDb } from "./db";
+import { users, jobApplications, jobListings } from "../drizzle/schema";
+import { eq } from "drizzle-orm";
+
+// Admin procedure - checks if user is admin
+const adminProcedure = publicProcedure.use(async ({ ctx, next }) => {
+  if (!ctx.user || ctx.user.role !== "admin") {
+    throw new Error("Unauthorized: Admin access required");
+  }
+  return next({ ctx });
+});
 
 export const appRouter = router({
   system: systemRouter,
@@ -83,15 +93,10 @@ export const appRouter = router({
       .mutation(async ({ input, ctx }) => {
         if (!ctx.user) throw new Error("Not authenticated");
         
-        const locationParts = input.location.split(",");
-        const city = locationParts[0].trim();
-        const province = locationParts.length > 1 ? locationParts[1].trim() : "ON";
-
         const jobData = {
           title: input.title,
           company: input.company,
-          city,
-          province,
+          location: input.location,
           category: input.category,
           description: input.description,
           salaryType: input.salaryType,
@@ -109,6 +114,71 @@ export const appRouter = router({
         };
 
         return await createJobListing(jobData);
+      }),
+  }),
+
+  admin: router({
+    // Get dashboard stats
+    stats: adminProcedure.query(async () => {
+      const db = await getDb();
+      if (!db) throw new Error("Database not available");
+
+      const totalApplications = await db.select().from(jobApplications);
+      const totalJobs = await db.select().from(jobListings).where(eq(jobListings.status, "active"));
+      const totalUsers = await db.select().from(users);
+
+      return {
+        totalApplications: totalApplications.length,
+        totalJobs: totalJobs.length,
+        totalUsers: totalUsers.length,
+        recentApplications: totalApplications.slice(-5),
+      };
+    }),
+
+    // Get all applications
+    applications: adminProcedure.query(async () => {
+      const db = await getDb();
+      if (!db) throw new Error("Database not available");
+      return await db.select().from(jobApplications);
+    }),
+
+    // Get all jobs
+    jobs: adminProcedure.query(async () => {
+      const db = await getDb();
+      if (!db) throw new Error("Database not available");
+      return await db.select().from(jobListings);
+    }),
+
+    // Get all users
+    usersList: adminProcedure.query(async () => {
+      const db = await getDb();
+      if (!db) throw new Error("Database not available");
+      return await db.select().from(users);
+    }),
+
+    // Delete job
+    deleteJob: adminProcedure
+      .input(z.number())
+      .mutation(async ({ input: jobId }) => {
+        const db = await getDb();
+        if (!db) throw new Error("Database not available");
+        await db.delete(jobListings).where(eq(jobListings.id, jobId));
+        return { success: true };
+      }),
+
+    // Update job status
+    updateJobStatus: adminProcedure
+      .input(z.object({
+        jobId: z.number(),
+        status: z.enum(["active", "inactive", "expired"]),
+      }))
+      .mutation(async ({ input }) => {
+        const db = await getDb();
+        if (!db) throw new Error("Database not available");
+        await db.update(jobListings)
+          .set({ status: input.status })
+          .where(eq(jobListings.id, input.jobId));
+        return { success: true };
       }),
   }),
 });
