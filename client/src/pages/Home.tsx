@@ -739,15 +739,8 @@ export default function Home() {
                         </div>
 
                         <div className="flex flex-wrap gap-2">
-                          <Badge variant="secondary">{job.category}</Badge>
                           {job.lmiaAvailable && (
-                            <Badge className="bg-green-100 text-green-800 hover:bg-green-100">LMIA Sponsorship Available</Badge>
-                          )}
-                          {job.visaSponsorshipAvailable && (
-                            <Badge className="bg-blue-100 text-blue-800 hover:bg-blue-100">Visa Sponsorship Available</Badge>
-                          )}
-                          {job.accommodation && (
-                            <Badge className="bg-purple-100 text-purple-800 hover:bg-purple-100">{job.accommodation}</Badge>
+                            <Badge className="bg-green-100 text-green-800 hover:bg-green-100">✓ LMIA</Badge>
                           )}
                         </div>
                       </div>
