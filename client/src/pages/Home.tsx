@@ -281,7 +281,7 @@ export default function Home() {
           </div>
 
           {/* Search Bar */}
-          <div className="flex gap-3 mb-6 max-w-2xl mx-auto">
+          <div className="flex gap-3 mb-6 max-w-3xl mx-auto">
             <div className="flex-1 relative">
               <Search className="absolute left-4 top-3.5 w-5 h-5 text-slate-400" />
               <Input
@@ -292,13 +292,28 @@ export default function Home() {
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
             </div>
-            <Button className="bg-red-600 hover:bg-red-700 text-white px-8 py-3 rounded-lg font-semibold">
+            <select
+              value={selectedLocation}
+              onChange={(e) => setSelectedLocation(e.target.value)}
+              className="px-4 py-3 bg-white text-slate-900 rounded-lg border-0 font-medium"
+            >
+              <option value="all">All Locations</option>
+              <option value="Toronto, ON">Toronto, ON</option>
+              <option value="Vancouver, BC">Vancouver, BC</option>
+              <option value="Calgary, AB">Calgary, AB</option>
+              <option value="Edmonton, AB">Edmonton, AB</option>
+              <option value="Montreal, QC">Montreal, QC</option>
+              <option value="Winnipeg, MB">Winnipeg, MB</option>
+              <option value="Ottawa, ON">Ottawa, ON</option>
+              <option value="Halifax, NS">Halifax, NS</option>
+            </select>
+            <Button className="bg-red-600 hover:bg-red-700 text-white px-8 py-3 rounded-lg font-semibold whitespace-nowrap">
               Search Jobs
             </Button>
           </div>
 
           {/* Filter Buttons */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 max-w-2xl mx-auto">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 max-w-3xl mx-auto">
             <Button
               onClick={() => handleFilterToggle("lmia")}
               className={`${
