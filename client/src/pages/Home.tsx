@@ -281,13 +281,13 @@ export default function Home() {
           </div>
 
           {/* Search Bar */}
-          <div className="flex gap-3 mb-6 max-w-3xl mx-auto">
+          <div className="flex flex-col sm:flex-row gap-3 mb-6 max-w-4xl mx-auto">
             <div className="flex-1 relative">
               <Search className="absolute left-4 top-3.5 w-5 h-5 text-slate-400" />
               <Input
                 type="text"
                 placeholder="Job title, NOC code, or keyword..."
-                className="pl-12 py-3 bg-white text-slate-900 rounded-lg border-0"
+                className="pl-12 py-3 bg-white text-slate-900 rounded-lg border-0 w-full"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
@@ -295,7 +295,7 @@ export default function Home() {
             <select
               value={selectedLocation}
               onChange={(e) => setSelectedLocation(e.target.value)}
-              className="px-4 py-3 bg-white text-slate-900 rounded-lg border-0 font-medium"
+              className="px-4 py-3 bg-white text-slate-900 rounded-lg border-0 font-medium min-w-[180px]"
             >
               <option value="all">All Locations</option>
               <option value="Toronto, ON">Toronto, ON</option>
@@ -307,7 +307,7 @@ export default function Home() {
               <option value="Ottawa, ON">Ottawa, ON</option>
               <option value="Halifax, NS">Halifax, NS</option>
             </select>
-            <Button className="bg-red-600 hover:bg-red-700 text-white px-8 py-3 rounded-lg font-semibold whitespace-nowrap">
+            <Button className="bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-lg font-semibold whitespace-nowrap h-auto">
               Search Jobs
             </Button>
           </div>
@@ -322,7 +322,7 @@ export default function Home() {
                   : "bg-slate-700 text-slate-200 hover:bg-slate-600"
               } rounded-lg py-2 font-semibold`}
             >
-              ✓ LMIA Approved
+              ✓ LMIA
             </Button>
             <Button
               onClick={() => handleFilterToggle("visa")}
