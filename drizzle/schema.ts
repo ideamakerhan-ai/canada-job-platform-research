@@ -55,33 +55,37 @@ export const jobListings = mysqlTable("job_listings", {
   id: int("id").autoincrement().primaryKey(),
   title: varchar("title", { length: 255 }).notNull(),
   company: varchar("company", { length: 255 }).notNull(),
-  location: varchar("location", { length: 100 }).notNull(),
+  location: varchar("location", { length: 255 }).notNull(),
   salary: varchar("salary", { length: 255 }),
-  salaryMin: int("salary_min"),
-  salaryMax: int("salary_max"),
-  salaryType: varchar("salary_type", { length: 20 }).default("annual"),
   jobType: varchar("job_type", { length: 50 }).notNull(),
   category: varchar("category", { length: 100 }).notNull(),
   description: text("description").notNull(),
   requirements: text("requirements"),
-  experienceRequired: varchar("experience_required", { length: 100 }),
-  accommodation: varchar("accommodation", { length: 100 }),
-  nocCode: varchar("noc_code", { length: 10 }),
-  teerLevel: int("teer_level"),
-  lmiaAvailable: int("lmia_available").default(0).notNull(),
-  visaSponsorship: int("visa_sponsorship").default(0).notNull(),
-  applicationMethod: varchar("application_method", { length: 50 }).notNull(),
-  applicationEmail: varchar("application_email", { length: 320 }),
-  applicationLink: varchar("application_link", { length: 500 }),
   postedBy: int("posted_by").notNull(),
-  status: varchar("status", { length: 50 }).default("active").notNull(),
-  expiresAt: timestamp("expires_at"),
+  isActive: int("is_active").default(1).notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().onUpdateNow().notNull(),
 });
 
 export type JobListing = typeof jobListings.$inferSelect;
 export type InsertJobListing = typeof jobListings.$inferInsert;
+
+// Extended job listing fields (stored separately or in application logic)
+export interface ExtendedJobListing extends JobListing {
+  salaryMin?: number;
+  salaryMax?: number;
+  salaryType?: string;
+  experienceRequired?: string;
+  accommodation?: string;
+  nocCode?: string;
+  teerLevel?: number;
+  lmiaAvailable?: number;
+  visaSponsorship?: number;
+  applicationMethod?: string;
+  applicationEmail?: string;
+  applicationLink?: string;
+  expiresAt?: Date;
+}
 
 // Job Reports Table (Scam Prevention)
 export const jobReports = mysqlTable("job_reports", {

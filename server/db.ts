@@ -118,22 +118,24 @@ export async function getJobListings(filters?: {
 }) {
   const db = await getDb();
   if (!db) return [];
-
-  const conditions = [eq(jobListings.status, "active")];
-
-  if (filters?.category && filters.category !== "all") {
-    conditions.push(eq(jobListings.category, filters.category));
+  
+  try {
+    const conditions = [eq(jobListings.isActive, 1)];
+    if (filters?.category && filters.category !== "all") {
+      conditions.push(eq(jobListings.category, filters.category));
+    }
+    if (filters?.location && filters.location !== "all") {
+      conditions.push(eq(jobListings.location, filters.location));
+    }
+    return await db
+      .select()
+      .from(jobListings)
+      .where(conditions.length > 1 ? and(...conditions) : conditions[0])
+      .limit(50);
+  } catch (error) {
+    console.error("[Database] getJobListings error:", error);
+    return [];
   }
-
-  if (filters?.location && filters.location !== "all") {
-    conditions.push(eq(jobListings.location, filters.location));
-  }
-
-  return await db
-    .select()
-    .from(jobListings)
-    .where(conditions.length > 1 ? and(...conditions) : conditions[0])
-    .limit(50);
 }
 
 export async function getJobById(jobId: number) {

@@ -24,10 +24,10 @@ interface JobListing {
   isSaved?: boolean;
   lmiaAvailable?: boolean;
   visaSponsorshipAvailable?: boolean;
-  accommodation?: string;
+  accommodation?: string | undefined;
 }
 
-// 샘플 데이터
+// 샘플 데이터 (데이터베이스가 비어있을 때 사용)
 const sampleJobs: JobListing[] = [
   {
     id: 1,
@@ -71,118 +71,6 @@ const sampleJobs: JobListing[] = [
     visaSponsorshipAvailable: true,
     accommodation: "Partial accommodation",
   },
-  {
-    id: 4,
-    title: "Marketing Specialist",
-    company: "Digital Solutions Inc",
-    location: "Montreal, QC",
-    salary: "$55,000 - $75,000",
-    jobType: "Full-time",
-    description: "Create and execute marketing strategies for growing tech company.",
-    postedDate: "1 day ago",
-    category: "Marketing & Communications",
-    lmiaAvailable: false,
-    visaSponsorshipAvailable: false,
-    accommodation: "Accommodation provided",
-  },
-  {
-    id: 5,
-    title: "Electrician Apprentice",
-    company: "Spark Electric Ltd",
-    location: "Edmonton, AB",
-    salary: "$45,000 - $65,000",
-    jobType: "Full-time",
-    description: "Join our team and learn from experienced electricians.",
-    postedDate: "4 days ago",
-    category: "Construction",
-    lmiaAvailable: true,
-    visaSponsorshipAvailable: true,
-    accommodation: "Accommodation provided",
-  },
-  {
-    id: 6,
-    title: "Data Analyst",
-    company: "Analytics Pro",
-    location: "Remote",
-    salary: "$75,000 - $95,000",
-    jobType: "Full-time",
-    description: "Analyze complex datasets and provide insights for business decisions.",
-    postedDate: "2 days ago",
-    category: "IT Development & Data",
-    lmiaAvailable: true,
-    visaSponsorshipAvailable: true,
-    accommodation: "Accommodation provided",
-  },
-  {
-    id: 7,
-    title: "Financial Analyst",
-    company: "Bay Street Finance",
-    location: "Toronto, ON",
-    salary: "$70,000 - $95,000",
-    jobType: "Full-time",
-    description: "Analyze financial data and provide strategic recommendations.",
-    postedDate: "1 day ago",
-    category: "Accounting & Finance",
-    lmiaAvailable: false,
-    visaSponsorshipAvailable: true,
-    accommodation: "Partial accommodation",
-  },
-  {
-    id: 8,
-    title: "Sales Representative",
-    company: "Global Trade Solutions",
-    location: "Vancouver, BC",
-    salary: "$50,000 - $80,000",
-    jobType: "Full-time",
-    description: "Sell enterprise software solutions to corporate clients.",
-    postedDate: "3 days ago",
-    category: "Sales & Trading",
-    lmiaAvailable: false,
-    visaSponsorshipAvailable: true,
-    accommodation: "Relocation assistance",
-  },
-  {
-    id: 9,
-    title: "Education Coordinator",
-    company: "Learning Academy",
-    location: "Montreal, QC",
-    salary: "$45,000 - $60,000",
-    jobType: "Full-time",
-    description: "Coordinate educational programs and student services.",
-    postedDate: "3 days ago",
-    category: "Education",
-    lmiaAvailable: false,
-    visaSponsorshipAvailable: false,
-    accommodation: "Accommodation provided",
-  },
-  {
-    id: 10,
-    title: "HR Manager",
-    company: "People First HR",
-    location: "Calgary, AB",
-    salary: "$60,000 - $80,000",
-    jobType: "Full-time",
-    description: "Manage human resources and employee relations.",
-    postedDate: "1 day ago",
-    category: "HR & Training",
-    lmiaAvailable: true,
-    visaSponsorshipAvailable: true,
-    accommodation: "Accommodation provided",
-  },
-  {
-    id: 11,
-    title: "Operations Manager",
-    company: "Logistics Plus",
-    location: "Edmonton, AB",
-    salary: "$55,000 - $75,000",
-    jobType: "Full-time",
-    description: "Oversee operations and optimize efficiency.",
-    postedDate: "2 days ago",
-    category: "Administration & Legal",
-    lmiaAvailable: false,
-    visaSponsorshipAvailable: true,
-    accommodation: "Partial accommodation",
-  },
 ];
 
 export default function Home() {
@@ -193,17 +81,41 @@ export default function Home() {
   const [selectedLocation, setSelectedLocation] = useState("all");
   const [selectedJobType, setSelectedJobType] = useState<string[]>([]);
   const [selectedSalaryRange, setSelectedSalaryRange] = useState<string[]>([]);
-  const [filteredJobs, setFilteredJobs] = useState<JobListing[]>(sampleJobs);
+  const [filteredJobs, setFilteredJobs] = useState<JobListing[]>([]);
   const [savedJobs, setSavedJobs] = useState<number[]>([]);
   const [appliedJobs, setAppliedJobs] = useState<number[]>([]);
-  const [allJobs, setAllJobs] = useState<JobListing[]>(sampleJobs);
+  const [allJobs, setAllJobs] = useState<JobListing[]>([]);
   const [selectedFilters, setSelectedFilters] = useState<string[]>([]);
   const [selectedJobTitle, setSelectedJobTitle] = useState<string | null>(null);
+  
+  // 데이터베이스에서 공고 로드
+  const { data: dbJobs = [] } = trpc.job.search.useQuery({});
 
-  // 초기화: 샘플 데이터만 사용
+  // 데이터베이스 공고를 JobListing 형식으로 변환
   useEffect(() => {
-    setAllJobs(sampleJobs);
-  }, []);
+    if (dbJobs && dbJobs.length > 0) {
+      const convertedJobs: JobListing[] = (dbJobs as any[]).map((job: any) => ({
+        id: job.id,
+        title: job.title,
+        company: job.company,
+        location: job.location,
+        salary: job.salary || 'Competitive',
+        jobType: job.jobType,
+        description: job.description,
+        postedDate: job.createdAt ? new Date(job.createdAt).toLocaleDateString() : 'Recently',
+        category: job.category,
+        lmiaAvailable: false,
+        visaSponsorshipAvailable: false,
+        accommodation: undefined,
+      }));
+      setAllJobs(convertedJobs);
+      setFilteredJobs(convertedJobs);
+    } else {
+      // 데이터가 없으면 샘플 데이터 사용
+      setAllJobs(sampleJobs);
+      setFilteredJobs(sampleJobs);
+    }
+  }, [dbJobs]);
 
   // 필터 업데이트 함수
   useEffect(() => {
@@ -248,571 +160,413 @@ export default function Home() {
         return selectedSalaryRange.some((range) => {
           if (range === "$0 - $50K") return minSalary <= 50000;
           if (range === "$50K - $100K") return minSalary >= 50000 && minSalary <= 100000;
-          if (range === "$100K+") return minSalary >= 100000;
-          return false;
+          if (range === "$100K - $150K") return minSalary >= 100000 && minSalary <= 150000;
+          if (range === "$150K+") return minSalary >= 150000;
+          return true;
         });
       });
     }
 
-    // 히어로 섹션 필터 적용
-    if (selectedFilters.length > 0) {
-      filtered = filtered.filter((job) => {
-        let meetsLMIA = !selectedFilters.includes("LMIA Approved") || job.lmiaAvailable;
-        let meetsNursing = !selectedFilters.includes("Nursing Jobs") || (job.lmiaAvailable && job.category === "Healthcare");
-        let meetsTruck = !selectedFilters.includes("Truck Driver Jobs") || (job.lmiaAvailable && job.category === "Transportation");
-        let meetsVisa = !selectedFilters.includes("Visa Sponsorship") || job.visaSponsorshipAvailable;
-        
-        return meetsLMIA && meetsNursing && meetsTruck && meetsVisa;
-      });
+    // LMIA Approved 필터
+    if (selectedFilters.includes("lmia")) {
+      filtered = filtered.filter((job) => job.lmiaAvailable);
     }
 
-    // 검색 통계 직업명 필터 적용
+    // Visa Sponsorship 필터
+    if (selectedFilters.includes("visa")) {
+      filtered = filtered.filter((job) => job.visaSponsorshipAvailable);
+    }
+
+    // Nursing Jobs 필터
+    if (selectedFilters.includes("nursing")) {
+      filtered = filtered.filter((job) => job.category === "Healthcare");
+    }
+
+    // Truck Driver Jobs 필터
+    if (selectedFilters.includes("truck")) {
+      filtered = filtered.filter((job) => job.category === "Transportation");
+    }
+
+    // 직업명 필터
     if (selectedJobTitle) {
-      const jobTitleMap: { [key: string]: string } = {
-        "Healthcare Professionals": "Healthcare",
-        "Software Developers": "IT Development & Data",
-        "Truck Drivers": "Transportation",
-        "Nurses": "Healthcare",
-        "Electricians": "Trades & Construction",
-        "Welders": "Trades & Construction",
-        "Retail & Sales": "Retail & Sales",
-        "Hospitality": "Hospitality & Tourism",
-        "Construction": "Trades & Construction",
-        "Manufacturing": "Manufacturing & Production",
-        "Transportation": "Transportation",
-        "Administration": "Administration & Legal",
-      };
-      const categoryToFilter = jobTitleMap[selectedJobTitle];
-      if (categoryToFilter) {
-        filtered = filtered.filter((job) => job.category === categoryToFilter);
-      }
+      filtered = filtered.filter((job) => {
+        const jobTitleLower = selectedJobTitle.toLowerCase();
+        return (
+          job.title.toLowerCase().includes(jobTitleLower) ||
+          job.category.toLowerCase().includes(jobTitleLower)
+        );
+      });
     }
 
     setFilteredJobs(filtered);
-  }, [searchTerm, selectedCategory, selectedLocation, selectedJobType, selectedSalaryRange, selectedFilters, selectedJobTitle]);
+  }, [
+    searchTerm,
+    selectedCategory,
+    selectedLocation,
+    selectedJobType,
+    selectedSalaryRange,
+    selectedFilters,
+    selectedJobTitle,
+    allJobs,
+  ]);
 
-
-  const handleSaveJob = (jobId: number) => {
-    setSavedJobs((prev) => {
-      if (prev.includes(jobId)) {
-        toast.success("Job removed from saved");
-        return prev.filter((id) => id !== jobId);
-      } else {
-        toast.success("Job saved!");
-        return [...prev, jobId];
-      }
-
-    });
+  const handleFilterToggle = (filter: string) => {
+    setSelectedFilters((prev) =>
+      prev.includes(filter) ? prev.filter((f) => f !== filter) : [...prev, filter]
+    );
   };
 
-  const handleApplyJob = (jobId: number, jobTitle: string) => {
+  const handleJobTitleClick = (title: string) => {
+    setSelectedJobTitle(selectedJobTitle === title ? null : title);
+  };
+
+  const handleJobCardClick = (jobId: number) => {
+    navigate(`/job/${jobId}`);
+  };
+
+  const handleApply = (jobId: number, e: React.MouseEvent) => {
+    e.stopPropagation();
     if (!isAuthenticated) {
-      toast.error("Please log in to apply for jobs");
       window.location.href = getLoginUrl();
       return;
     }
-
-    setAppliedJobs((prev) => {
-      if (!prev.includes(jobId)) {
-        toast.success(`Applied for ${jobTitle}!`);
-        return [...prev, jobId];
-      }
-      return prev;
-    });
+    navigate(`/job/${jobId}`);
   };
-
-  const handleShareJob = (jobTitle: string, jobCompany: string) => {
-    const text = `Check out this job: ${jobTitle} at ${jobCompany}`;
-    if (navigator.share) {
-      navigator.share({
-        title: "LMIAJobsCanada",
-        text: text,
-        url: window.location.href,
-      });
-    } else {
-      // Fallback: copy to clipboard
-      navigator.clipboard.writeText(text);
-      toast.success("Job link copied to clipboard!");
-    }
-  };
-
-  const toggleJobType = (type: string) => {
-    setSelectedJobType((prev) =>
-      prev.includes(type) ? prev.filter((t) => t !== type) : [...prev, type]
-    );
-  };
-
-  const toggleSalaryRange = (range: string) => {
-    setSelectedSalaryRange((prev) =>
-      prev.includes(range) ? prev.filter((r) => r !== range) : [...prev, range]
-    );
-  };
-
-  const toggleFilter = (filterName: string) => {
-    setSelectedFilters((prev) =>
-      prev.includes(filterName) ? prev.filter((f) => f !== filterName) : [...prev, filterName]
-    );
-  };
-
-  const categories = [
-    "all",
-    "Strategy & Planning",
-    "Marketing & Communications",
-    "Accounting & Finance",
-    "HR & Training",
-    "Administration & Legal",
-    "IT Development & Data",
-    "Design",
-    "Sales & Trading",
-    "Construction",
-    "Healthcare",
-    "Research & Development",
-    "Education",
-    "Media & Culture",
-    "Finance & Insurance",
-    "Transportation",
-    "Service",
-    "Manufacturing",
-    "Public Service"
-  ];
-  const locations = [
-    "all",
-    "Toronto, ON",
-    "Vancouver, BC",
-    "Calgary, AB",
-    "Montreal, QC",
-    "Edmonton, AB",
-    "Ottawa, ON",
-    "Winnipeg, MB",
-    "Halifax, NS",
-    "Quebec City, QC",
-    "Victoria, BC",
-    "Remote",
-  ];
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100">
-      {/* 헤더 */}
+      {/* Header */}
       <header className="bg-white border-b border-slate-200 sticky top-0 z-50 shadow-sm">
         <div className="container py-4">
           <div className="flex items-center justify-between">
-            <div className="cursor-pointer flex items-center gap-2" onClick={() => {
-              setSearchTerm("");
-              setSelectedCategory("all");
-              setSelectedLocation("all");
-              setSelectedJobType([]);
-              setSelectedSalaryRange([]);
-              navigate("/");
-            }}>
-              <div className="bg-red-600 text-white rounded-md p-2 font-bold">CJ</div>
-              <h1 className="text-xl font-bold text-slate-900 hover:text-blue-600 transition-colors">CanadaJobs</h1>
+            <div className="flex items-center gap-3">
+              <div className="bg-red-600 text-white rounded-lg px-3 py-2 font-bold text-lg">CJ</div>
+              <h1 className="text-2xl font-bold text-slate-900">CanadaJobs</h1>
             </div>
             <nav className="hidden md:flex items-center gap-8">
-              <a href="#" className="text-slate-700 hover:text-slate-900 font-medium">Find Jobs</a>
-              <a href="#" className="text-slate-700 hover:text-slate-900 font-medium" onClick={() => navigate("/post-job")}>Post a Job</a>
-              <a href="#" className="text-slate-700 hover:text-slate-900 font-medium">Job Guide</a>
+              <a href="#" className="text-slate-600 hover:text-slate-900 font-medium">Find Jobs</a>
+              <a href="#" className="text-slate-600 hover:text-slate-900 font-medium">Post a Job</a>
+              <a href="#" className="text-slate-600 hover:text-slate-900 font-medium">Job Guide</a>
             </nav>
-            <nav className="md:hidden flex items-center gap-4">
-              <a href="#" className="text-slate-700 hover:text-slate-900 font-medium text-sm" onClick={() => navigate("/post-job")}>Post a Job</a>
-            </nav>
-            <div className="flex gap-3">
+            <div className="flex items-center gap-3">
               {isAuthenticated ? (
-                <div className="flex items-center gap-3">
-                  <Button variant="ghost" size="sm" onClick={() => navigate("/profile")}>
-                    <div className="w-8 h-8 bg-red-200 rounded-full flex items-center justify-center text-red-600 font-bold">I</div>
-                  </Button>
-                </div>
+                <>
+                  <a href="/my-profile" className="bg-red-100 text-red-600 rounded-full w-10 h-10 flex items-center justify-center font-bold hover:bg-red-200">
+                    {user?.name?.charAt(0) || 'U'}
+                  </a>
+                </>
               ) : (
-                <Button size="sm" onClick={() => (window.location.href = getLoginUrl())}>
-                  Sign In
-                </Button>
+                <a href={getLoginUrl()} className="bg-red-100 text-red-600 rounded-full w-10 h-10 flex items-center justify-center font-bold hover:bg-red-200">
+                  I
+                </a>
               )}
             </div>
           </div>
         </div>
       </header>
 
-      {/* 히어로 섹션 */}
-      <section className="bg-slate-900 text-white py-16 relative overflow-hidden">
-        <div className="absolute inset-0 opacity-10"></div>
-        <div className="container relative z-10">
-          <div className="text-center mb-12">
-            <div className="inline-block mb-4 px-4 py-2 border border-red-500 rounded-full text-sm text-red-400">
-              ✓ Canada's Job Platform
+      {/* Hero Section */}
+      <section className="bg-gradient-to-br from-slate-900 to-slate-800 text-white py-16">
+        <div className="container">
+          <div className="text-center mb-8">
+            <div className="inline-block border border-red-500 rounded-full px-4 py-2 mb-4">
+              <span className="text-red-500 text-sm font-semibold">✓ Canada's Job Platform</span>
             </div>
             <h2 className="text-5xl font-bold mb-4">
-              Find Your <span className="text-red-500">Perfect Job</span><br/>in Canada
+              Find Your <span className="text-red-500">Perfect Job</span> in Canada
             </h2>
             <p className="text-slate-300 text-lg max-w-2xl mx-auto">
               Browse verified job listings from Canadian employers. Find positions with visa sponsorship, LMIA approval, and accommodation support.
             </p>
           </div>
 
-          {/* 검색 바 */}
-          <div className="max-w-2xl mx-auto mb-8">
-            <div className="flex gap-2">
-              <div className="flex-1 relative">
-                <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-slate-400" />
-                <Input
-                  placeholder="Job title, NOC code, or keyword..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="w-full pl-12 py-3 text-base text-slate-900 placeholder:text-slate-400 border-0 rounded-lg"
-                />
-              </div>
-              <Button className="bg-red-600 hover:bg-red-700 text-white px-8 py-3 rounded-lg font-medium">
-                Search Jobs
-              </Button>
+          {/* Search Bar */}
+          <div className="flex gap-3 mb-6 max-w-2xl mx-auto">
+            <div className="flex-1 relative">
+              <Search className="absolute left-4 top-3.5 w-5 h-5 text-slate-400" />
+              <Input
+                type="text"
+                placeholder="Job title, NOC code, or keyword..."
+                className="pl-12 py-3 bg-white text-slate-900 rounded-lg border-0"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
             </div>
+            <Button className="bg-red-600 hover:bg-red-700 text-white px-8 py-3 rounded-lg font-semibold">
+              Search Jobs
+            </Button>
           </div>
 
-          {/* 필터 버튼 */}
-          <div className="grid grid-cols-2 md:flex md:flex-wrap justify-center gap-3 max-w-md mx-auto">
-            <Button 
-              onClick={() => toggleFilter("LMIA Approved")}
+          {/* Filter Buttons */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 max-w-2xl mx-auto">
+            <Button
+              onClick={() => handleFilterToggle("lmia")}
               className={`${
-                selectedFilters.includes("LMIA Approved")
-                  ? "bg-red-600 border-red-600 text-white hover:bg-red-700"
-                  : "bg-slate-800 border-slate-700 text-white hover:bg-slate-700"
-              }`}
-              variant="outline"
+                selectedFilters.includes("lmia")
+                  ? "bg-red-600 text-white"
+                  : "bg-slate-700 text-slate-200 hover:bg-slate-600"
+              } rounded-lg py-2 font-semibold`}
             >
               ✓ LMIA Approved
             </Button>
-            <Button 
-              onClick={() => toggleFilter("Visa Sponsorship")}
+            <Button
+              onClick={() => handleFilterToggle("visa")}
               className={`${
-                selectedFilters.includes("Visa Sponsorship")
-                  ? "bg-red-600 border-red-600 text-white hover:bg-red-700"
-                  : "bg-slate-800 border-slate-700 text-white hover:bg-slate-700"
-              }`}
-              variant="outline"
+                selectedFilters.includes("visa")
+                  ? "bg-red-600 text-white"
+                  : "bg-slate-700 text-slate-200 hover:bg-slate-600"
+              } rounded-lg py-2 font-semibold`}
             >
               ⊕ Visa Sponsorship
             </Button>
-            <Button 
-              onClick={() => toggleFilter("Nursing Jobs")}
+            <Button
+              onClick={() => handleFilterToggle("nursing")}
               className={`${
-                selectedFilters.includes("Nursing Jobs")
-                  ? "bg-red-600 border-red-600 text-white hover:bg-red-700"
-                  : "bg-slate-800 border-slate-700 text-white hover:bg-slate-700"
-              }`}
-              variant="outline"
+                selectedFilters.includes("nursing")
+                  ? "bg-red-600 text-white"
+                  : "bg-slate-700 text-slate-200 hover:bg-slate-600"
+              } rounded-lg py-2 font-semibold`}
             >
               🏥 Nursing Jobs
             </Button>
-            <Button 
-              onClick={() => toggleFilter("Truck Driver Jobs")}
+            <Button
+              onClick={() => handleFilterToggle("truck")}
               className={`${
-                selectedFilters.includes("Truck Driver Jobs")
-                  ? "bg-red-600 border-red-600 text-white hover:bg-red-700"
-                  : "bg-slate-800 border-slate-700 text-white hover:bg-slate-700"
-              }`}
-              variant="outline"
+                selectedFilters.includes("truck")
+                  ? "bg-red-600 text-white"
+                  : "bg-slate-700 text-slate-200 hover:bg-slate-600"
+              } rounded-lg py-2 font-semibold`}
             >
               🚚 Truck Driver Jobs
             </Button>
           </div>
+        </div>
+      </section>
 
-          {/* 검색 통계 섹션 */}
-          <div className="mt-12 grid grid-cols-1 md:grid-cols-2 gap-8">
-            <div className="bg-slate-900 bg-opacity-70 rounded-lg p-6 backdrop-blur-sm border border-white border-opacity-40">
-              <h3 className="text-lg font-bold mb-4 text-white">Most Searched Jobs</h3>
-              <div className="space-y-3">
-                {["Healthcare Professionals", "Software Developers", "Truck Drivers", "Nurses", "Electricians", "Welders"].map((job) => {
-                  const jobCounts: { [key: string]: string } = {
-                    "Healthcare Professionals": "1,234",
-                    "Software Developers": "892",
-                    "Truck Drivers": "756",
-                    "Nurses": "645",
-                    "Electricians": "534",
-                    "Welders": "423"
-                  };
-                  return (
-                    <div key={job} className="flex justify-between items-center cursor-pointer hover:opacity-80 transition-opacity" onClick={() => setSelectedJobTitle(selectedJobTitle === job ? null : job)}>
-                      <span className={`font-bold text-lg ${
-                        selectedJobTitle === job ? "text-red-400" : "text-white"
-                      }`}>{job}</span>
-                      <span className="text-red-400 font-bold text-2xl">{jobCounts[job]}</span>
-                    </div>
-                  );
-                })}
-              </div>
+      {/* Most Searched & Posted Jobs */}
+      <section className="bg-slate-900 py-12">
+        <div className="container">
+          <div className="grid md:grid-cols-2 gap-8">
+            {/* Most Searched Jobs */}
+            <Card className="bg-slate-800 border-slate-700">
+              <CardHeader>
+                <CardTitle className="text-white">Most Searched Jobs</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                {[
+                  { title: "Healthcare Professionals", count: "1,234" },
+                  { title: "Software Developers", count: "892" },
+                  { title: "Truck Drivers", count: "756" },
+                  { title: "Nurses", count: "645" },
+                  { title: "Electricians", count: "534" },
+                  { title: "Welders", count: "412" },
+                ].map((job, idx) => (
+                  <div
+                    key={idx}
+                    onClick={() => handleJobTitleClick(job.title)}
+                    className={`flex justify-between items-center p-3 rounded-lg cursor-pointer transition ${
+                      selectedJobTitle === job.title
+                        ? "bg-red-600 text-white"
+                        : "bg-slate-700 text-slate-200 hover:bg-slate-600"
+                    }`}
+                  >
+                    <span className="font-semibold text-lg">{job.title}</span>
+                    <span className="text-red-500 font-bold text-xl">{job.count}</span>
+                  </div>
+                ))}
+              </CardContent>
+            </Card>
+
+            {/* Most Posted Jobs */}
+            <Card className="bg-slate-800 border-slate-700">
+              <CardHeader>
+                <CardTitle className="text-white">Most Posted Jobs</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                {[
+                  { title: "Retail & Sales", count: "456" },
+                  { title: "Hospitality", count: "389" },
+                  { title: "Construction", count: "312" },
+                  { title: "Administration", count: "278" },
+                  { title: "Manufacturing", count: "245" },
+                  { title: "Transportation", count: "198" },
+                ].map((job, idx) => (
+                  <div
+                    key={idx}
+                    onClick={() => handleJobTitleClick(job.title)}
+                    className={`flex justify-between items-center p-3 rounded-lg cursor-pointer transition ${
+                      selectedJobTitle === job.title
+                        ? "bg-red-600 text-white"
+                        : "bg-slate-700 text-slate-200 hover:bg-slate-600"
+                    }`}
+                  >
+                    <span className="font-semibold text-lg">{job.title}</span>
+                    <span className="text-red-500 font-bold text-xl">{job.count}</span>
+                  </div>
+                ))}
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+      </section>
+
+      {/* Stats Section */}
+      <section className="bg-white py-12 border-t border-slate-200">
+        <div className="container">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+            <div className="text-center">
+              <div className="text-3xl font-bold text-red-600 mb-2">{allJobs.length}+</div>
+              <div className="text-slate-600">Active Jobs</div>
             </div>
-            <div className="bg-slate-900 bg-opacity-70 rounded-lg p-6 backdrop-blur-sm border border-white border-opacity-40">
-              <h3 className="text-lg font-bold mb-4 text-white">Most Posted Jobs</h3>
-              <div className="space-y-3">
-                {["Retail & Sales", "Hospitality", "Construction", "Manufacturing", "Transportation", "Administration"].map((job) => {
-                  const jobCounts: { [key: string]: string } = {
-                    "Retail & Sales": "456",
-                    "Hospitality": "389",
-                    "Construction": "312",
-                    "Manufacturing": "298",
-                    "Transportation": "267",
-                    "Administration": "245"
-                  };
-                  return (
-                    <div key={job} className="flex justify-between items-center cursor-pointer hover:opacity-80 transition-opacity" onClick={() => setSelectedJobTitle(selectedJobTitle === job ? null : job)}>
-                      <span className={`font-bold text-lg ${
-                        selectedJobTitle === job ? "text-red-400" : "text-white"
-                      }`}>{job}</span>
-                      <span className="text-red-400 font-bold text-2xl">{jobCounts[job]}</span>
-                    </div>
-                  );
-                })}
-              </div>
+            <div className="text-center">
+              <div className="text-3xl font-bold text-red-600 mb-2">50+</div>
+              <div className="text-slate-600">Cities</div>
+            </div>
+            <div className="text-center">
+              <div className="text-3xl font-bold text-green-600 mb-2">100%</div>
+              <div className="text-slate-600">Verified</div>
+            </div>
+            <div className="text-center">
+              <div className="text-3xl font-bold text-blue-600 mb-2">Free</div>
+              <div className="text-slate-600">For Job Seekers</div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* 통계 섹션 */}
-      <section className="bg-slate-100 py-12 border-b border-slate-200">
+      {/* Featured Jobs */}
+      <section className="bg-slate-50 py-16">
         <div className="container">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-8">
-            <div className="text-center">
-              <div className="text-3xl md:text-4xl font-bold text-slate-900 mb-2">8+</div>
-              <div className="text-sm md:text-base text-slate-600">Active Jobs</div>
-            </div>
-            <div className="text-center">
-              <div className="text-3xl md:text-4xl font-bold text-slate-900 mb-2">8+</div>
-              <div className="text-sm md:text-base text-slate-600">Cities</div>
-            </div>
-            <div className="text-center">
-              <div className="text-3xl md:text-4xl font-bold text-green-600 mb-2">100%</div>
-              <div className="text-sm md:text-base text-slate-600">LMIA Verified</div>
-            </div>
-            <div className="text-center">
-              <div className="text-3xl md:text-4xl font-bold text-blue-600 mb-2">Free</div>
-              <div className="text-sm md:text-base text-slate-600">For Job Seekers</div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Featured Jobs 섹션 */}
-      <section className="bg-white border-b border-slate-200 py-12">
-        <div className="container">
-          <div className="flex items-center justify-between mb-8">
-            <div>
-              <h2 className="text-3xl font-bold text-slate-900 mb-2">Featured Jobs</h2>
-              <p className="text-slate-600">Latest LMIA-approved opportunities</p>
-            </div>
-            <Button variant="outline" onClick={() => navigate("/")}>
-              View All Jobs <span className="ml-2">→</span>
-            </Button>
-          </div>
-
-          {/* Featured Jobs Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {allJobs.slice(0, 6).map((job) => (
-              <div
+          <h2 className="text-3xl font-bold text-slate-900 mb-8">Featured Opportunities</h2>
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {filteredJobs.slice(0, 6).map((job) => (
+              <Card
                 key={job.id}
-                onClick={() => navigate(`/job/${job.id}`)}
-                className="cursor-pointer group"
+                onClick={() => handleJobCardClick(job.id)}
+                className="bg-white border-l-4 border-l-red-600 hover:shadow-lg transition cursor-pointer"
               >
-                <Card className="hover:shadow-lg transition-shadow border-l-4 border-l-red-300 bg-white h-full group-hover:bg-slate-50">
-                  <CardContent className="p-6">
-                    <div className="flex items-center gap-2 mb-3">
-                      <Badge className="bg-red-100 text-red-800 hover:bg-red-100">
-                        ⭐ Featured
-                      </Badge>
-                    </div>
-                    
-                    <h3 className="text-lg font-bold text-slate-900 mb-1 group-hover:text-red-600 transition-colors">{job.title}</h3>
-                    <p className="text-slate-600 text-sm mb-4">{job.company}</p>
-                    
-                    <div className="space-y-2 mb-4 text-sm text-slate-600">
-                      <div className="flex items-center gap-2">
-                        <MapPin className="w-4 h-4" />
-                        {job.location}
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <DollarSign className="w-4 h-4" />
-                        {job.salary}
-                      </div>
-                    </div>
-
-                    <div className="flex flex-wrap gap-2 mb-4">
-                      {job.lmiaAvailable && (
-                        <Badge className="bg-green-100 text-green-800 hover:bg-green-100 text-xs">✓ LMIA</Badge>
-                      )}
-                      {job.visaSponsorshipAvailable && (
-                        <Badge className="bg-blue-100 text-blue-800 hover:bg-blue-100 text-xs">⊕ Visa Sponsor</Badge>
-                      )}
-                      {job.accommodation && (
-                        <Badge className="bg-purple-100 text-purple-800 hover:bg-purple-100 text-xs">🏠 {job.accommodation.split(' ')[0]}</Badge>
-                      )}
-                    </div>
-
-                    <p className="text-xs text-slate-500 mb-2">NOC 72200</p>
-                    <p className="text-xs text-slate-500">Click to view details →</p>
-                  </CardContent>
-                </Card>
-              </div>
+                <CardHeader>
+                  <div className="flex items-start justify-between mb-2">
+                    <Badge className="bg-red-600 text-white">Featured</Badge>
+                  </div>
+                  <CardTitle className="text-lg text-slate-900">{job.title}</CardTitle>
+                  <CardDescription className="text-slate-600">{job.company}</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-3">
+                  <div className="flex items-center gap-2 text-slate-600">
+                    <MapPin className="w-4 h-4" />
+                    <span>{job.location}</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-slate-600">
+                    <DollarSign className="w-4 h-4" />
+                    <span>{job.salary}</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-slate-600">
+                    <Briefcase className="w-4 h-4" />
+                    <span>{job.jobType}</span>
+                  </div>
+                  <p className="text-sm text-slate-600 line-clamp-2">{job.description}</p>
+                  <div className="flex flex-wrap gap-2 pt-2">
+                    {job.lmiaAvailable && (
+                      <Badge variant="outline" className="text-red-600 border-red-600">LMIA</Badge>
+                    )}
+                  </div>
+                  <Button
+                    onClick={(e) => handleApply(job.id, e)}
+                    className="w-full bg-red-600 hover:bg-red-700 text-white mt-4"
+                  >
+                    View Details
+                  </Button>
+                </CardContent>
+              </Card>
             ))}
           </div>
         </div>
       </section>
 
-      {/* 메인 콘텐츠 */}
-      <main className="container py-12">
-        <div className="grid grid-cols-1 gap-8">
-          {/* 사이드바 - 필터 (숨김) */}
-          <aside className="lg:col-span-1 hidden">
-            <Card>
-              <CardHeader>
-                <CardTitle>Filters</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-6">
-                {/* 직종 필터 */}
-                <div>
-                  <h3 className="font-semibold text-slate-900 mb-3">Job Type</h3>
-                  <div className="space-y-2">
-                    {["Full-time", "Part-time", "Contract"].map((type) => (
-                      <label key={type} className="flex items-center gap-2 cursor-pointer">
-                        <input
-                          type="checkbox"
-                          checked={selectedJobType.includes(type)}
-                          onChange={() => toggleJobType(type)}
-                          className="w-4 h-4"
-                        />
-                        <span className="text-sm text-slate-700">{type}</span>
-                      </label>
-                    ))}
-                  </div>
-                </div>
-
-                {/* 급여 범위 필터 */}
-                <div>
-                  <h3 className="font-semibold text-slate-900 mb-3">Salary Range</h3>
-                  <div className="space-y-2">
-                    {["$0 - $50K", "$50K - $100K", "$100K+"].map((range) => (
-                      <label key={range} className="flex items-center gap-2 cursor-pointer">
-                        <input
-                          type="checkbox"
-                          checked={selectedSalaryRange.includes(range)}
-                          onChange={() => toggleSalaryRange(range)}
-                          className="w-4 h-4"
-                        />
-                        <span className="text-sm text-slate-700">{range}</span>
-                      </label>
-                    ))}
-                  </div>
-                </div>
-              </CardContent>
-             </Card>
-          </aside>
-          {/* 공고 리스트 */}
-          <section className="lg:col-span-4">
-            <div className="mb-6">
-              <p className="text-slate-600">Showing {filteredJobs.length} jobs</p>
-            </div>
-
-            <div className="space-y-4">
-              {filteredJobs.map((job) => (
-                <Card key={job.id} className="hover:shadow-lg transition-shadow cursor-pointer bg-white" onClick={() => navigate(`/job/${job.id}`)}>
-                  <CardContent className="p-6">
+      {/* Job Listings */}
+      <section className="bg-white py-16">
+        <div className="container">
+          <h2 className="text-3xl font-bold text-slate-900 mb-8">All Job Listings</h2>
+          <div className="space-y-4">
+            {filteredJobs.length > 0 ? (
+              filteredJobs.map((job) => (
+                <Card
+                  key={job.id}
+                  onClick={() => handleJobCardClick(job.id)}
+                  className="bg-white border-l-4 border-l-slate-200 hover:border-l-red-600 hover:shadow-md transition cursor-pointer"
+                >
+                  <CardContent className="pt-6">
                     <div className="flex items-start justify-between">
                       <div className="flex-1">
-                        <h3 className="text-xl font-semibold text-slate-900 mb-1">{job.title}</h3>
+                        <h3 className="text-lg font-semibold text-slate-900 mb-1">{job.title}</h3>
                         <p className="text-slate-600 mb-3">{job.company}</p>
-                        <p className="text-slate-700 text-sm mb-4">{job.description}</p>
-
-                        <div className="flex flex-wrap gap-4 mb-4 text-sm text-slate-600">
-                          <div className="flex items-center gap-1">
-                            <MapPin className="w-4 h-4" />
-                            {job.location}
-                          </div>
-                          <div className="flex items-center gap-1">
-                            <DollarSign className="w-4 h-4" />
-                            {job.salary}
-                          </div>
-                          <div className="flex items-center gap-1">
-                            <Briefcase className="w-4 h-4" />
-                            {job.jobType}
-                          </div>
-                          <div className="flex items-center gap-1">
-                            <Clock className="w-4 h-4" />
-                            {job.postedDate}
-                          </div>
+                        <div className="flex flex-wrap gap-4 text-sm text-slate-600 mb-3">
+                          <span className="flex items-center gap-1">
+                            <MapPin className="w-4 h-4" /> {job.location}
+                          </span>
+                          <span className="flex items-center gap-1">
+                            <DollarSign className="w-4 h-4" /> {job.salary}
+                          </span>
+                          <span className="flex items-center gap-1">
+                            <Clock className="w-4 h-4" /> {job.postedDate}
+                          </span>
                         </div>
-
                         <div className="flex flex-wrap gap-2">
                           {job.lmiaAvailable && (
-                            <Badge className="bg-green-100 text-green-800 hover:bg-green-100">✓ LMIA</Badge>
+                            <Badge variant="outline" className="text-red-600 border-red-600">LMIA</Badge>
                           )}
                         </div>
                       </div>
-
-                      <div className="flex flex-col gap-2 ml-4" onClick={(e) => e.stopPropagation()}>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => handleSaveJob(job.id)}
-                          title="Save job"
-                        >
-                          <Heart
-                            className={`w-5 h-5 ${
-                              savedJobs.includes(job.id)
-                                ? "fill-red-500 text-red-500"
-                                : "text-slate-400"
-                            }`}
-                          />
-                        </Button>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => handleShareJob(job.title, job.company)}
-                        >
-                          <Share2 className="w-4 h-4" />
-                          Share
-                        </Button>
-                      </div>
+                      <Heart className="w-6 h-6 text-slate-300 hover:text-red-600 transition" />
                     </div>
                   </CardContent>
                 </Card>
-              ))}
-            </div>
-          </section>
+              ))
+            ) : (
+              <div className="text-center py-12">
+                <p className="text-slate-600 text-lg">No jobs found matching your criteria.</p>
+              </div>
+            )}
+          </div>
         </div>
-      </main>
+      </section>
 
-      {/* 푸터 */}
-      <footer className="bg-slate-900 text-slate-300 py-12 mt-16">
+      {/* Footer */}
+      <footer className="bg-slate-900 text-slate-300 py-12 border-t border-slate-800">
         <div className="container">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
+          <div className="grid md:grid-cols-4 gap-8 mb-8">
             <div>
-              <h4 className="font-semibold text-white mb-4">About CanadaJobs</h4>
-              <p className="text-sm">Your trusted platform for finding jobs across Canada.</p>
-            </div>
-            <div>
-              <h4 className="font-semibold text-white mb-4">For Employers</h4>
+              <h4 className="text-white font-semibold mb-4">About</h4>
               <ul className="space-y-2 text-sm">
-                <li><button onClick={() => navigate("/post-job")} className="hover:text-white cursor-pointer">Post a Job</button></li>
-                <li><button onClick={() => toast.info("Pricing information coming soon!")} className="hover:text-white cursor-pointer">Pricing</button></li>
-                <li><button onClick={() => toast.info("Company Page feature coming soon!")} className="hover:text-white cursor-pointer">Company Page</button></li>
+                <li><a href="#" className="hover:text-white transition">About Us</a></li>
+                <li><a href="#" className="hover:text-white transition">Blog</a></li>
+                <li><a href="#" className="hover:text-white transition">Careers</a></li>
               </ul>
             </div>
             <div>
-              <h4 className="font-semibold text-white mb-4">For Job Seekers</h4>
+              <h4 className="text-white font-semibold mb-4">For Employers</h4>
               <ul className="space-y-2 text-sm">
-                <li><button onClick={() => window.scrollTo(0, 0)} className="hover:text-white cursor-pointer">Browse Jobs</button></li>
-                <li><button onClick={() => navigate("/occupations")} className="hover:text-white cursor-pointer">NOC Occupations</button></li>
-                <li><button onClick={() => toast.info("Salary Guide coming soon!")} className="hover:text-white cursor-pointer">Salary Guide</button></li>
-                <li><button onClick={() => toast.info("LMIA Guide coming soon!")} className="hover:text-white cursor-pointer">LMIA Guide</button></li>
+                <li><a href="#" className="hover:text-white transition">Post a Job</a></li>
+                <li><a href="/admin" className="hover:text-white transition">Admin Dashboard</a></li>
               </ul>
             </div>
             <div>
-              <h4 className="font-semibold text-white mb-4">Company</h4>
+              <h4 className="text-white font-semibold mb-4">Resources</h4>
               <ul className="space-y-2 text-sm">
-                <li><button onClick={() => toast.info("Help Center coming soon!")} className="hover:text-white cursor-pointer">Help Center</button></li>
-                <li><button onClick={() => toast.info("Contact Us feature coming soon!")} className="hover:text-white cursor-pointer">Contact Us</button></li>
-                <li><button onClick={() => toast.info("Privacy Policy coming soon!")} className="hover:text-white cursor-pointer">Privacy Policy</button></li>
+                <li><a href="#" className="hover:text-white transition">Job Guide</a></li>
+                <li><a href="#" className="hover:text-white transition">FAQ</a></li>
+              </ul>
+            </div>
+            <div>
+              <h4 className="text-white font-semibold mb-4">Legal</h4>
+              <ul className="space-y-2 text-sm">
+                <li><a href="#" className="hover:text-white transition">Privacy Policy</a></li>
+                <li><a href="#" className="hover:text-white transition">Terms of Service</a></li>
               </ul>
             </div>
           </div>
-          <div className="border-t border-slate-700 pt-8 text-center text-sm">
+          <div className="border-t border-slate-800 pt-8 text-center text-sm">
             <p>&copy; 2026 CanadaJobs. All rights reserved.</p>
           </div>
         </div>

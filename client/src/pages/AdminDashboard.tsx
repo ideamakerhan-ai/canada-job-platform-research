@@ -199,12 +199,10 @@ export default function AdminDashboard() {
                         <h3 className="font-semibold text-slate-900">{job.title}</h3>
                         <p className="text-sm text-slate-600">{job.company} • {job.location}</p>
                         <div className="flex gap-2 mt-2">
-                          {job.lmiaAvailable && <span className="text-xs bg-red-100 text-red-800 px-2 py-1 rounded">LMIA</span>}
-                          {job.visaSponsorship && <span className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded">Visa</span>}
                           <span className={`text-xs px-2 py-1 rounded ${
-                            job.status === "active" ? "bg-green-100 text-green-800" : "bg-gray-100 text-gray-800"
+                            job.isActive === 1 ? "bg-green-100 text-green-800" : "bg-gray-100 text-gray-800"
                           }`}>
-                            {job.status}
+                            {job.isActive === 1 ? "Active" : "Inactive"}
                           </span>
                         </div>
                       </div>
@@ -214,10 +212,10 @@ export default function AdminDashboard() {
                           variant="outline"
                           onClick={() => updateStatusMutation.mutate({
                             jobId: job.id,
-                            status: job.status === "active" ? "inactive" : "active",
+                            status: job.isActive === 1 ? "inactive" : "active",
                           })}
                         >
-                          {job.status === "active" ? <XCircle className="w-4 h-4" /> : <CheckCircle className="w-4 h-4" />}
+                          {job.isActive === 1 ? <XCircle className="w-4 h-4" /> : <CheckCircle className="w-4 h-4" />}
                         </Button>
                         <Button
                           size="sm"

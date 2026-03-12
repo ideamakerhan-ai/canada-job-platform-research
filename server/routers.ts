@@ -124,7 +124,7 @@ export const appRouter = router({
       if (!db) throw new Error("Database not available");
 
       const totalApplications = await db.select().from(jobApplications);
-      const totalJobs = await db.select().from(jobListings).where(eq(jobListings.status, "active"));
+      const totalJobs = await db.select().from(jobListings).where(eq(jobListings.isActive, 1));
       const totalUsers = await db.select().from(users);
 
       return {
@@ -175,8 +175,9 @@ export const appRouter = router({
       .mutation(async ({ input }) => {
         const db = await getDb();
         if (!db) throw new Error("Database not available");
+        const isActive = input.status === "active" ? 1 : 0;
         await db.update(jobListings)
-          .set({ status: input.status })
+          .set({ isActive })
           .where(eq(jobListings.id, input.jobId));
         return { success: true };
       }),

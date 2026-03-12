@@ -15,6 +15,13 @@
       "when": 1769598630464,
       "tag": "0001_loving_wither",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "5",
+      "when": 1773286322386,
+      "tag": "0002_safe_cobalt_man",
+      "breakpoints": true
     }
   ]
 }
