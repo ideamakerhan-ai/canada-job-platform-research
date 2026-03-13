@@ -15,6 +15,7 @@ const sampleJobs = [
     company: "TechCorp Canada",
     location: "Toronto, ON",
     salary: "$120,000 - $150,000",
+    salaryType: "annual",
     jobType: "Full-time",
     description: "Looking for experienced software engineer with 5+ years in backend development.",
     postedDate: "2 days ago",
@@ -29,6 +30,7 @@ const sampleJobs = [
     company: "Vancouver General Hospital",
     location: "Vancouver, BC",
     salary: "$65,000 - $85,000",
+    salaryType: "annual",
     jobType: "Full-time",
     description: "Seeking compassionate nurses for our emergency department.",
     postedDate: "1 day ago",
@@ -43,6 +45,7 @@ const sampleJobs = [
     company: "BuildRight Construction",
     location: "Calgary, AB",
     salary: "$80,000 - $110,000",
+    salaryType: "annual",
     jobType: "Full-time",
     description: "Lead construction projects from conception to completion.",
     postedDate: "3 days ago",
@@ -57,6 +60,7 @@ const sampleJobs = [
     company: "TransCanada Logistics",
     location: "Edmonton, AB",
     salary: "$70,000 - $95,000",
+    salaryType: "annual",
     jobType: "Full-time",
     description: "Experienced truck drivers needed for long-haul routes across Canada.",
     postedDate: "5 days ago",
@@ -71,6 +75,7 @@ const sampleJobs = [
     company: "Maple Leaf Hospitality",
     location: "Vancouver, BC",
     salary: "$55,000 - $75,000",
+    salaryType: "annual",
     jobType: "Full-time",
     description: "Head chef position for upscale restaurant. Must have 10+ years experience.",
     postedDate: "1 week ago",
@@ -85,6 +90,7 @@ const sampleJobs = [
     company: "Power Solutions Inc",
     location: "Montreal, QC",
     salary: "$60,000 - $85,000",
+    salaryType: "annual",
     jobType: "Full-time",
     description: "Licensed electrician for commercial and residential projects.",
     postedDate: "3 days ago",
@@ -221,7 +227,10 @@ export default function JobDetail() {
                 <p className="text-sm text-slate-600 mb-1">Salary</p>
                 <div className="flex items-center gap-2 text-slate-900 font-semibold">
                   <DollarSign className="w-4 h-4" />
-                  {job.salary}
+                  <span>
+                    {job.salary}
+                    {job.salaryType === "hourly" ? "/hr" : "/year"}
+                  </span>
                 </div>
               </div>
               <div>

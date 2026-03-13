@@ -1,0 +1,1 @@
+ALTER TABLE `job_postings` ADD `salary_type` enum('annual','hourly') DEFAULT 'annual' NOT NULL;

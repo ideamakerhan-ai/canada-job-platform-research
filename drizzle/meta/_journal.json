@@ -43,6 +43,13 @@
       "when": 1773386359743,
       "tag": "0005_windy_eternals",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "5",
+      "when": 1773387534020,
+      "tag": "0006_fresh_thena",
+      "breakpoints": true
     }
   ]
 }

@@ -189,6 +189,7 @@ export const jobPostings = mysqlTable("job_postings", {
   category: varchar("category", { length: 100 }).notNull(),
   salaryMin: int("salary_min"),
   salaryMax: int("salary_max"),
+  salaryType: mysqlEnum("salary_type", ["annual", "hourly"]).default("annual").notNull(),
   currency: varchar("currency", { length: 10 }).default("CAD").notNull(),
   description: text("description").notNull(),
   requirements: text("requirements"),

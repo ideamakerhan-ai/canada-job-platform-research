@@ -336,3 +336,10 @@
 - [x] Apply 클릭 시 고용주 이메일 주소 표시 (다이얼로그/모달)
 - [x] 이메일 복사 버튼 추가
 - [x] 모바일에서 정상 작동 확인
+
+
+## Phase 55: 급여 유형 선택 기능 추가
+- [x] 데이터베이스 스키마에 salaryType 필드 추가 (annual/hourly)
+- [x] PostJob 폼에 급여 유형 선택 라디오 버튼 추가
+- [x] 급여 유형에 따라 입력 필드 레이블 변경 (Annual Salary / Hourly Rate)
+- [x] JobDetail 페이지에서 급여 유형에 따라 표시 형식 변경

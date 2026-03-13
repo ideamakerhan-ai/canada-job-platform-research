@@ -59,6 +59,7 @@ export default function PostJob() {
     category: "",
     salaryMin: "",
     salaryMax: "",
+    salaryType: "annual",
     description: "",
     requirements: "",
     applicationEmail: "",
@@ -242,23 +243,57 @@ export default function PostJob() {
                 <p className="text-sm font-medium text-blue-900">⚠️ Salary disclosure is mandatory in Ontario</p>
                 <p className="text-xs text-blue-800">You must provide salary or salary range for all job postings.</p>
               </div>
+              
+              {/* Salary Type */}
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-slate-900">Salary Type *</label>
+                <div className="flex gap-4">
+                  <label className="flex items-center gap-2 cursor-pointer">
+                    <input
+                      type="radio"
+                      name="salaryType"
+                      value="annual"
+                      checked={formData.salaryType === "annual"}
+                      onChange={(e) => handleSelectChange("salaryType", e.target.value)}
+                      className="w-4 h-4"
+                    />
+                    <span className="text-sm">Annual Salary</span>
+                  </label>
+                  <label className="flex items-center gap-2 cursor-pointer">
+                    <input
+                      type="radio"
+                      name="salaryType"
+                      value="hourly"
+                      checked={formData.salaryType === "hourly"}
+                      onChange={(e) => handleSelectChange("salaryType", e.target.value)}
+                      className="w-4 h-4"
+                    />
+                    <span className="text-sm">Hourly Rate</span>
+                  </label>
+                </div>
+              </div>
+              
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <label className="text-sm font-medium text-slate-900">Salary Min (CAD)</label>
+                  <label className="text-sm font-medium text-slate-900">
+                    {formData.salaryType === "annual" ? "Salary Min (CAD)" : "Hourly Rate Min (CAD)"}
+                  </label>
                   <Input
                     name="salaryMin"
                     type="number"
-                    placeholder="e.g., 50000"
+                    placeholder={formData.salaryType === "annual" ? "e.g., 50000" : "e.g., 20"}
                     value={formData.salaryMin}
                     onChange={handleInputChange}
                   />
                 </div>
                 <div className="space-y-2">
-                  <label className="text-sm font-medium text-slate-900">Salary Max (CAD)</label>
+                  <label className="text-sm font-medium text-slate-900">
+                    {formData.salaryType === "annual" ? "Salary Max (CAD)" : "Hourly Rate Max (CAD)"}
+                  </label>
                   <Input
                     name="salaryMax"
                     type="number"
-                    placeholder="e.g., 80000"
+                    placeholder={formData.salaryType === "annual" ? "e.g., 80000" : "e.g., 35"}
                     value={formData.salaryMax}
                     onChange={handleInputChange}
                   />
