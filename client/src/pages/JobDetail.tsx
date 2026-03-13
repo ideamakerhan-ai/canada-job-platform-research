@@ -101,6 +101,7 @@ export default function JobDetail() {
   const [isSaved, setIsSaved] = useState(false);
   const [isApplied, setIsApplied] = useState(false);
   const [showResumeModal, setShowResumeModal] = useState(false);
+  const [showEmailModal, setShowEmailModal] = useState(false);
 
 
   useEffect(() => {
@@ -135,21 +136,14 @@ export default function JobDetail() {
   };
 
   const handleApply = () => {
-    // 사용자 정보 입력 모달 없이 바로 이메일 클라이언트 열기
-    const subject = encodeURIComponent(`Job Application: ${job.title}`);
-    const body = encodeURIComponent(
-      `I would like to apply for the position of ${job.title} at ${job.company}.\n\n` +
-      `Position: ${job.title}\n` +
-      `Company: ${job.company}\n` +
-      `Location: ${job.location}\n\n` +
-      `Job Link: ${window.location.href}`
-    );
+    setShowEmailModal(true);
+  };
 
-    const recipientEmail = "jobs@canadajobs.com";
-    window.location.href = `mailto:${recipientEmail}?subject=${subject}&body=${body}`;
-
+  const handleCopyEmail = () => {
+    const email = "jobs@canadajobs.com";
+    navigator.clipboard.writeText(email);
+    toast.success("Email copied to clipboard");
     setIsApplied(true);
-    toast.success("Opening your email client to apply");
   };
 
 
@@ -157,6 +151,7 @@ export default function JobDetail() {
   const handleApplySuccess = () => {
     setIsApplied(true);
     setShowResumeModal(false);
+    setShowEmailModal(false);
     toast.success("Application submitted successfully");
   };
 
@@ -288,9 +283,52 @@ export default function JobDetail() {
         </div>
       </main>
 
-
-
-
+      {/* Email Modal */}
+      <Dialog open={showEmailModal} onOpenChange={setShowEmailModal}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Contact Employer</DialogTitle>
+            <DialogDescription>
+              Send your application to the employer's email address
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div className="bg-slate-50 p-4 rounded-lg">
+              <p className="text-sm text-slate-600 mb-2">Employer Email:</p>
+              <p className="text-lg font-semibold text-slate-900">jobs@canadajobs.com</p>
+            </div>
+            <div className="space-y-2">
+              <p className="text-sm text-slate-700">
+                <strong>Position:</strong> {job.title}
+              </p>
+              <p className="text-sm text-slate-700">
+                <strong>Company:</strong> {job.company}
+              </p>
+              <p className="text-sm text-slate-700">
+                <strong>Location:</strong> {job.location}
+              </p>
+            </div>
+            <div className="flex gap-2">
+              <Button
+                onClick={handleCopyEmail}
+                className="flex-1"
+              >
+                Copy Email
+              </Button>
+              <Button
+                variant="outline"
+                onClick={() => setShowEmailModal(false)}
+                className="flex-1"
+              >
+                Close
+              </Button>
+            </div>
+            <p className="text-xs text-slate-500 text-center">
+              Copy the email address and send your resume and application details
+            </p>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
