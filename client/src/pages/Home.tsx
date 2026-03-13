@@ -273,7 +273,7 @@ export default function Home() {
               Find Your <span className="text-red-500">Perfect Job</span> in Canada
             </h2>
             <p className="text-slate-300 text-lg max-w-2xl mx-auto">
-              Browse verified job listings from Canadian employers. Find positions with visa sponsorship, LMIA approval, and accommodation support.
+              Find verified jobs with visa sponsorship and LMIA support
             </p>
           </div>
 
