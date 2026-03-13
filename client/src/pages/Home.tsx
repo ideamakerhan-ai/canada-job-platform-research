@@ -249,12 +249,9 @@ export default function Home() {
             </nav>
             <div className="flex items-center gap-3">
               {isAuthenticated ? (
-                <>
-                  <span className="text-sm text-slate-600 mr-2">Welcome, {user?.name}</span>
-                  <a href="/my-profile" className="bg-red-100 text-red-600 rounded-full w-10 h-10 flex items-center justify-center font-bold hover:bg-red-200">
-                    {user?.name?.charAt(0) || 'U'}
-                  </a>
-                </>
+                <a href="/my-profile" className="bg-red-100 text-red-600 rounded-full w-10 h-10 flex items-center justify-center font-bold hover:bg-red-200 transition-colors">
+                  {user?.name?.charAt(0) || 'U'}
+                </a>
               ) : (
                 <a href={getLoginUrl()} className="bg-red-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-red-700">
                   Employer Login
@@ -266,7 +263,7 @@ export default function Home() {
       </header>
 
       {/* Hero Section */}
-      <section className="bg-gradient-to-br from-slate-900 to-slate-800 text-white py-16">
+      <section className="bg-gradient-to-br from-slate-900 to-slate-800 text-white py-12">
         <div className="container">
           <div className="text-center mb-8">
             <div className="inline-block border border-red-500 rounded-full px-4 py-2 mb-4">
