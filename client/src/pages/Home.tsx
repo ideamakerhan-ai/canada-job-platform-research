@@ -278,7 +278,7 @@ export default function Home() {
           </div>
 
           {/* Search Bar */}
-          <div className="flex flex-col gap-2 mb-6 max-w-6xl mx-auto w-full">
+          <div className="flex flex-col gap-2 mb-4 md:mb-6 max-w-6xl mx-auto w-full">
             {/* Job Title Search */}
             <div className="flex gap-2 w-full">
               <div className="relative flex-1">
@@ -286,12 +286,12 @@ export default function Home() {
                 <Input
                   type="text"
                   placeholder="Job title or keyword..."
-                  className="pl-12 py-3 bg-white text-slate-900 rounded-lg border-0 w-full shadow-md text-base"
+                  className="pl-12 py-3 h-12 bg-white text-slate-900 rounded-lg border-0 w-full shadow-md text-base"
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                 />
               </div>
-              <Button className="bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-lg font-semibold shadow-md text-base whitespace-nowrap">
+              <Button className="bg-red-600 hover:bg-red-700 text-white px-6 py-3 h-12 rounded-lg font-semibold shadow-md text-base whitespace-nowrap">
                 Search
               </Button>
             </div>
@@ -299,7 +299,7 @@ export default function Home() {
             <select
               value={selectedLocation}
               onChange={(e) => setSelectedLocation(e.target.value)}
-              className="px-4 py-3 bg-white text-slate-900 rounded-lg border-0 font-medium shadow-md text-base w-full"
+              className="px-4 py-3 h-12 bg-white text-slate-900 rounded-lg border-0 font-medium shadow-md text-base w-full"
             >
               <option value="all">All Locations</option>
               <option value="Toronto, ON">Toronto, ON</option>
@@ -313,12 +313,15 @@ export default function Home() {
             </select>
           </div>
 
+          {/* Extra spacing for mobile */}
+          <div className="md:hidden h-2"></div>
+
           {/* Filter Buttons Removed */}
         </div>
       </section>
 
       {/* Most Searched & Posted Jobs */}
-      <section className="bg-slate-900 py-8">
+      <section className="bg-slate-900 py-6 md:py-8">
         <div className="container">
           {/* Popular Jobs */}
           <Card className="bg-slate-800 border-slate-700">
