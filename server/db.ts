@@ -1,6 +1,5 @@
-import { eq, and } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
-import { InsertUser, users, jobListings, savedJobs, jobApplications, InsertJobListing } from "../drizzle/schema";
+import { InsertUser, users, jobPostings, jobApplications } from "../drizzle/schema";
 import { ENV } from './_core/env';
 
 let _db: ReturnType<typeof drizzle> | null = null;
@@ -48,288 +47,68 @@ export async function upsertUser(user: InsertUser): Promise<void> {
     const textFields = ["name", "email", "loginMethod"] as const;
     type TextField = (typeof textFields)[number];
 
-    const assignNullable = (field: TextField) => {
-      const value = user[field];
-      if (value === undefined) return;
-      const normalized = value ?? null;
-      values[field] = normalized;
-      updateSet[field] = normalized;
-    };
-
-    textFields.forEach(assignNullable);
-
-    if (user.lastSignedIn !== undefined) {
-      values.lastSignedIn = user.lastSignedIn;
-      updateSet.lastSignedIn = user.lastSignedIn;
-    }
-    if (user.role !== undefined) {
-      values.role = user.role;
-      updateSet.role = user.role;
-    } else if (user.openId === ENV.ownerOpenId) {
-      values.role = 'admin';
-      updateSet.role = 'admin';
-    } else {
-      // 새 사용자는 기본값으로 'user' 역할을 가짐
-      values.role = 'user';
+    for (const field of textFields) {
+      if (user[field] !== undefined) {
+        values[field] = user[field];
+        updateSet[field] = user[field];
+      }
     }
 
-    if (!values.lastSignedIn) {
-      values.lastSignedIn = new Date();
-    }
+    // Try to update, if no rows affected, insert
+    const result = await db
+      .update(users)
+      .set(updateSet)
+      .where(eq(users.openId, user.openId));
 
-    if (Object.keys(updateSet).length === 0) {
-      updateSet.lastSignedIn = new Date();
+    // If no rows were updated, insert the user
+    if (!result) {
+      await db.insert(users).values(values);
     }
-
-    await db.insert(users).values(values).onDuplicateKeyUpdate({
-      set: updateSet,
-    });
   } catch (error) {
-    console.error("[Database] Failed to upsert user:", error);
+    console.error("[Database] Error upserting user:", error);
     throw error;
   }
 }
 
-export async function getUserByOpenId(openId: string) {
-  const db = await getDb();
-  if (!db) {
-    console.warn("[Database] Cannot get user: database not available");
-    return undefined;
-  }
-
-  const result = await db.select().from(users).where(eq(users.openId, openId)).limit(1);
-
-  return result.length > 0 ? result[0] : undefined;
-}
-
-export async function getUserById(userId: number) {
-  const db = await getDb();
-  if (!db) return null;
-
-  const result = await db.select().from(users).where(eq(users.id, userId)).limit(1);
-
-  return result.length > 0 ? result[0] : null;
-}
-
-export async function getJobListings(filters?: {
-  category?: string;
-  location?: string;
-  search?: string;
-}) {
+// Job Postings
+export async function getJobPostings(employerId: number) {
   const db = await getDb();
   if (!db) return [];
   
   try {
-    const conditions = [eq(jobListings.isActive, 1)];
-    if (filters?.category && filters.category !== "all") {
-      conditions.push(eq(jobListings.category, filters.category));
-    }
-    if (filters?.location && filters.location !== "all") {
-      conditions.push(eq(jobListings.location, filters.location));
-    }
-    return await db
-      .select()
-      .from(jobListings)
-      .where(conditions.length > 1 ? and(...conditions) : conditions[0])
-      .limit(50);
+    return await db.select().from(jobPostings).where(eq(jobPostings.employerId, employerId));
   } catch (error) {
-    console.error("[Database] getJobListings error:", error);
+    console.error("[Database] Error getting job postings:", error);
     return [];
   }
 }
 
-export async function getJobById(jobId: number) {
-  const db = await getDb();
-  if (!db) return null;
-
-  const result = await db
-    .select()
-    .from(jobListings)
-    .where(eq(jobListings.id, jobId))
-    .limit(1);
-
-  return result.length > 0 ? result[0] : null;
-}
-
-export async function saveJob(userId: number, jobId: number) {
-  const db = await getDb();
-  if (!db) return false;
-
-  try {
-    await db.insert(savedJobs).values({ userId, jobId });
-    return true;
-  } catch (error) {
-    console.error("Failed to save job:", error);
-    return false;
-  }
-}
-
-export async function getSavedJobs(userId: number) {
+// Job Applications
+export async function getJobApplications(jobId: number) {
   const db = await getDb();
   if (!db) return [];
-
-  return await db
-    .select()
-    .from(savedJobs)
-    .where(eq(savedJobs.userId, userId));
-}
-
-export async function applyForJob(userId: number, jobId: number) {
-  const db = await getDb();
-  if (!db) return false;
-
+  
   try {
-    await db
-      .insert(jobApplications)
-      .values({ userId, jobId, status: "applied" });
-    return true;
+    return await db.select().from(jobApplications).where(eq(jobApplications.jobId, jobId));
   } catch (error) {
-    console.error("Failed to apply for job:", error);
-    return false;
-  }
-}
-
-export async function getUserApplications(userId: number) {
-  const db = await getDb();
-  if (!db) return [];
-
-  return await db
-    .select()
-    .from(jobApplications)
-    .where(eq(jobApplications.userId, userId));
-}
-
-export async function createJobListing(data: InsertJobListing) {
-  const db = await getDb();
-  if (!db) {
-    console.warn("[Database] Cannot create job listing: database not available");
-    return null;
-  }
-
-  try {
-    const result = await db.insert(jobListings).values(data);
-    return result;
-  } catch (error) {
-    console.error("[Database] Failed to create job listing:", error);
-    throw error;
-  }
-}
-
-
-// Resume Management Functions
-import { resumes, InsertResume, Resume } from "../drizzle/schema";
-
-export async function createResume(data: InsertResume): Promise<Resume | null> {
-  const db = await getDb();
-  if (!db) return null;
-
-  try {
-    const result = await db.insert(resumes).values(data);
-    return data as Resume;
-  } catch (error) {
-    console.error("Failed to create resume:", error);
-    return null;
-  }
-}
-
-export async function getUserResumes(userId: number): Promise<Resume[]> {
-  const db = await getDb();
-  if (!db) return [];
-
-  try {
-    return await db
-      .select()
-      .from(resumes)
-      .where(eq(resumes.userId, userId));
-  } catch (error) {
-    console.error("Failed to get user resumes:", error);
+    console.error("[Database] Error getting job applications:", error);
     return [];
   }
 }
 
-export async function getResumeById(resumeId: number): Promise<Resume | null> {
+// Import eq for where clauses
+import { eq } from "drizzle-orm";
+
+// Get user by openId
+export async function getUserByOpenId(openId: string) {
   const db = await getDb();
   if (!db) return null;
-
+  
   try {
-    const result = await db
-      .select()
-      .from(resumes)
-      .where(eq(resumes.id, resumeId))
-      .limit(1);
+    const result = await db.select().from(users).where(eq(users.openId, openId));
     return result[0] || null;
   } catch (error) {
-    console.error("Failed to get resume:", error);
+    console.error("[Database] Error getting user by openId:", error);
     return null;
-  }
-}
-
-export async function updateResume(resumeId: number, data: Partial<InsertResume>): Promise<boolean> {
-  const db = await getDb();
-  if (!db) return false;
-
-  try {
-    await db
-      .update(resumes)
-      .set(data)
-      .where(eq(resumes.id, resumeId));
-    return true;
-  } catch (error) {
-    console.error("Failed to update resume:", error);
-    return false;
-  }
-}
-
-export async function deleteResume(resumeId: number): Promise<boolean> {
-  const db = await getDb();
-  if (!db) return false;
-
-  try {
-    await db
-      .delete(resumes)
-      .where(eq(resumes.id, resumeId));
-    return true;
-  } catch (error) {
-    console.error("Failed to delete resume:", error);
-    return false;
-  }
-}
-
-export async function setDefaultResume(userId: number, resumeId: number): Promise<boolean> {
-  const db = await getDb();
-  if (!db) return false;
-
-  try {
-    // Reset all resumes for this user
-    await db
-      .update(resumes)
-      .set({ isDefault: 0 })
-      .where(eq(resumes.userId, userId));
-
-    // Set the selected resume as default
-    await db
-      .update(resumes)
-      .set({ isDefault: 1 })
-      .where(eq(resumes.id, resumeId));
-
-    return true;
-  } catch (error) {
-    console.error("Failed to set default resume:", error);
-    return false;
-  }
-}
-
-export async function applyForJobWithResume(userId: number, jobId: number, resumeId: number) {
-  const db = await getDb();
-  if (!db) return false;
-
-  try {
-    await db
-      .insert(jobApplications)
-      .values({ userId, jobId, resumeId, status: "applied" });
-    return true;
-  } catch (error) {
-    console.error("Failed to apply for job:", error);
-    return false;
   }
 }

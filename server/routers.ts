@@ -1,16 +1,16 @@
 import { COOKIE_NAME } from "@shared/const";
 import { getSessionCookieOptions } from "./_core/cookies";
 import { systemRouter } from "./_core/systemRouter";
-import { publicProcedure, router } from "./_core/trpc";
+import { publicProcedure, router, protectedProcedure } from "./_core/trpc";
 import { z } from "zod";
-import { getJobListings, getJobById, saveJob, applyForJob, getSavedJobs, getUserApplications, createJobListing, getDb, createResume, getUserResumes, updateResume, deleteResume, setDefaultResume, applyForJobWithResume } from "./db";
-import { users, jobApplications, jobListings, resumes } from "../drizzle/schema";
-import { eq } from "drizzle-orm";
+import { getDb } from "./db";
+import { users, jobPostings, jobApplications, employers, paymentPackages, payments } from "../drizzle/schema";
+import { eq, and, desc } from "drizzle-orm";
 
-// Admin procedure - checks if user is admin
-const adminProcedure = publicProcedure.use(async ({ ctx, next }) => {
-  if (!ctx.user || ctx.user.role !== "admin") {
-    throw new Error("Unauthorized: Admin access required");
+// Employer procedure - checks if user is employer
+const employerProcedure = protectedProcedure.use(async ({ ctx, next }) => {
+  if (!ctx.user || ctx.user.role !== "employer") {
+    throw new Error("Unauthorized: Employer access required");
   }
   return next({ ctx });
 });
@@ -28,253 +28,272 @@ export const appRouter = router({
     }),
   }),
 
+  // 구직자 관련 라우터
   job: router({
+    // 공고 검색 (지역 + 키워드)
     search: publicProcedure
       .input(z.object({
-        category: z.string().optional(),
         location: z.string().optional(),
+        keyword: z.string().optional(),
       }).optional())
       .query(async ({ input }) => {
-        return await getJobListings(input);
+        const db = await getDb();
+        if (!db) throw new Error("Database not available");
+
+        const conditions = [eq(jobPostings.status, "active")];
+
+        if (input?.location && input.location !== "all") {
+          conditions.push(eq(jobPostings.location, input.location));
+        }
+
+        if (input?.keyword) {
+          conditions.push(eq(jobPostings.jobTitle, input.keyword));
+        }
+
+        return await db.select().from(jobPostings)
+          .where(and(...conditions))
+          .orderBy(desc(jobPostings.createdAt));
       }),
 
+    // 공고 상세 조회
     getDetail: publicProcedure
       .input(z.number())
       .query(async ({ input }) => {
-        return await getJobById(input);
-      }),
-
-    saveJob: publicProcedure
-      .input(z.object({
-        jobId: z.number(),
-      }))
-      .mutation(async ({ input, ctx }) => {
-        if (!ctx.user) throw new Error("Not authenticated");
-        return await saveJob(ctx.user.id, input.jobId);
-      }),
-
-    applyJob: publicProcedure
-      .input(z.object({
-        jobId: z.number(),
-      }))
-      .mutation(async ({ input, ctx }) => {
-        if (!ctx.user) throw new Error("Not authenticated");
-        return await applyForJob(ctx.user.id, input.jobId);
-      }),
-
-    mySavedJobs: publicProcedure
-      .query(async ({ ctx }) => {
-        if (!ctx.user) return [];
-        return await getSavedJobs(ctx.user.id);
-      }),
-
-    myApplications: publicProcedure
-      .query(async ({ ctx }) => {
-        if (!ctx.user) return [];
-        return await getUserApplications(ctx.user.id);
-      }),
-
-    postJob: publicProcedure
-      .input(z.object({
-        title: z.string(),
-        company: z.string(),
-        location: z.string(),
-        category: z.string(),
-        description: z.string(),
-        salaryType: z.enum(["hourly", "annual"]),
-        salaryMin: z.number(),
-        salaryMax: z.number(),
-        jobType: z.string(),
-        experienceRequired: z.string(),
-        accommodation: z.string(),
-        lmiaSponsorship: z.boolean(),
-        visaSponsorship: z.boolean(),
-      }))
-      .mutation(async ({ input, ctx }) => {
-        if (!ctx.user) throw new Error("Not authenticated");
-        
-        const jobData = {
-          title: input.title,
-          company: input.company,
-          location: input.location,
-          category: input.category,
-          description: input.description,
-          salaryType: input.salaryType,
-          salaryMin: input.salaryMin,
-          salaryMax: input.salaryMax,
-          jobType: input.jobType,
-          experienceRequired: input.experienceRequired,
-          accommodation: input.accommodation,
-          lmiaAvailable: input.lmiaSponsorship ? 1 : 0,
-          visaSponsorship: input.visaSponsorship ? 1 : 0,
-          postedBy: ctx.user.id,
-          applicationMethod: "email",
-          applicationEmail: ctx.user.email || "",
-          status: "active",
-        };
-
-        return await createJobListing(jobData);
-      }),
-  }),
-
-  admin: router({
-    // Get dashboard stats
-    stats: adminProcedure.query(async () => {
-      const db = await getDb();
-      if (!db) throw new Error("Database not available");
-
-      const totalApplications = await db.select().from(jobApplications);
-      const totalJobs = await db.select().from(jobListings).where(eq(jobListings.isActive, 1));
-      const totalUsers = await db.select().from(users);
-
-      return {
-        totalApplications: totalApplications.length,
-        totalJobs: totalJobs.length,
-        totalUsers: totalUsers.length,
-        recentApplications: totalApplications.slice(-5),
-      };
-    }),
-
-    // Get all applications
-    applications: adminProcedure.query(async () => {
-      const db = await getDb();
-      if (!db) throw new Error("Database not available");
-      return await db.select().from(jobApplications);
-    }),
-
-    // Get all jobs
-    jobs: adminProcedure.query(async () => {
-      const db = await getDb();
-      if (!db) throw new Error("Database not available");
-      return await db.select().from(jobListings);
-    }),
-
-    // Get all users
-    usersList: adminProcedure.query(async () => {
-      const db = await getDb();
-      if (!db) throw new Error("Database not available");
-      return await db.select().from(users);
-    }),
-
-    // Delete job
-    deleteJob: adminProcedure
-      .input(z.number())
-      .mutation(async ({ input: jobId }) => {
         const db = await getDb();
         if (!db) throw new Error("Database not available");
-        await db.delete(jobListings).where(eq(jobListings.id, jobId));
-        return { success: true };
+        
+        const job = await db.select().from(jobPostings).where(eq(jobPostings.id, input));
+        return job[0] || null;
       }),
 
-    // Update job status
-    updateJobStatus: adminProcedure
+    // 공고에 지원
+    apply: publicProcedure
       .input(z.object({
         jobId: z.number(),
-        status: z.enum(["active", "inactive", "expired"]),
+        applicantName: z.string(),
+        applicantEmail: z.string().email(),
+        applicantPhone: z.string().optional(),
+        applicantMessage: z.string().optional(),
       }))
       .mutation(async ({ input }) => {
         const db = await getDb();
         if (!db) throw new Error("Database not available");
-        const isActive = input.status === "active" ? 1 : 0;
-        await db.update(jobListings)
-          .set({ isActive })
-          .where(eq(jobListings.id, input.jobId));
+
+        // 공고 조회
+        const job = await db.select().from(jobPostings).where(eq(jobPostings.id, input.jobId));
+        if (!job[0]) throw new Error("Job not found");
+
+        // 지원 저장
+        await db.insert(jobApplications).values({
+          jobId: input.jobId,
+          employerId: job[0].employerId,
+          applicantName: input.applicantName,
+          applicantEmail: input.applicantEmail,
+          applicantPhone: input.applicantPhone || "",
+          applicantMessage: input.applicantMessage || "",
+          status: "applied",
+        });
+
+        // 공고의 지원자 수 증가
+        await db.update(jobPostings)
+          .set({ applicationCount: job[0].applicationCount + 1 })
+          .where(eq(jobPostings.id, input.jobId));
+
         return { success: true };
       }),
   }),
 
-  resume: router({
-    // Get user's resumes
-    myResumes: publicProcedure.query(async ({ ctx }) => {
-      if (!ctx.user) return [];
-      return await getUserResumes(ctx.user.id);
+  // 고용주 관련 라우터
+  employer: router({
+    // 고용주 정보 조회
+    getProfile: employerProcedure.query(async ({ ctx }) => {
+      const db = await getDb();
+      if (!db) throw new Error("Database not available");
+
+      const employer = await db.select().from(employers).where(eq(employers.userId, ctx.user.id));
+      return employer[0] || null;
     }),
 
-    // Create new resume
-    create: publicProcedure
+    // 고용주 정보 생성/업데이트
+    updateProfile: employerProcedure
       .input(z.object({
-        title: z.string(),
-        fullName: z.string(),
-        email: z.string(),
-        phone: z.string().optional(),
-        location: z.string().optional(),
-        summary: z.string().optional(),
-        experience: z.string().optional(),
-        education: z.string().optional(),
-        skills: z.string().optional(),
+        companyName: z.string(),
+        companyEmail: z.string().email(),
+        companyPhone: z.string().optional(),
+        companyWebsite: z.string().optional(),
+        companyDescription: z.string().optional(),
+        industry: z.string().optional(),
+        employeeCount: z.string().optional(),
       }))
       .mutation(async ({ input, ctx }) => {
-        if (!ctx.user) throw new Error("Not authenticated");
-        
-        // Check resume count (max 5)
-        const existingResumes = await getUserResumes(ctx.user.id);
-        if (existingResumes.length >= 5) {
-          throw new Error("Maximum 5 resumes allowed");
+        const db = await getDb();
+        if (!db) throw new Error("Database not available");
+
+        const existing = await db.select().from(employers).where(eq(employers.userId, ctx.user.id));
+
+        if (existing[0]) {
+          await db.update(employers)
+            .set(input)
+            .where(eq(employers.userId, ctx.user.id));
+        } else {
+          await db.insert(employers).values({
+            userId: ctx.user.id,
+            ...input,
+          });
         }
 
-        return await createResume({
-          userId: ctx.user.id,
-          title: input.title,
-          fullName: input.fullName,
-          email: input.email,
-          phone: input.phone,
-          location: input.location,
-          summary: input.summary,
-          experience: input.experience,
-          education: input.education,
-          skills: input.skills,
-          isDefault: existingResumes.length === 0 ? 1 : 0,
-        });
+        return { success: true };
       }),
 
-    // Update resume
-    update: publicProcedure
+    // 공고 목록 조회
+    getJobPostings: employerProcedure.query(async ({ ctx }) => {
+      const db = await getDb();
+      if (!db) throw new Error("Database not available");
+
+      const employer = await db.select().from(employers).where(eq(employers.userId, ctx.user.id));
+      if (!employer[0]) throw new Error("Employer profile not found");
+
+      return await db.select().from(jobPostings)
+        .where(eq(jobPostings.employerId, employer[0].id))
+        .orderBy(desc(jobPostings.createdAt));
+    }),
+
+    // 공고 생성
+    createJobPosting: employerProcedure
       .input(z.object({
-        resumeId: z.number(),
-        title: z.string().optional(),
-        fullName: z.string().optional(),
-        email: z.string().optional(),
-        phone: z.string().optional(),
-        location: z.string().optional(),
-        summary: z.string().optional(),
-        experience: z.string().optional(),
-        education: z.string().optional(),
-        skills: z.string().optional(),
+        jobTitle: z.string(),
+        companyName: z.string(),
+        location: z.string(),
+        jobType: z.enum(["full-time", "part-time", "contract", "temporary", "freelance"]),
+        salary: z.string().optional(),
+        description: z.string().optional(),
+        requirements: z.string().optional(),
+        benefits: z.string().optional(),
+        contactEmail: z.string().email().optional(),
+        contactPhone: z.string().optional(),
       }))
       .mutation(async ({ input, ctx }) => {
-        if (!ctx.user) throw new Error("Not authenticated");
-        const { resumeId, ...data } = input;
-        return await updateResume(resumeId, data);
+        const db = await getDb();
+        if (!db) throw new Error("Database not available");
+
+        const employer = await db.select().from(employers).where(eq(employers.userId, ctx.user.id));
+        if (!employer[0]) throw new Error("Employer profile not found");
+
+        await db.insert(jobPostings).values({
+          employerId: employer[0].id,
+          ...input,
+          status: "active",
+        });
+
+        return { success: true };
       }),
 
-    // Delete resume
-    delete: publicProcedure
-      .input(z.number())
-      .mutation(async ({ input: resumeId, ctx }) => {
-        if (!ctx.user) throw new Error("Not authenticated");
-        return await deleteResume(resumeId);
+    // 공고 수정
+    updateJobPosting: employerProcedure
+      .input(z.object({
+        jobId: z.number(),
+        jobTitle: z.string().optional(),
+        companyName: z.string().optional(),
+        location: z.string().optional(),
+        jobType: z.enum(["full-time", "part-time", "contract", "temporary", "freelance"]).optional(),
+        salary: z.string().optional(),
+        description: z.string().optional(),
+        requirements: z.string().optional(),
+        benefits: z.string().optional(),
+        contactEmail: z.string().email().optional(),
+        contactPhone: z.string().optional(),
+      }))
+      .mutation(async ({ input, ctx }) => {
+        const db = await getDb();
+        if (!db) throw new Error("Database not available");
+
+        const { jobId, ...updateData } = input;
+
+        await db.update(jobPostings)
+          .set(updateData)
+          .where(eq(jobPostings.id, jobId));
+
+        return { success: true };
       }),
 
-    // Set default resume
-    setDefault: publicProcedure
+    // 공고 삭제
+    deleteJobPosting: employerProcedure
       .input(z.number())
-      .mutation(async ({ input: resumeId, ctx }) => {
-        if (!ctx.user) throw new Error("Not authenticated");
-        return await setDefaultResume(ctx.user.id, resumeId);
+      .mutation(async ({ input: jobId }) => {
+        const db = await getDb();
+        if (!db) throw new Error("Database not available");
+
+        await db.delete(jobPostings).where(eq(jobPostings.id, jobId));
+        return { success: true };
+      }),
+
+    // 공고 마감
+    closeJobPosting: employerProcedure
+      .input(z.number())
+      .mutation(async ({ input: jobId }) => {
+        const db = await getDb();
+        if (!db) throw new Error("Database not available");
+
+        await db.update(jobPostings)
+          .set({ status: "closed" })
+          .where(eq(jobPostings.id, jobId));
+
+        return { success: true };
+      }),
+
+    // 지원자 목록 조회
+    getApplications: employerProcedure
+      .input(z.number())
+      .query(async ({ input: jobId }) => {
+        const db = await getDb();
+        if (!db) throw new Error("Database not available");
+
+        return await db.select().from(jobApplications)
+          .where(eq(jobApplications.jobId, jobId))
+          .orderBy(desc(jobApplications.appliedAt));
+      }),
+
+    // 지원자 상태 업데이트
+    updateApplicationStatus: employerProcedure
+      .input(z.object({
+        applicationId: z.number(),
+        status: z.enum(["applied", "reviewed", "rejected", "accepted"]),
+      }))
+      .mutation(async ({ input }) => {
+        const db = await getDb();
+        if (!db) throw new Error("Database not available");
+
+        await db.update(jobApplications)
+          .set({ status: input.status })
+          .where(eq(jobApplications.id, input.applicationId));
+
+        return { success: true };
       }),
   }),
 
-  application: router({
-    // Apply for job with resume selection
-    applyWithResume: publicProcedure
-      .input(z.object({
-        jobId: z.number(),
-        resumeId: z.number(),
-      }))
-      .mutation(async ({ input, ctx }) => {
-        if (!ctx.user) throw new Error("Not authenticated");
-        return await applyForJobWithResume(ctx.user.id, input.jobId, input.resumeId);
-      }),
+  // 결제 관련 라우터
+  payment: router({
+    // 패키지 목록 조회
+    getPackages: publicProcedure.query(async () => {
+      const db = await getDb();
+      if (!db) throw new Error("Database not available");
+
+      return await db.select().from(paymentPackages)
+        .where(eq(paymentPackages.isActive, 1));
+    }),
+
+    // 결제 이력 조회
+    getPaymentHistory: employerProcedure.query(async ({ ctx }) => {
+      const db = await getDb();
+      if (!db) throw new Error("Database not available");
+
+      const employer = await db.select().from(employers).where(eq(employers.userId, ctx.user.id));
+      if (!employer[0]) throw new Error("Employer profile not found");
+
+      return await db.select().from(payments)
+        .where(eq(payments.employerId, employer[0].id))
+        .orderBy(desc(payments.createdAt));
+    }),
   }),
 });
 

@@ -1,22 +1,25 @@
-import { int, mysqlEnum, mysqlTable, text, timestamp, varchar } from "drizzle-orm/mysql-core";
+import { int, mysqlEnum, mysqlTable, text, timestamp, varchar, decimal } from "drizzle-orm/mysql-core";
 
 /**
- * Core user table backing auth flow.
- * Extend this file with additional tables as your product grows.
- * Columns use camelCase to match both database fields and generated types.
+ * CanadaJobBoard v1.0 - 고용주 중심의 채용 플랫폼
+ * 
+ * 주요 테이블:
+ * - users: 고용주 및 구직자
+ * - employers: 고용주 정보
+ * - payment_packages: 결제 패키지
+ * - payments: 결제 이력
+ * - job_postings: 공고
+ * - job_applications: 지원자
  */
+
+// 사용자 테이블 (고용주 및 구직자)
 export const users = mysqlTable("users", {
-  /**
-   * Surrogate primary key. Auto-incremented numeric value managed by the database.
-   * Use this for relations between tables.
-   */
   id: int("id").autoincrement().primaryKey(),
-  /** Manus OAuth identifier (openId) returned from the OAuth callback. Unique per user. */
   openId: varchar("openId", { length: 64 }).notNull().unique(),
   name: text("name"),
   email: varchar("email", { length: 320 }),
   loginMethod: varchar("loginMethod", { length: 64 }),
-  role: mysqlEnum("role", ["user", "admin"]).default("user").notNull(),
+  role: mysqlEnum("role", ["user", "admin", "employer"]).default("user").notNull(),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
   lastSignedIn: timestamp("lastSignedIn").defaultNow().notNull(),
@@ -25,154 +28,112 @@ export const users = mysqlTable("users", {
 export type User = typeof users.$inferSelect;
 export type InsertUser = typeof users.$inferInsert;
 
-// NOC Occupations Table
-export const nocOccupations = mysqlTable("noc_occupations", {
+// 고용주 정보 테이블
+export const employers = mysqlTable("employers", {
   id: int("id").autoincrement().primaryKey(),
-  title: varchar("title", { length: 255 }).notNull(),
-  nocCode: varchar("noc_code", { length: 10 }).notNull().unique(),
-  teerLevel: int("teer_level").notNull(),
-  description: text("description"),
+  userId: int("user_id").notNull().unique(),
+  companyName: varchar("company_name", { length: 255 }).notNull(),
+  companyEmail: varchar("company_email", { length: 320 }).notNull(),
+  companyPhone: varchar("company_phone", { length: 20 }),
+  companyWebsite: varchar("company_website", { length: 255 }),
+  companyDescription: text("company_description"),
+  industry: varchar("industry", { length: 100 }),
+  employeeCount: varchar("employee_count", { length: 50 }),
+  isVerified: int("is_verified").default(0).notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().onUpdateNow().notNull(),
 });
 
-export type NocOccupation = typeof nocOccupations.$inferSelect;
-export type InsertNocOccupation = typeof nocOccupations.$inferInsert;
+export type Employer = typeof employers.$inferSelect;
+export type InsertEmployer = typeof employers.$inferInsert;
 
-// Cities Table
-export const cities = mysqlTable("cities", {
+// 결제 패키지 테이블
+export const paymentPackages = mysqlTable("payment_packages", {
   id: int("id").autoincrement().primaryKey(),
   name: varchar("name", { length: 100 }).notNull(),
-  province: varchar("province", { length: 50 }).notNull(),
-  slug: varchar("slug", { length: 100 }).notNull().unique(),
-  createdAt: timestamp("created_at").defaultNow().notNull(),
-});
-
-export type City = typeof cities.$inferSelect;
-export type InsertCity = typeof cities.$inferInsert;
-
-// Job Listings Table
-export const jobListings = mysqlTable("job_listings", {
-  id: int("id").autoincrement().primaryKey(),
-  title: varchar("title", { length: 255 }).notNull(),
-  company: varchar("company", { length: 255 }).notNull(),
-  location: varchar("location", { length: 255 }).notNull(),
-  salary: varchar("salary", { length: 255 }),
-  jobType: varchar("job_type", { length: 50 }).notNull(),
-  category: varchar("category", { length: 100 }).notNull(),
-  description: text("description").notNull(),
-  requirements: text("requirements"),
-  postedBy: int("posted_by").notNull(),
+  description: text("description"),
+  price: decimal("price", { precision: 10, scale: 2 }).notNull(),
+  currency: varchar("currency", { length: 3 }).default("CAD").notNull(),
+  jobSlots: int("job_slots").notNull(), // 동시에 올릴 수 있는 공고 수
+  durationDays: int("duration_days").notNull(), // 공고 게시 기간 (일)
+  features: text("features"), // JSON 형식의 기능 목록
   isActive: int("is_active").default(1).notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().onUpdateNow().notNull(),
 });
 
-export type JobListing = typeof jobListings.$inferSelect;
-export type InsertJobListing = typeof jobListings.$inferInsert;
+export type PaymentPackage = typeof paymentPackages.$inferSelect;
+export type InsertPaymentPackage = typeof paymentPackages.$inferInsert;
 
-// Extended job listing fields (stored separately or in application logic)
-export interface ExtendedJobListing extends JobListing {
-  salaryMin?: number;
-  salaryMax?: number;
-  salaryType?: string;
-  experienceRequired?: string;
-  accommodation?: string;
-  nocCode?: string;
-  teerLevel?: number;
-  lmiaAvailable?: number;
-  visaSponsorship?: number;
-  applicationMethod?: string;
-  applicationEmail?: string;
-  applicationLink?: string;
-  expiresAt?: Date;
-}
-
-// Job Reports Table (Scam Prevention)
-export const jobReports = mysqlTable("job_reports", {
+// 결제 이력 테이블
+export const payments = mysqlTable("payments", {
   id: int("id").autoincrement().primaryKey(),
-  jobId: int("job_id").notNull(),
-  userId: int("user_id"),
-  reason: varchar("reason", { length: 100 }).notNull(),
-  description: text("description"),
-  status: varchar("status", { length: 50 }).default("pending").notNull(),
+  employerId: int("employer_id").notNull(),
+  packageId: int("package_id").notNull(),
+  amount: decimal("amount", { precision: 10, scale: 2 }).notNull(),
+  currency: varchar("currency", { length: 3 }).default("CAD").notNull(),
+  stripePaymentId: varchar("stripe_payment_id", { length: 255 }),
+  status: mysqlEnum("status", ["pending", "completed", "failed", "refunded"]).default("pending").notNull(),
+  expiresAt: timestamp("expires_at"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().onUpdateNow().notNull(),
 });
 
-export type JobReport = typeof jobReports.$inferSelect;
-export type InsertJobReport = typeof jobReports.$inferInsert;
+export type Payment = typeof payments.$inferSelect;
+export type InsertPayment = typeof payments.$inferInsert;
 
-// Saved Jobs Table
-export const savedJobs = mysqlTable("saved_jobs", {
+// 공고 테이블
+export const jobPostings = mysqlTable("job_postings", {
   id: int("id").autoincrement().primaryKey(),
-  userId: int("user_id").notNull(),
-  jobId: int("job_id").notNull(),
+  employerId: int("employer_id").notNull(),
+  
+  // 필수 필드
+  jobTitle: varchar("job_title", { length: 255 }).notNull(),
+  companyName: varchar("company_name", { length: 255 }).notNull(),
+  location: varchar("location", { length: 255 }).notNull(), // 도시, 주
+  jobType: mysqlEnum("job_type", ["full-time", "part-time", "contract", "temporary", "freelance"]).notNull(),
+  salary: varchar("salary", { length: 100 }).notNull().default(""),
+  
+  // 선택 필드
+  description: text("description").notNull().default(""),
+  requirements: text("requirements").notNull().default(""),
+  benefits: text("benefits").notNull().default(""),
+  contactEmail: varchar("contact_email", { length: 320 }).notNull().default(""),
+  contactPhone: varchar("contact_phone", { length: 20 }).notNull().default(""),
+  
+  // 상태
+  status: mysqlEnum("status", ["active", "closed", "draft"]).default("active").notNull(),
+  expiresAt: timestamp("expires_at"),
+  
+  // 메타데이터
+  viewCount: int("view_count").default(0).notNull(),
+  applicationCount: int("application_count").default(0).notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().onUpdateNow().notNull(),
 });
 
-export type SavedJob = typeof savedJobs.$inferSelect;
-export type InsertSavedJob = typeof savedJobs.$inferInsert;
+export type JobPosting = typeof jobPostings.$inferSelect;
+export type InsertJobPosting = typeof jobPostings.$inferInsert;
 
-// Job Applications Table
+// 공고 지원 테이블
 export const jobApplications = mysqlTable("job_applications", {
   id: int("id").autoincrement().primaryKey(),
-  userId: int("user_id").notNull(),
   jobId: int("job_id").notNull(),
-  resumeId: int("resume_id"),
-  status: varchar("status", { length: 50 }).default("applied").notNull(),
+  employerId: int("employer_id").notNull(),
+  
+  // 지원자 정보
+  applicantName: varchar("applicant_name", { length: 255 }).notNull(),
+  applicantEmail: varchar("applicant_email", { length: 320 }).notNull(),
+  applicantPhone: varchar("applicant_phone", { length: 20 }).notNull().default(""),
+  applicantMessage: text("applicant_message").notNull().default(""),
+  
+  // 상태
+  status: mysqlEnum("status", ["applied", "reviewed", "rejected", "accepted"]).default("applied").notNull(),
+  
+  // 메타데이터
   appliedAt: timestamp("applied_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().onUpdateNow().notNull(),
 });
 
 export type JobApplication = typeof jobApplications.$inferSelect;
 export type InsertJobApplication = typeof jobApplications.$inferInsert;
-
-// User Profiles Table
-export const userProfiles = mysqlTable("user_profiles", {
-  id: int("id").autoincrement().primaryKey(),
-  userId: int("user_id").notNull().unique(),
-  bio: text("bio"),
-  skills: text("skills"),
-  experience: text("experience"),
-  education: text("education"),
-  resumeUrl: varchar("resume_url", { length: 500 }),
-  location: varchar("location", { length: 255 }),
-  jobPreferences: text("job_preferences"),
-  createdAt: timestamp("created_at").defaultNow().notNull(),
-  updatedAt: timestamp("updated_at").defaultNow().onUpdateNow().notNull(),
-});
-
-export type UserProfile = typeof userProfiles.$inferSelect;
-export type InsertUserProfile = typeof userProfiles.$inferInsert;
-
-// Resumes Table - Store multiple resumes per user
-export const resumes = mysqlTable("resumes", {
-  id: int("id").autoincrement().primaryKey(),
-  userId: int("user_id").notNull(),
-  title: varchar("title", { length: 255 }).notNull(),
-  fullName: varchar("full_name", { length: 255 }).notNull(),
-  email: varchar("email", { length: 320 }).notNull(),
-  phone: varchar("phone", { length: 20 }),
-  location: varchar("location", { length: 255 }),
-  summary: text("summary"),
-  experience: text("experience"),
-  education: text("education"),
-  skills: text("skills"),
-  resumeUrl: varchar("resume_url", { length: 500 }),
-  isDefault: int("is_default").default(0).notNull(),
-  createdAt: timestamp("created_at").defaultNow().notNull(),
-  updatedAt: timestamp("updated_at").defaultNow().onUpdateNow().notNull(),
-});
-
-export type Resume = typeof resumes.$inferSelect;
-export type InsertResume = typeof resumes.$inferInsert;
-
-// Recently Viewed Jobs Table
-export const recentlyViewedJobs = mysqlTable("recently_viewed_jobs", {
-  id: int("id").autoincrement().primaryKey(),
-  userId: int("user_id").notNull(),
-  jobId: int("job_id").notNull(),
-  viewedAt: timestamp("viewed_at").defaultNow().notNull(),
-});
-
-export type RecentlyViewedJob = typeof recentlyViewedJobs.$inferSelect;
-export type InsertRecentlyViewedJob = typeof recentlyViewedJobs.$inferInsert;
