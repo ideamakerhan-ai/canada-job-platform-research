@@ -351,37 +351,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Most Searched & Posted Jobs */}
-      <section className="bg-slate-900 py-6 md:py-8">
-        <div className="container">
-          {/* Popular Jobs */}
-          <div className="space-y-4">
-            <h3 className="text-white font-semibold text-lg">Popular Jobs</h3>
-            <div className="flex flex-wrap gap-2">
-              {[
-                "Healthcare Professionals",
-                "Software Developers",
-                "Truck Drivers",
-                "Nurses",
-                "Electricians",
-                "Welders",
-              ].map((job, idx) => (
-                <button
-                  key={idx}
-                  onClick={() => handleJobTitleClick(job)}
-                  className={`px-4 py-2 rounded-full transition ${
-                    selectedJobTitle === job
-                      ? "bg-red-600 text-white"
-                      : "bg-slate-700 text-slate-200 hover:bg-slate-600"
-                  }`}
-                >
-                  {job}
-                </button>
-              ))}
-            </div>
-          </div>
-        </div>
-      </section>
+
 
 
 
