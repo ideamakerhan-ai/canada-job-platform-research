@@ -120,7 +120,28 @@ export default function JobDetail() {
   };
 
   const handleApply = () => {
-    setShowResumeModal(true);
+    const applicantName = prompt('Your Name:');
+    if (!applicantName) return;
+    
+    const applicantEmail = prompt('Your Email:');
+    if (!applicantEmail) return;
+    
+    const applicantPhone = prompt('Your Phone (optional):');
+    
+    const subject = encodeURIComponent(`Job Application: ${job.title}`);
+    const body = encodeURIComponent(
+      `I would like to apply for the position of ${job.title} at ${job.company}.\n\n` +
+      `Applicant Name: ${applicantName}\n` +
+      `Email: ${applicantEmail}\n` +
+      `Phone: ${applicantPhone || 'N/A'}\n\n` +
+      `Job Link: ${window.location.href}`
+    );
+    
+    const recipientEmail = 'jobs@canadajobs.com';
+    window.location.href = `mailto:${recipientEmail}?subject=${subject}&body=${body}`;
+    
+    setIsApplied(true);
+    toast.success('Opening email client to submit your application');
   };
 
   const handleApplySuccess = () => {

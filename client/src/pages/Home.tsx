@@ -245,19 +245,19 @@ export default function Home() {
             </div>
             <nav className="hidden md:flex items-center gap-8">
               <a href="#" className="text-slate-600 hover:text-slate-900 font-medium">Find Jobs</a>
-              <a href="#" className="text-slate-600 hover:text-slate-900 font-medium">Post a Job</a>
-              <a href="#" className="text-slate-600 hover:text-slate-900 font-medium">Job Guide</a>
+              <a href={getLoginUrl()} className="text-slate-600 hover:text-slate-900 font-medium">Post a Job</a>
             </nav>
             <div className="flex items-center gap-3">
               {isAuthenticated ? (
                 <>
+                  <span className="text-sm text-slate-600 mr-2">Welcome, {user?.name}</span>
                   <a href="/my-profile" className="bg-red-100 text-red-600 rounded-full w-10 h-10 flex items-center justify-center font-bold hover:bg-red-200">
                     {user?.name?.charAt(0) || 'U'}
                   </a>
                 </>
               ) : (
-                <a href={getLoginUrl()} className="bg-red-100 text-red-600 rounded-full w-10 h-10 flex items-center justify-center font-bold hover:bg-red-200">
-                  I
+                <a href={getLoginUrl()} className="bg-red-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-red-700">
+                  Employer Login
                 </a>
               )}
             </div>
@@ -281,13 +281,13 @@ export default function Home() {
           </div>
 
           {/* Search Bar */}
-          <div className="flex flex-col sm:flex-row gap-3 mb-6 max-w-4xl mx-auto">
+          <div className="flex flex-col sm:flex-row gap-2 mb-8 max-w-5xl mx-auto">
             <div className="flex-1 relative">
-              <Search className="absolute left-4 top-3.5 w-5 h-5 text-slate-400" />
+              <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-slate-400" />
               <Input
                 type="text"
                 placeholder="Job title or keyword..."
-                className="pl-12 py-3 bg-white text-slate-900 rounded-lg border-0 w-full"
+                className="pl-12 pr-4 py-3 bg-white text-slate-900 rounded-lg border-0 w-full shadow-md"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
@@ -295,7 +295,7 @@ export default function Home() {
             <select
               value={selectedLocation}
               onChange={(e) => setSelectedLocation(e.target.value)}
-              className="px-4 py-3 bg-white text-slate-900 rounded-lg border-0 font-medium min-w-[180px]"
+              className="px-4 py-3 bg-white text-slate-900 rounded-lg border-0 font-medium shadow-md"
             >
               <option value="all">All Locations</option>
               <option value="Toronto, ON">Toronto, ON</option>
@@ -307,8 +307,8 @@ export default function Home() {
               <option value="Ottawa, ON">Ottawa, ON</option>
               <option value="Halifax, NS">Halifax, NS</option>
             </select>
-            <Button className="bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-lg font-semibold whitespace-nowrap h-auto">
-              Search Jobs
+            <Button className="bg-red-600 hover:bg-red-700 text-white px-8 py-3 rounded-lg font-semibold whitespace-nowrap h-auto shadow-md">
+              Search
             </Button>
           </div>
 
