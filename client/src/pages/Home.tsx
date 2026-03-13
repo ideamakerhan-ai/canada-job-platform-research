@@ -319,11 +319,10 @@ export default function Home() {
       {/* Most Searched & Posted Jobs */}
       <section className="bg-slate-900 py-12">
         <div className="container">
-          <div className="grid md:grid-cols-2 gap-8">
-            {/* Most Searched Jobs */}
-            <Card className="bg-slate-800 border-slate-700">
+          {/* Popular Jobs */}
+          <Card className="bg-slate-800 border-slate-700">
               <CardHeader>
-                <CardTitle className="text-white">Most Searched Jobs</CardTitle>
+                <CardTitle className="text-white">Popular Jobs</CardTitle>
               </CardHeader>
               <CardContent className="space-y-3">
                 {[
@@ -348,61 +347,11 @@ export default function Home() {
                   </div>
                 ))}
               </CardContent>
-            </Card>
-
-            {/* Most Posted Jobs */}
-            <Card className="bg-slate-800 border-slate-700">
-              <CardHeader>
-                <CardTitle className="text-white">Most Posted Jobs</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                {[
-                  { title: "Retail & Sales", count: "456" },
-                  { title: "Hospitality", count: "389" },
-                  { title: "Construction", count: "312" },
-                  { title: "Administration", count: "278" },
-                  { title: "Manufacturing", count: "245" },
-                  { title: "Transportation", count: "198" },
-                ].map((job, idx) => (
-                  <div
-                    key={idx}
-                    onClick={() => handleJobTitleClick(job.title)}
-                    className={`flex justify-between items-center p-3 rounded-lg cursor-pointer transition ${
-                      selectedJobTitle === job.title
-                        ? "bg-red-600 text-white"
-                        : "bg-slate-700 text-slate-200 hover:bg-slate-600"
-                    }`}
-                  >
-                    <span className="font-semibold text-lg">{job.title}</span>
-                    <span className="text-red-500 font-bold text-xl">{job.count}</span>
-                  </div>
-                ))}
-              </CardContent>
-            </Card>
-          </div>
+          </Card>
         </div>
       </section>
 
-      {/* Stats Section */}
-      <section className="bg-white py-12 border-t border-slate-200">
-        <div className="container">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-            <div className="text-center">
-              <div className="text-3xl font-bold text-red-600 mb-2">{allJobs.length}+</div>
-              <div className="text-slate-600">Active Jobs</div>
-            </div>
-            <div className="text-center">
-              <div className="text-3xl font-bold text-red-600 mb-2">50+</div>
-              <div className="text-slate-600">Cities</div>
-            </div>
 
-            <div className="text-center">
-              <div className="text-3xl font-bold text-blue-600 mb-2">Free</div>
-              <div className="text-slate-600">For Job Seekers</div>
-            </div>
-          </div>
-        </div>
-      </section>
 
       {/* Featured Jobs */}
       <section className="bg-slate-50 py-16">
