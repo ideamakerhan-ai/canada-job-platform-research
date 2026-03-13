@@ -101,10 +101,7 @@ export default function JobDetail() {
   const [isSaved, setIsSaved] = useState(false);
   const [isApplied, setIsApplied] = useState(false);
   const [showResumeModal, setShowResumeModal] = useState(false);
-  const [showApplyModal, setShowApplyModal] = useState(false);
-  const [applicantName, setApplicantName] = useState("");
-  const [applicantEmail, setApplicantEmail] = useState("");
-  const [applicantPhone, setApplicantPhone] = useState("");
+
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -138,25 +135,13 @@ export default function JobDetail() {
   };
 
   const handleApply = () => {
-    setShowApplyModal(true);
-  };
-
-  const handleSubmitApplication = () => {
-    if (!applicantName.trim()) {
-      toast.error("Please enter your name");
-      return;
-    }
-    if (!applicantEmail.trim()) {
-      toast.error("Please enter your email");
-      return;
-    }
-
+    // 사용자 정보 입력 모달 없이 바로 이메일 클라이언트 열기
     const subject = encodeURIComponent(`Job Application: ${job.title}`);
     const body = encodeURIComponent(
       `I would like to apply for the position of ${job.title} at ${job.company}.\n\n` +
-      `Applicant Name: ${applicantName}\n` +
-      `Email: ${applicantEmail}\n` +
-      `Phone: ${applicantPhone || "N/A"}\n\n` +
+      `Position: ${job.title}\n` +
+      `Company: ${job.company}\n` +
+      `Location: ${job.location}\n\n` +
       `Job Link: ${window.location.href}`
     );
 
@@ -164,12 +149,10 @@ export default function JobDetail() {
     window.location.href = `mailto:${recipientEmail}?subject=${subject}&body=${body}`;
 
     setIsApplied(true);
-    setShowApplyModal(false);
-    setApplicantName("");
-    setApplicantEmail("");
-    setApplicantPhone("");
-    toast.success("Opening email client to submit your application");
+    toast.success("Opening your email client to apply");
   };
+
+
 
   const handleApplySuccess = () => {
     setIsApplied(true);
@@ -305,64 +288,7 @@ export default function JobDetail() {
         </div>
       </main>
 
-      {/* Apply Modal */}
-      <Dialog open={showApplyModal} onOpenChange={setShowApplyModal}>
-        <DialogContent className="sm:max-w-md">
-          <DialogHeader>
-            <DialogTitle>Apply for this job</DialogTitle>
-            <DialogDescription>
-              Enter your information to apply for the {job.title} position at {job.company}
-            </DialogDescription>
-          </DialogHeader>
-          <div className="space-y-4">
-            <div>
-              <label className="text-sm font-medium text-slate-700">Your Name</label>
-              <Input
-                type="text"
-                placeholder="Enter your full name"
-                value={applicantName}
-                onChange={(e) => setApplicantName(e.target.value)}
-                className="mt-1"
-              />
-            </div>
-            <div>
-              <label className="text-sm font-medium text-slate-700">Your Email</label>
-              <Input
-                type="email"
-                placeholder="Enter your email address"
-                value={applicantEmail}
-                onChange={(e) => setApplicantEmail(e.target.value)}
-                className="mt-1"
-              />
-            </div>
-            <div>
-              <label className="text-sm font-medium text-slate-700">Phone (Optional)</label>
-              <Input
-                type="tel"
-                placeholder="Enter your phone number"
-                value={applicantPhone}
-                onChange={(e) => setApplicantPhone(e.target.value)}
-                className="mt-1"
-              />
-            </div>
-            <div className="flex gap-3 pt-4">
-              <Button
-                variant="outline"
-                onClick={() => setShowApplyModal(false)}
-                className="flex-1"
-              >
-                Cancel
-              </Button>
-              <Button
-                onClick={handleSubmitApplication}
-                className="flex-1 bg-red-600 hover:bg-red-700"
-              >
-                Send Application
-              </Button>
-            </div>
-          </div>
-        </DialogContent>
-      </Dialog>
+
 
 
     </div>
