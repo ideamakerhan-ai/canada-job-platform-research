@@ -278,18 +278,18 @@ export default function Home() {
           </div>
 
           {/* Search Bar */}
-          <div className="flex flex-col gap-3 mb-8 max-w-6xl mx-auto w-full">
+          <div className="flex flex-col gap-2 mb-6 max-w-6xl mx-auto w-full">
             {/* Job Title Search */}
             <div className="relative w-full">
               <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-slate-400" />
               <Input
                 type="text"
                 placeholder="Job title or keyword..."
-                className="pl-12 pr-12 py-3 bg-white text-slate-900 rounded-lg border-0 w-full shadow-md text-base"
+                className="pl-12 pr-40 py-3 bg-white text-slate-900 rounded-lg border-0 w-full shadow-md text-base"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
-              <Button className="absolute right-1 top-1/2 transform -translate-y-1/2 bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-md font-semibold shadow-md text-sm">
+              <Button className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-red-600 hover:bg-red-700 text-white px-5 py-2 rounded-md font-semibold shadow-md text-sm">
                 Search
               </Button>
             </div>
@@ -316,7 +316,7 @@ export default function Home() {
       </section>
 
       {/* Most Searched & Posted Jobs */}
-      <section className="bg-slate-900 py-12">
+      <section className="bg-slate-900 py-8">
         <div className="container">
           {/* Popular Jobs */}
           <Card className="bg-slate-800 border-slate-700">
@@ -353,7 +353,7 @@ export default function Home() {
 
 
       {/* Featured Jobs */}
-      <section className="bg-slate-50 py-16">
+      <section className="bg-slate-50 py-12">
         <div className="container">
           <h2 className="text-3xl font-bold text-slate-900 mb-8">Featured Opportunities</h2>
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -403,7 +403,7 @@ export default function Home() {
       </section>
 
       {/* Job Listings */}
-      <section className="bg-white py-16">
+      <section className="bg-white py-12">
         <div className="container">
           <h2 className="text-3xl font-bold text-slate-900 mb-8">All Job Listings</h2>
           <div className="space-y-4">
