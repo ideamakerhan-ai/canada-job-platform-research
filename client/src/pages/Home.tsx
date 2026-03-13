@@ -278,21 +278,26 @@ export default function Home() {
           </div>
 
           {/* Search Bar */}
-          <div className="flex flex-col lg:flex-row gap-3 mb-8 max-w-6xl mx-auto items-center w-full">
-            <div className="flex-1 relative w-full">
+          <div className="flex flex-col gap-3 mb-8 max-w-6xl mx-auto w-full">
+            {/* Job Title Search */}
+            <div className="relative w-full">
               <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-slate-400" />
               <Input
                 type="text"
                 placeholder="Job title or keyword..."
-                className="pl-12 pr-4 py-3 bg-white text-slate-900 rounded-lg border-0 w-full shadow-md text-base"
+                className="pl-12 pr-12 py-3 bg-white text-slate-900 rounded-lg border-0 w-full shadow-md text-base"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
+              <Button className="absolute right-1 top-1/2 transform -translate-y-1/2 bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-md font-semibold shadow-md text-sm">
+                Search
+              </Button>
             </div>
+            {/* Location Select */}
             <select
               value={selectedLocation}
               onChange={(e) => setSelectedLocation(e.target.value)}
-              className="px-4 py-3 bg-white text-slate-900 rounded-lg border-0 font-medium shadow-md min-w-[180px] text-base"
+              className="px-4 py-3 bg-white text-slate-900 rounded-lg border-0 font-medium shadow-md text-base w-full"
             >
               <option value="all">All Locations</option>
               <option value="Toronto, ON">Toronto, ON</option>
@@ -304,9 +309,6 @@ export default function Home() {
               <option value="Ottawa, ON">Ottawa, ON</option>
               <option value="Halifax, NS">Halifax, NS</option>
             </select>
-            <Button className="bg-red-600 hover:bg-red-700 text-white px-8 py-3 rounded-lg font-semibold whitespace-nowrap h-auto shadow-md text-base min-w-[140px]">
-              Search
-            </Button>
           </div>
 
           {/* Filter Buttons Removed */}
