@@ -286,7 +286,7 @@ export default function Home() {
               <Search className="absolute left-4 top-3.5 w-5 h-5 text-slate-400" />
               <Input
                 type="text"
-                placeholder="Job title, NOC code, or keyword..."
+                placeholder="Job title or keyword..."
                 className="pl-12 py-3 bg-white text-slate-900 rounded-lg border-0 w-full"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
@@ -312,49 +312,7 @@ export default function Home() {
             </Button>
           </div>
 
-          {/* Filter Buttons */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 max-w-3xl mx-auto">
-            <Button
-              onClick={() => handleFilterToggle("lmia")}
-              className={`${
-                selectedFilters.includes("lmia")
-                  ? "bg-red-600 text-white"
-                  : "bg-slate-700 text-slate-200 hover:bg-slate-600"
-              } rounded-lg py-2 font-semibold`}
-            >
-              ✓ LMIA
-            </Button>
-            <Button
-              onClick={() => handleFilterToggle("visa")}
-              className={`${
-                selectedFilters.includes("visa")
-                  ? "bg-red-600 text-white"
-                  : "bg-slate-700 text-slate-200 hover:bg-slate-600"
-              } rounded-lg py-2 font-semibold`}
-            >
-              ⊕ Visa Sponsorship
-            </Button>
-            <Button
-              onClick={() => handleFilterToggle("nursing")}
-              className={`${
-                selectedFilters.includes("nursing")
-                  ? "bg-red-600 text-white"
-                  : "bg-slate-700 text-slate-200 hover:bg-slate-600"
-              } rounded-lg py-2 font-semibold`}
-            >
-              🏥 Nursing Jobs
-            </Button>
-            <Button
-              onClick={() => handleFilterToggle("truck")}
-              className={`${
-                selectedFilters.includes("truck")
-                  ? "bg-red-600 text-white"
-                  : "bg-slate-700 text-slate-200 hover:bg-slate-600"
-              } rounded-lg py-2 font-semibold`}
-            >
-              🚚 Truck Driver Jobs
-            </Button>
-          </div>
+          {/* Filter Buttons Removed */}
         </div>
       </section>
 
@@ -437,10 +395,7 @@ export default function Home() {
               <div className="text-3xl font-bold text-red-600 mb-2">50+</div>
               <div className="text-slate-600">Cities</div>
             </div>
-            <div className="text-center">
-              <div className="text-3xl font-bold text-green-600 mb-2">100%</div>
-              <div className="text-slate-600">Verified</div>
-            </div>
+
             <div className="text-center">
               <div className="text-3xl font-bold text-blue-600 mb-2">Free</div>
               <div className="text-slate-600">For Job Seekers</div>
