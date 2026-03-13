@@ -280,16 +280,18 @@ export default function Home() {
           {/* Search Bar */}
           <div className="flex flex-col gap-2 mb-6 max-w-6xl mx-auto w-full">
             {/* Job Title Search */}
-            <div className="relative w-full">
-              <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-slate-400" />
-              <Input
-                type="text"
-                placeholder="Job title or keyword..."
-                className="pl-12 pr-40 py-3 bg-white text-slate-900 rounded-lg border-0 w-full shadow-md text-base"
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-              />
-              <Button className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-red-600 hover:bg-red-700 text-white px-5 py-2 rounded-md font-semibold shadow-md text-sm">
+            <div className="flex gap-2 w-full">
+              <div className="relative flex-1">
+                <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-slate-400" />
+                <Input
+                  type="text"
+                  placeholder="Job title or keyword..."
+                  className="pl-12 py-3 bg-white text-slate-900 rounded-lg border-0 w-full shadow-md text-base"
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                />
+              </div>
+              <Button className="bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-lg font-semibold shadow-md text-base whitespace-nowrap">
                 Search
               </Button>
             </div>
