@@ -281,13 +281,13 @@ export default function Home() {
           </div>
 
           {/* Search Bar */}
-          <div className="flex flex-col sm:flex-row gap-2 mb-8 max-w-5xl mx-auto">
-            <div className="flex-1 relative">
+          <div className="flex flex-col lg:flex-row gap-3 mb-8 max-w-6xl mx-auto items-center w-full">
+            <div className="flex-1 relative w-full">
               <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-slate-400" />
               <Input
                 type="text"
                 placeholder="Job title or keyword..."
-                className="pl-12 pr-4 py-3 bg-white text-slate-900 rounded-lg border-0 w-full shadow-md"
+                className="pl-12 pr-4 py-3 bg-white text-slate-900 rounded-lg border-0 w-full shadow-md text-base"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
@@ -295,7 +295,7 @@ export default function Home() {
             <select
               value={selectedLocation}
               onChange={(e) => setSelectedLocation(e.target.value)}
-              className="px-4 py-3 bg-white text-slate-900 rounded-lg border-0 font-medium shadow-md"
+              className="px-4 py-3 bg-white text-slate-900 rounded-lg border-0 font-medium shadow-md min-w-[180px] text-base"
             >
               <option value="all">All Locations</option>
               <option value="Toronto, ON">Toronto, ON</option>
@@ -307,7 +307,7 @@ export default function Home() {
               <option value="Ottawa, ON">Ottawa, ON</option>
               <option value="Halifax, NS">Halifax, NS</option>
             </select>
-            <Button className="bg-red-600 hover:bg-red-700 text-white px-8 py-3 rounded-lg font-semibold whitespace-nowrap h-auto shadow-md">
+            <Button className="bg-red-600 hover:bg-red-700 text-white px-8 py-3 rounded-lg font-semibold whitespace-nowrap h-auto shadow-md text-base min-w-[140px]">
               Search
             </Button>
           </div>

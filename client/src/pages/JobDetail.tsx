@@ -1,12 +1,13 @@
 import { useParams, useLocation as useWouterLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { MapPin, DollarSign, Briefcase, Clock, Heart, Share2, ArrowLeft, CheckCircle } from "lucide-react";
+import { MapPin, DollarSign, Briefcase, Clock, Heart, Share2, ArrowLeft, CheckCircle, Mail } from "lucide-react";
 import { useState, useEffect } from "react";
 import { toast } from "sonner";
 import { ResumeModal } from "@/components/ResumeModal";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
 
-// 샘플 데이터 (Home.tsx와 동일)
 const sampleJobs = [
   {
     id: 1,
@@ -48,46 +49,63 @@ const sampleJobs = [
     category: "Construction",
     lmiaAvailable: false,
     visaSponsorshipAvailable: true,
-    accommodation: "Partial accommodation",
+    accommodation: "Housing support",
   },
   {
     id: 4,
-    title: "Marketing Specialist",
-    company: "Digital Solutions Inc",
-    location: "Montreal, QC",
-    salary: "$55,000 - $75,000",
+    title: "Truck Driver",
+    company: "TransCanada Logistics",
+    location: "Edmonton, AB",
+    salary: "$70,000 - $95,000",
     jobType: "Full-time",
-    description: "Create and execute marketing strategies for growing tech company.",
-    postedDate: "1 day ago",
-    category: "Marketing & Communications",
-    lmiaAvailable: false,
+    description: "Experienced truck drivers needed for long-haul routes across Canada.",
+    postedDate: "5 days ago",
+    category: "Transportation",
+    lmiaAvailable: true,
     visaSponsorshipAvailable: false,
-    accommodation: "Accommodation provided",
+    accommodation: "Per diem provided",
   },
   {
     id: 5,
-    title: "Electrician Apprentice",
-    company: "Spark Electric Ltd",
-    location: "Edmonton, AB",
-    salary: "$45,000 - $65,000",
+    title: "Chef",
+    company: "Maple Leaf Hospitality",
+    location: "Vancouver, BC",
+    salary: "$55,000 - $75,000",
     jobType: "Full-time",
-    description: "Join our team and learn from experienced electricians.",
-    postedDate: "4 days ago",
-    category: "Construction",
+    description: "Head chef position for upscale restaurant. Must have 10+ years experience.",
+    postedDate: "1 week ago",
+    category: "Hospitality",
+    lmiaAvailable: false,
+    visaSponsorshipAvailable: true,
+    accommodation: "Accommodation available",
+  },
+  {
+    id: 6,
+    title: "Electrician",
+    company: "Power Solutions Inc",
+    location: "Montreal, QC",
+    salary: "$60,000 - $85,000",
+    jobType: "Full-time",
+    description: "Licensed electrician for commercial and residential projects.",
+    postedDate: "3 days ago",
+    category: "Skilled Trades",
     lmiaAvailable: true,
     visaSponsorshipAvailable: true,
-    accommodation: "Accommodation provided",
+    accommodation: "Relocation package",
   },
 ];
 
 export default function JobDetail() {
   const { id } = useParams();
   const [, navigate] = useWouterLocation();
-  const [isApplied, setIsApplied] = useState(false);
   const [isSaved, setIsSaved] = useState(false);
+  const [isApplied, setIsApplied] = useState(false);
   const [showResumeModal, setShowResumeModal] = useState(false);
+  const [showApplyModal, setShowApplyModal] = useState(false);
+  const [applicantName, setApplicantName] = useState("");
+  const [applicantEmail, setApplicantEmail] = useState("");
+  const [applicantPhone, setApplicantPhone] = useState("");
 
-  // 페이지 로드 시 스크롤을 최상단으로 초기화
   useEffect(() => {
     window.scrollTo(0, 0);
   }, [id]);
@@ -120,28 +138,37 @@ export default function JobDetail() {
   };
 
   const handleApply = () => {
-    const applicantName = prompt('Your Name:');
-    if (!applicantName) return;
-    
-    const applicantEmail = prompt('Your Email:');
-    if (!applicantEmail) return;
-    
-    const applicantPhone = prompt('Your Phone (optional):');
-    
+    setShowApplyModal(true);
+  };
+
+  const handleSubmitApplication = () => {
+    if (!applicantName.trim()) {
+      toast.error("Please enter your name");
+      return;
+    }
+    if (!applicantEmail.trim()) {
+      toast.error("Please enter your email");
+      return;
+    }
+
     const subject = encodeURIComponent(`Job Application: ${job.title}`);
     const body = encodeURIComponent(
       `I would like to apply for the position of ${job.title} at ${job.company}.\n\n` +
       `Applicant Name: ${applicantName}\n` +
       `Email: ${applicantEmail}\n` +
-      `Phone: ${applicantPhone || 'N/A'}\n\n` +
+      `Phone: ${applicantPhone || "N/A"}\n\n` +
       `Job Link: ${window.location.href}`
     );
-    
-    const recipientEmail = 'jobs@canadajobs.com';
+
+    const recipientEmail = "jobs@canadajobs.com";
     window.location.href = `mailto:${recipientEmail}?subject=${subject}&body=${body}`;
-    
+
     setIsApplied(true);
-    toast.success('Opening email client to submit your application');
+    setShowApplyModal(false);
+    setApplicantName("");
+    setApplicantEmail("");
+    setApplicantPhone("");
+    toast.success("Opening email client to submit your application");
   };
 
   const handleApplySuccess = () => {
@@ -156,13 +183,13 @@ export default function JobDetail() {
       <header className="bg-white border-b border-slate-200 sticky top-0 z-50 shadow-sm">
         <div className="container py-4">
           <div className="flex items-center justify-between">
-            <div className="cursor-pointer" onClick={() => navigate("/")}>
-              <h1 className="text-2xl font-bold text-slate-900 hover:text-blue-600 transition-colors">CJ</h1>
-              <p className="text-sm text-slate-600">Canada Job Platform</p>
+            <div className="cursor-pointer hover:opacity-70" onClick={() => navigate("/")}>
+              <h1 className="text-2xl font-bold text-slate-900">CJ</h1>
+              <p className="text-sm text-slate-600">Canada Jobs</p>
             </div>
-            <Button variant="ghost" onClick={() => navigate("/")}>
+            <Button variant="ghost" onClick={() => navigate("/")} className="ml-auto">
               <ArrowLeft className="w-4 h-4 mr-2" />
-              Back to Jobs
+              Back
             </Button>
           </div>
         </div>
@@ -239,10 +266,10 @@ export default function JobDetail() {
             <div className="flex flex-wrap gap-2 mb-6">
               <Badge variant="secondary">{job.category}</Badge>
               {job.lmiaAvailable && (
-                <Badge className="bg-green-100 text-green-800 hover:bg-green-100">LMIA Sponsorship Available</Badge>
+                <Badge className="bg-green-100 text-green-800 hover:bg-green-100">LMIA</Badge>
               )}
               {job.visaSponsorshipAvailable && (
-                <Badge className="bg-blue-100 text-blue-800 hover:bg-blue-100">Visa Sponsorship Available</Badge>
+                <Badge className="bg-blue-100 text-blue-800 hover:bg-blue-100">Visa Sponsorship</Badge>
               )}
               {job.accommodation && (
                 <Badge className="bg-purple-100 text-purple-800 hover:bg-purple-100">{job.accommodation}</Badge>
@@ -268,40 +295,76 @@ export default function JobDetail() {
                   Applied
                 </>
               ) : (
-                "Apply Now"
+                <>
+                  <Mail className="w-5 h-5 mr-2" />
+                  Apply Now
+                </>
               )}
             </Button>
-
-            {showResumeModal && (
-              <ResumeModal
-                key={`resume-modal-${Date.now()}`}
-                open={showResumeModal}
-                onOpenChange={setShowResumeModal}
-                jobId={job.id}
-                onApplySuccess={handleApplySuccess}
-              />
-            )}
-          </div>
-
-          {/* 추가 정보 */}
-          <div className="bg-white rounded-lg shadow-lg p-8">
-            <h2 className="text-2xl font-bold text-slate-900 mb-4">Requirements</h2>
-            <ul className="list-disc list-inside space-y-2 text-slate-700">
-              <li>5+ years of professional experience</li>
-              <li>Strong communication skills</li>
-              <li>Valid work authorization or willingness to obtain LMIA</li>
-              <li>Relevant certifications (if applicable)</li>
-            </ul>
           </div>
         </div>
       </main>
 
-      {/* 푸터 */}
-      <footer className="bg-slate-900 text-slate-300 py-12 mt-16">
-        <div className="container">
-          <p className="text-center text-sm">© 2026 CanadaJobs. All rights reserved.</p>
-        </div>
-      </footer>
+      {/* Apply Modal */}
+      <Dialog open={showApplyModal} onOpenChange={setShowApplyModal}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Apply for this job</DialogTitle>
+            <DialogDescription>
+              Enter your information to apply for the {job.title} position at {job.company}
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div>
+              <label className="text-sm font-medium text-slate-700">Your Name</label>
+              <Input
+                type="text"
+                placeholder="Enter your full name"
+                value={applicantName}
+                onChange={(e) => setApplicantName(e.target.value)}
+                className="mt-1"
+              />
+            </div>
+            <div>
+              <label className="text-sm font-medium text-slate-700">Your Email</label>
+              <Input
+                type="email"
+                placeholder="Enter your email address"
+                value={applicantEmail}
+                onChange={(e) => setApplicantEmail(e.target.value)}
+                className="mt-1"
+              />
+            </div>
+            <div>
+              <label className="text-sm font-medium text-slate-700">Phone (Optional)</label>
+              <Input
+                type="tel"
+                placeholder="Enter your phone number"
+                value={applicantPhone}
+                onChange={(e) => setApplicantPhone(e.target.value)}
+                className="mt-1"
+              />
+            </div>
+            <div className="flex gap-3 pt-4">
+              <Button
+                variant="outline"
+                onClick={() => setShowApplyModal(false)}
+                className="flex-1"
+              >
+                Cancel
+              </Button>
+              <Button
+                onClick={handleSubmitApplication}
+                className="flex-1 bg-red-600 hover:bg-red-700"
+              >
+                Send Application
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+
     </div>
   );
 }
