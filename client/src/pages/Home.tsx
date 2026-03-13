@@ -241,7 +241,7 @@ export default function Home() {
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               <div className="bg-red-600 text-white rounded-lg px-3 py-2 font-bold text-lg">CJ</div>
-              <h1 className="text-2xl font-bold text-slate-900">CanadaJobs</h1>
+              <h1 className="text-2xl font-bold text-slate-900">CanadaJobBoard</h1>
             </div>
             <nav className="hidden md:flex items-center gap-8">
               <a href="#" className="text-slate-600 hover:text-slate-900 font-medium">Find Jobs</a>
