@@ -8,7 +8,7 @@ import {
   createJobListing, getDb, createResume, getUserResumes, updateResume, deleteResume,
   setDefaultResume, applyForJobWithResume
 } from "./db";
-import { users, jobApplications, jobListings, resumes, jobPostings, jobPostingApplications } from "../drizzle/schema";
+import { users, jobApplications, jobListings, resumes, jobPostings, jobPostingApplications, jobPostingCompliance } from "../drizzle/schema";
 import { eq, and } from "drizzle-orm";
 
 // Admin procedure - checks if user is admin
@@ -297,6 +297,8 @@ export const appRouter = router({
         visaSponsorship: z.boolean().optional(),
         accommodationProvided: z.boolean().optional(),
         applicationEmail: z.string(),
+        usesAi: z.boolean().optional(),
+        vacancyStatus: z.enum(["existing", "future"]).optional(),
       }))
       .mutation(async ({ input, ctx }) => {
         if (!ctx.user) throw new Error("Not authenticated");
@@ -319,6 +321,17 @@ export const appRouter = router({
           applicationEmail: input.applicationEmail,
           status: "published",
         });
+        
+        // Get the inserted job posting ID
+        const postings = await db.select().from(jobPostings).where(eq(jobPostings.employerId, ctx.user.id)).orderBy(jobPostings.createdAt).limit(1);
+        if (postings.length > 0) {
+          const jobPostingId = postings[0].id;
+          await db.insert(jobPostingCompliance).values({
+            jobPostingId: jobPostingId,
+            usesAi: input.usesAi ? 1 : 0,
+            vacancyStatus: (input.vacancyStatus || "existing") as "existing" | "future",
+          });
+        }
         return { success: true };
       }),
 
@@ -394,6 +407,20 @@ export const appRouter = router({
           .select()
           .from(jobPostingApplications)
           .where(eq(jobPostingApplications.jobPostingId, jobPostingId));
+      }),
+  }),
+
+  payment: router({
+    createCheckoutSession: publicProcedure
+      .input(z.object({
+        packageType: z.string(),
+      }))
+      .mutation(async ({ input, ctx }) => {
+        if (!ctx.user) throw new Error("Not authenticated");
+        // Placeholder for Stripe checkout session
+        return {
+          checkoutUrl: "https://checkout.stripe.com",
+        };
       }),
   }),
 });

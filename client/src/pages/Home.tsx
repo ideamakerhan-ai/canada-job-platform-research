@@ -245,7 +245,7 @@ export default function Home() {
             </div>
             <nav className="hidden md:flex items-center gap-8">
               <a href="#" className="text-slate-600 hover:text-slate-900 font-medium">Find Jobs</a>
-              <a href="/post-job" className="text-slate-600 hover:text-slate-900 font-medium">Post a Job</a>
+              <a href="/post-job-compliance" className="text-slate-600 hover:text-slate-900 font-medium">Post a Job</a>
             </nav>
             <div className="flex items-center gap-3">
               {isAuthenticated ? (
@@ -501,7 +501,7 @@ export default function Home() {
             <div>
               <h4 className="text-white font-semibold mb-4">For Employers</h4>
               <ul className="space-y-2 text-sm">
-                <li><a href="/post-job" className="hover:text-white transition">Post a Job</a></li>
+                <li><a href="/post-job-compliance" className="hover:text-white transition">Post a Job</a></li>
                 <li><a href="/admin" className="hover:text-white transition">Admin Dashboard</a></li>
               </ul>
             </div>

@@ -76,9 +76,10 @@ export default function EmployerDashboard() {
 
         {/* Tabs */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-2 mb-8 bg-white border border-slate-200 p-1">
+          <TabsList className="grid w-full grid-cols-3 mb-8 bg-white border border-slate-200 p-1">
             <TabsTrigger value="postings">My Job Postings</TabsTrigger>
             <TabsTrigger value="applications">Applications</TabsTrigger>
+            <TabsTrigger value="billing">Billing & Payments</TabsTrigger>
           </TabsList>
 
           {/* My Job Postings Tab */}
@@ -240,6 +241,42 @@ export default function EmployerDashboard() {
                 </CardContent>
               </Card>
             )}
+          </TabsContent>
+
+          {/* Billing & Payments Tab */}
+          <TabsContent value="billing" className="space-y-4">
+            <Card>
+              <CardHeader>
+                <CardTitle>Payment History</CardTitle>
+                <CardDescription>View your job posting package purchases</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  <div className="border rounded-lg p-4 flex items-center justify-between">
+                    <div>
+                      <p className="font-semibold text-slate-900">5 Job Postings Package</p>
+                      <p className="text-sm text-slate-600">Purchased on Mar 13, 2026</p>
+                    </div>
+                    <div className="text-right">
+                      <p className="font-bold text-slate-900">$124.99 CAD</p>
+                      <Badge className="bg-green-100 text-green-800">Completed</Badge>
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle>Purchase More Postings</CardTitle>
+                <CardDescription>Add more job posting credits to your account</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <Button onClick={() => setLocation("/payment/checkout")} className="w-full">
+                  Buy Job Posting Package
+                </Button>
+              </CardContent>
+            </Card>
           </TabsContent>
         </Tabs>
       </div>

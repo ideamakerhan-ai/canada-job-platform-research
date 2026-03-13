@@ -9,10 +9,12 @@ import { useLocation } from "wouter";
 import Profile from "./pages/Profile";
 import ProfilePage from "./pages/ProfilePage";
 import PostJob from "./pages/PostJob";
+import PostJobCompliance from "./pages/PostJobCompliance";
 import Occupations from "./pages/Occupations";
 import JobDetail from "./pages/JobDetail";
 import AdminDashboard from "./pages/AdminDashboard";
 import EmployerDashboard from "./pages/EmployerDashboard";
+import PaymentCheckout from "./pages/PaymentCheckout";
 
 function Router() {
   // make sure to consider if you need authentication for certain routes
@@ -22,10 +24,12 @@ function Router() {
           <Route path={"/job/:id"} component={JobDetail} />
       <Route path={"/profile"} component={Profile} />
       <Route path={"/my-profile"} component={ProfilePage} />
+      <Route path={"/post-job-compliance"} component={PostJobCompliance} />
       <Route path={"/post-job"} component={PostJob} />
       <Route path={"/occupations"} component={Occupations} />
       <Route path={"/admin"} component={AdminDashboard} />
       <Route path={"/employer/dashboard"} component={EmployerDashboard} />
+      <Route path={"/payment/checkout"} component={PaymentCheckout} />
       <Route path={"/404"} component={NotFound} />
       {/* Final fallback route */}
       <Route component={NotFound} />

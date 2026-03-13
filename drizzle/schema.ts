@@ -17,6 +17,7 @@ export const users = mysqlTable("users", {
   email: varchar("email", { length: 320 }),
   loginMethod: varchar("loginMethod", { length: 64 }),
   role: mysqlEnum("role", ["user", "admin"]).default("user").notNull(),
+  stripeCustomerId: varchar("stripe_customer_id", { length: 255 }).unique(),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
   lastSignedIn: timestamp("lastSignedIn").defaultNow().notNull(),
@@ -218,3 +219,85 @@ export const jobPostingApplications = mysqlTable("job_posting_applications", {
 
 export type JobPostingApplication = typeof jobPostingApplications.$inferSelect;
 export type InsertJobPostingApplication = typeof jobPostingApplications.$inferInsert;
+
+// Employer Profiles Table (고용주 프로필)
+export const employerProfiles = mysqlTable("employer_profiles", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("user_id").notNull().unique(),
+  companyName: varchar("company_name", { length: 255 }).notNull(),
+  companyWebsite: varchar("company_website", { length: 500 }),
+  companyPhone: varchar("company_phone", { length: 20 }),
+  companyDescription: text("company_description"),
+  industryType: varchar("industry_type", { length: 100 }),
+  employeeCount: varchar("employee_count", { length: 50 }),
+  verificationStatus: mysqlEnum("verification_status", ["pending", "verified", "rejected"]).default("pending").notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().onUpdateNow().notNull(),
+});
+
+export type EmployerProfile = typeof employerProfiles.$inferSelect;
+export type InsertEmployerProfile = typeof employerProfiles.$inferInsert;
+
+// Payments Table (결제 기록)
+export const payments = mysqlTable("payments", {
+  id: int("id").autoincrement().primaryKey(),
+  employerId: int("employer_id").notNull(),
+  stripePaymentId: varchar("stripe_payment_id", { length: 255 }).notNull().unique(),
+  packageType: varchar("package_type", { length: 50 }).notNull(), // "single", "five", "ten", etc.
+  amount: int("amount").notNull(), // Amount in cents
+  currency: varchar("currency", { length: 10 }).default("CAD").notNull(),
+  jobPostingCount: int("job_posting_count").notNull(), // 1, 5, 10 등
+  status: mysqlEnum("status", ["pending", "completed", "failed", "refunded"]).default("pending").notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  completedAt: timestamp("completed_at"),
+});
+
+export type Payment = typeof payments.$inferSelect;
+export type InsertPayment = typeof payments.$inferInsert;
+
+// Job Posting Legal Compliance Table (법규 준수 정보)
+export const jobPostingCompliance = mysqlTable("job_posting_compliance", {
+  id: int("id").autoincrement().primaryKey(),
+  jobPostingId: int("job_posting_id").notNull().unique(),
+  usesAi: int("uses_ai").default(0).notNull(), // AI 사용 여부
+  vacancyStatus: mysqlEnum("vacancy_status", ["existing", "future"]).default("existing").notNull(), // 기존 공석 또는 향후 예정
+  interviewDate: timestamp("interview_date"), // 면접 날짜 (면접 후 통보용)
+  notificationSentDate: timestamp("notification_sent_date"), // 통보 날짜
+  canadianExperienceRequired: int("canadian_experience_required").default(0).notNull(), // 캐나다 경력 요구 여부 (위반 확인용)
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().onUpdateNow().notNull(),
+});
+
+export type JobPostingCompliance = typeof jobPostingCompliance.$inferSelect;
+export type InsertJobPostingCompliance = typeof jobPostingCompliance.$inferInsert;
+
+// Job Posting Reports Table (사기성 공고 신고)
+export const jobPostingReports = mysqlTable("job_posting_reports", {
+  id: int("id").autoincrement().primaryKey(),
+  jobPostingId: int("job_posting_id").notNull(),
+  reporterEmail: varchar("reporter_email", { length: 320 }).notNull(),
+  reason: varchar("reason", { length: 255 }).notNull(),
+  description: text("description"),
+  status: mysqlEnum("status", ["pending", "reviewed", "removed", "dismissed"]).default("pending").notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  reviewedAt: timestamp("reviewed_at"),
+  reviewedBy: int("reviewed_by"), // Admin user ID
+});
+
+export type JobPostingReport = typeof jobPostingReports.$inferSelect;
+export type InsertJobPostingReport = typeof jobPostingReports.$inferInsert;
+
+// Admin Dashboard Logs Table (관리자 활동 로그)
+export const adminDashboardLogs = mysqlTable("admin_dashboard_logs", {
+  id: int("id").autoincrement().primaryKey(),
+  adminId: int("admin_id").notNull(),
+  action: varchar("action", { length: 100 }).notNull(), // "delete_posting", "verify_employer", "remove_report", etc.
+  targetType: varchar("target_type", { length: 50 }).notNull(), // "job_posting", "employer", "report", etc.
+  targetId: int("target_id").notNull(),
+  details: text("details"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+export type AdminDashboardLog = typeof adminDashboardLogs.$inferSelect;
+export type InsertAdminDashboardLog = typeof adminDashboardLogs.$inferInsert;
+

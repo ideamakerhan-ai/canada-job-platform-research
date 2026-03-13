@@ -65,6 +65,8 @@ export default function PostJob() {
     lmiaAvailable: false,
     visaSponsorship: false,
     accommodationProvided: false,
+    usesAi: false,
+    vacancyStatus: "existing",
   });
 
   const createPostingMutation = trpc.employer.createPosting.useMutation();
@@ -131,6 +133,8 @@ export default function PostJob() {
         lmiaAvailable: formData.lmiaAvailable,
         visaSponsorship: formData.visaSponsorship,
         accommodationProvided: formData.accommodationProvided,
+        usesAi: formData.usesAi,
+        vacancyStatus: formData.vacancyStatus as "existing" | "future",
       });
 
       // Navigate to employer dashboard
@@ -233,7 +237,11 @@ export default function PostJob() {
                 </Select>
               </div>
 
-              {/* Salary Range */}
+              {/* Salary Range - REQUIRED */}
+              <div className="space-y-2 p-4 bg-blue-50 border border-blue-200 rounded">
+                <p className="text-sm font-medium text-blue-900">⚠️ Salary disclosure is mandatory in Ontario</p>
+                <p className="text-xs text-blue-800">You must provide salary or salary range for all job postings.</p>
+              </div>
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <label className="text-sm font-medium text-slate-900">Salary Min (CAD)</label>
@@ -293,6 +301,43 @@ export default function PostJob() {
                   onChange={handleInputChange}
                   required
                 />
+              </div>
+
+              {/* Compliance Section */}
+              <div className="space-y-3 border-t pt-4 bg-amber-50 p-4 rounded">
+                <label className="text-sm font-medium text-slate-900">Legal Compliance *</label>
+                
+                {/* Vacancy Status */}
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-slate-900">Vacancy Status *</label>
+                  <Select value={formData.vacancyStatus} onValueChange={(value) => handleSelectChange("vacancyStatus", value)}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select vacancy status" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="existing">Existing Vacancy</SelectItem>
+                      <SelectItem value="future">Future Vacancy</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <p className="text-xs text-slate-600">Indicate whether this is an existing or future vacancy.</p>
+                </div>
+
+                {/* AI Usage */}
+                <div className="flex items-start gap-2">
+                  <Checkbox
+                    id="usesAi"
+                    checked={formData.usesAi}
+                    onCheckedChange={(checked) => handleCheckboxChange("usesAi", checked as boolean)}
+                  />
+                  <div className="flex-1">
+                    <label htmlFor="usesAi" className="text-sm font-medium cursor-pointer">
+                      This position uses AI for screening/evaluation
+                    </label>
+                    <p className="text-xs text-slate-600 mt-1">
+                      Check this if you use AI to screen, evaluate, or select candidates.
+                    </p>
+                  </div>
+                </div>
               </div>
 
               {/* Benefits */}
