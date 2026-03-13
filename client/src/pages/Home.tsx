@@ -355,34 +355,31 @@ export default function Home() {
       <section className="bg-slate-900 py-6 md:py-8">
         <div className="container">
           {/* Popular Jobs */}
-          <Card className="bg-slate-800 border-slate-700">
-              <CardHeader>
-                <CardTitle className="text-white">Popular Jobs</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                {[
-                  { title: "Healthcare Professionals", count: "1,234" },
-                  { title: "Software Developers", count: "892" },
-                  { title: "Truck Drivers", count: "756" },
-                  { title: "Nurses", count: "645" },
-                  { title: "Electricians", count: "534" },
-                  { title: "Welders", count: "412" },
-                ].map((job, idx) => (
-                  <div
-                    key={idx}
-                    onClick={() => handleJobTitleClick(job.title)}
-                    className={`flex justify-between items-center p-3 rounded-lg cursor-pointer transition ${
-                      selectedJobTitle === job.title
-                        ? "bg-red-600 text-white"
-                        : "bg-slate-700 text-slate-200 hover:bg-slate-600"
-                    }`}
-                  >
-                    <span className="font-semibold text-lg">{job.title}</span>
-                    <span className="text-red-500 font-bold text-xl">{job.count}</span>
-                  </div>
-                ))}
-              </CardContent>
-          </Card>
+          <div className="space-y-4">
+            <h3 className="text-white font-semibold text-lg">Popular Jobs</h3>
+            <div className="flex flex-wrap gap-2">
+              {[
+                "Healthcare Professionals",
+                "Software Developers",
+                "Truck Drivers",
+                "Nurses",
+                "Electricians",
+                "Welders",
+              ].map((job, idx) => (
+                <button
+                  key={idx}
+                  onClick={() => handleJobTitleClick(job)}
+                  className={`px-4 py-2 rounded-full transition ${
+                    selectedJobTitle === job
+                      ? "bg-red-600 text-white"
+                      : "bg-slate-700 text-slate-200 hover:bg-slate-600"
+                  }`}
+                >
+                  {job}
+                </button>
+              ))}
+            </div>
+          </div>
         </div>
       </section>
 
