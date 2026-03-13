@@ -352,3 +352,21 @@
 ## Phase 57: Popular Jobs 섹션 전체 제거
 - [x] Popular Jobs 섹션 HTML 제거
 - [x] 관련 상태 관리 코드 정리 (필요 시)
+
+## Phase 58: Stripe 웹훅 구현
+- [x] Stripe 웹훅 엔드포인트 구현 (/api/stripe/webhook)
+- [x] checkout.session.completed 이벤트 처리
+- [x] 결제 완료 시 payments 테이블 업데이트
+- [x] 결제 완료 시 고용주 잔여 공고 크레딧 자동 증가
+
+## Phase 59: 고용주 이메일 동적 연결
+- [x] job_postings 테이블에 contactEmail 필드 확인/추가
+- [x] PostJob 폼에 연락처 이메일 입력 필드 추가
+- [x] JobDetail 페이지 Apply 버튼에 실제 고용주 이메일 연결
+- [x] 하드코딩된 이메일 제거
+
+## Phase 60: Footer 법적 고지 추가
+- [x] Footer 컴포넌트 생성
+- [x] 이용약관(Terms of Service) 페이지 생성
+- [x] 개인정보처리방침(Privacy Policy) 페이지 생성
+- [x] App.tsx에 라우트 추가

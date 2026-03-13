@@ -23,6 +23,7 @@ const sampleJobs = [
     lmiaAvailable: true,
     visaSponsorshipAvailable: true,
     accommodation: "Accommodation provided",
+    applicationEmail: "hr@techcorp.ca",
   },
   {
     id: 2,
@@ -38,6 +39,7 @@ const sampleJobs = [
     lmiaAvailable: true,
     visaSponsorshipAvailable: true,
     accommodation: "Relocation assistance",
+    applicationEmail: "recruitment@vgh.ca",
   },
   {
     id: 3,
@@ -53,6 +55,7 @@ const sampleJobs = [
     lmiaAvailable: false,
     visaSponsorshipAvailable: true,
     accommodation: "Housing support",
+    applicationEmail: "jobs@buildright.ca",
   },
   {
     id: 4,
@@ -68,6 +71,7 @@ const sampleJobs = [
     lmiaAvailable: true,
     visaSponsorshipAvailable: false,
     accommodation: "Per diem provided",
+    applicationEmail: "careers@transcanada.ca",
   },
   {
     id: 5,
@@ -78,6 +82,7 @@ const sampleJobs = [
     salaryType: "annual",
     jobType: "Full-time",
     description: "Head chef position for upscale restaurant. Must have 10+ years experience.",
+    applicationEmail: "hiring@mapleleaf-hospitality.ca",
     postedDate: "1 week ago",
     category: "Hospitality",
     lmiaAvailable: false,
@@ -86,18 +91,19 @@ const sampleJobs = [
   },
   {
     id: 6,
-    title: "Electrician",
-    company: "Power Solutions Inc",
-    location: "Montreal, QC",
-    salary: "$60,000 - $85,000",
+    title: "Software Developer (Entry Level)",
+    company: "InnovateTech Solutions",
+    location: "Toronto, ON",
+    salary: "$70,000 - $90,000",
     salaryType: "annual",
     jobType: "Full-time",
-    description: "Licensed electrician for commercial and residential projects.",
-    postedDate: "3 days ago",
-    category: "Skilled Trades",
-    lmiaAvailable: true,
-    visaSponsorshipAvailable: true,
-    accommodation: "Relocation package",
+    description: "Entry-level software developer position. We provide mentorship and training.",
+    postedDate: "1 week ago",
+    category: "IT Development & Data",
+    lmiaAvailable: false,
+    visaSponsorshipAvailable: false,
+    accommodation: "None",
+    applicationEmail: "dev-jobs@innovatetech.ca",
   },
 ];
 
@@ -146,9 +152,9 @@ export default function JobDetail() {
   };
 
   const handleCopyEmail = () => {
-    const email = "jobs@canadajobs.com";
+    const email = job.applicationEmail || "jobs@canadajobs.com";
     navigator.clipboard.writeText(email);
-    toast.success("Email copied to clipboard");
+    toast.success(`${email} copied to clipboard`);
     setIsApplied(true);
   };
 
@@ -159,6 +165,9 @@ export default function JobDetail() {
     setShowResumeModal(false);
     setShowEmailModal(false);
     toast.success("Application submitted successfully");
+    // Open email client with pre-filled email
+    const email = job.applicationEmail || "jobs@canadajobs.com";
+    window.location.href = `mailto:${email}?subject=Job Application - ${job.title}`;
   };
 
   return (

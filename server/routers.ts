@@ -2,6 +2,7 @@ import { COOKIE_NAME } from "@shared/const";
 import { getSessionCookieOptions } from "./_core/cookies";
 import { systemRouter } from "./_core/systemRouter";
 import { publicProcedure, router } from "./_core/trpc";
+import { paymentRouter } from "./routers-payment";
 import { z } from "zod";
 import {
   getJobListings, getJobById, saveJob, applyForJob, getSavedJobs, getUserApplications,
@@ -410,19 +411,7 @@ export const appRouter = router({
       }),
   }),
 
-  payment: router({
-    createCheckoutSession: publicProcedure
-      .input(z.object({
-        packageType: z.string(),
-      }))
-      .mutation(async ({ input, ctx }) => {
-        if (!ctx.user) throw new Error("Not authenticated");
-        // Placeholder for Stripe checkout session
-        return {
-          checkoutUrl: "https://checkout.stripe.com",
-        };
-      }),
-  }),
+  payment: paymentRouter,
 });
 
 export type AppRouter = typeof appRouter;

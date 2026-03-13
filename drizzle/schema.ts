@@ -231,6 +231,7 @@ export const employerProfiles = mysqlTable("employer_profiles", {
   companyDescription: text("company_description"),
   industryType: varchar("industry_type", { length: 100 }),
   employeeCount: varchar("employee_count", { length: 50 }),
+  jobPostingCredits: int("job_posting_credits").default(0).notNull(), // 남은 공고 크레딧
   verificationStatus: mysqlEnum("verification_status", ["pending", "verified", "rejected"]).default("pending").notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().onUpdateNow().notNull(),

@@ -72,8 +72,13 @@ export default function PaymentCheckout() {
     setIsLoading(true);
 
     try {
+      // Map package ID to correct enum value
+      let packageType: "1" | "5" | "10" = "1";
+      if (packageId === "FIVE_POSTINGS") packageType = "5";
+      if (packageId === "TEN_POSTINGS") packageType = "10";
+
       const result = await createCheckoutMutation.mutateAsync({
-        packageType: packageId,
+        packageType,
       });
 
       if (result.checkoutUrl) {

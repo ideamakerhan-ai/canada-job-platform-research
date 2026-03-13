@@ -1,0 +1,1 @@
+ALTER TABLE `employer_profiles` ADD `job_posting_credits` int DEFAULT 0 NOT NULL;
