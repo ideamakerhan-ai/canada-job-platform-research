@@ -245,7 +245,7 @@ export default function Home() {
             </div>
             <nav className="hidden md:flex items-center gap-8">
               <a href="#" className="text-slate-600 hover:text-slate-900 font-medium">Find Jobs</a>
-              <a href={getLoginUrl()} className="text-slate-600 hover:text-slate-900 font-medium">Post a Job</a>
+              <a href="/post-job" className="text-slate-600 hover:text-slate-900 font-medium">Post a Job</a>
             </nav>
             <div className="flex items-center gap-3">
               {isAuthenticated ? (
@@ -315,8 +315,39 @@ export default function Home() {
 
           {/* Extra spacing for mobile */}
           <div className="md:hidden h-2"></div>
+        </div>
+      </section>
 
-          {/* Filter Buttons Removed */}
+      {/* Filter Section */}
+      <section className="bg-white border-b border-slate-200 py-6">
+        <div className="container">
+          <div className="flex flex-wrap gap-4">
+            {/* Job Type Filter */}
+            <div className="flex items-center gap-2">
+              <span className="text-sm font-medium text-slate-700">Job Type:</span>
+              <div className="flex gap-2">
+                {['Full-time', 'Part-time', 'Contract'].map((type) => (
+                  <button
+                    key={type}
+                    onClick={() => {
+                      if (selectedJobType.includes(type)) {
+                        setSelectedJobType(selectedJobType.filter(t => t !== type));
+                      } else {
+                        setSelectedJobType([...selectedJobType, type]);
+                      }
+                    }}
+                    className={`px-3 py-1 rounded-full text-sm font-medium transition ${
+                      selectedJobType.includes(type)
+                        ? 'bg-red-600 text-white'
+                        : 'bg-slate-200 text-slate-700 hover:bg-slate-300'
+                    }`}
+                  >
+                    {type}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
         </div>
       </section>
 
@@ -470,7 +501,7 @@ export default function Home() {
             <div>
               <h4 className="text-white font-semibold mb-4">For Employers</h4>
               <ul className="space-y-2 text-sm">
-                <li><a href="#" className="hover:text-white transition">Post a Job</a></li>
+                <li><a href="/post-job" className="hover:text-white transition">Post a Job</a></li>
                 <li><a href="/admin" className="hover:text-white transition">Admin Dashboard</a></li>
               </ul>
             </div>

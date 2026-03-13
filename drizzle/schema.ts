@@ -176,3 +176,45 @@ export const recentlyViewedJobs = mysqlTable("recently_viewed_jobs", {
 
 export type RecentlyViewedJob = typeof recentlyViewedJobs.$inferSelect;
 export type InsertRecentlyViewedJob = typeof recentlyViewedJobs.$inferInsert;
+
+// Job Postings Table (고용주가 작성한 공고)
+export const jobPostings = mysqlTable("job_postings", {
+  id: int("id").autoincrement().primaryKey(),
+  employerId: int("employer_id").notNull(),
+  title: varchar("title", { length: 255 }).notNull(),
+  company: varchar("company", { length: 255 }).notNull(),
+  location: varchar("location", { length: 255 }).notNull(),
+  jobType: varchar("job_type", { length: 50 }).notNull(),
+  category: varchar("category", { length: 100 }).notNull(),
+  salaryMin: int("salary_min"),
+  salaryMax: int("salary_max"),
+  currency: varchar("currency", { length: 10 }).default("CAD").notNull(),
+  description: text("description").notNull(),
+  requirements: text("requirements"),
+  lmiaAvailable: int("lmia_available").default(0).notNull(),
+  visaSponsorship: int("visa_sponsorship").default(0).notNull(),
+  accommodationProvided: int("accommodation_provided").default(0).notNull(),
+  applicationEmail: varchar("application_email", { length: 320 }).notNull(),
+  status: mysqlEnum("status", ["draft", "published", "closed", "archived"]).default("draft").notNull(),
+  isActive: int("is_active").default(1).notNull(),
+  expiresAt: timestamp("expires_at"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().onUpdateNow().notNull(),
+});
+
+export type JobPosting = typeof jobPostings.$inferSelect;
+export type InsertJobPosting = typeof jobPostings.$inferInsert;
+
+// Job Posting Applications Table (공고에 대한 지원)
+export const jobPostingApplications = mysqlTable("job_posting_applications", {
+  id: int("id").autoincrement().primaryKey(),
+  jobPostingId: int("job_posting_id").notNull(),
+  applicantEmail: varchar("applicant_email", { length: 320 }).notNull(),
+  applicantName: varchar("applicant_name", { length: 255 }).notNull(),
+  status: mysqlEnum("status", ["new", "reviewed", "rejected", "accepted"]).default("new").notNull(),
+  appliedAt: timestamp("applied_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().onUpdateNow().notNull(),
+});
+
+export type JobPostingApplication = typeof jobPostingApplications.$inferSelect;
+export type InsertJobPostingApplication = typeof jobPostingApplications.$inferInsert;

@@ -3,9 +3,13 @@ import { getSessionCookieOptions } from "./_core/cookies";
 import { systemRouter } from "./_core/systemRouter";
 import { publicProcedure, router } from "./_core/trpc";
 import { z } from "zod";
-import { getJobListings, getJobById, saveJob, applyForJob, getSavedJobs, getUserApplications, createJobListing, getDb, createResume, getUserResumes, updateResume, deleteResume, setDefaultResume, applyForJobWithResume } from "./db";
-import { users, jobApplications, jobListings, resumes } from "../drizzle/schema";
-import { eq } from "drizzle-orm";
+import {
+  getJobListings, getJobById, saveJob, applyForJob, getSavedJobs, getUserApplications,
+  createJobListing, getDb, createResume, getUserResumes, updateResume, deleteResume,
+  setDefaultResume, applyForJobWithResume
+} from "./db";
+import { users, jobApplications, jobListings, resumes, jobPostings, jobPostingApplications } from "../drizzle/schema";
+import { eq, and } from "drizzle-orm";
 
 // Admin procedure - checks if user is admin
 const adminProcedure = publicProcedure.use(async ({ ctx, next }) => {
@@ -274,6 +278,122 @@ export const appRouter = router({
       .mutation(async ({ input, ctx }) => {
         if (!ctx.user) throw new Error("Not authenticated");
         return await applyForJobWithResume(ctx.user.id, input.jobId, input.resumeId);
+      }),
+  }),
+
+  employer: router({
+    createPosting: publicProcedure
+      .input(z.object({
+        title: z.string(),
+        company: z.string(),
+        location: z.string(),
+        jobType: z.string(),
+        category: z.string(),
+        salaryMin: z.number().optional(),
+        salaryMax: z.number().optional(),
+        description: z.string(),
+        requirements: z.string().optional(),
+        lmiaAvailable: z.boolean().optional(),
+        visaSponsorship: z.boolean().optional(),
+        accommodationProvided: z.boolean().optional(),
+        applicationEmail: z.string(),
+      }))
+      .mutation(async ({ input, ctx }) => {
+        if (!ctx.user) throw new Error("Not authenticated");
+        const db = await getDb();
+        if (!db) throw new Error("Database not available");
+        const result = await db.insert(jobPostings).values({
+          employerId: ctx.user.id,
+          title: input.title,
+          company: input.company,
+          location: input.location,
+          jobType: input.jobType,
+          category: input.category,
+          salaryMin: input.salaryMin,
+          salaryMax: input.salaryMax,
+          description: input.description,
+          requirements: input.requirements,
+          lmiaAvailable: input.lmiaAvailable ? 1 : 0,
+          visaSponsorship: input.visaSponsorship ? 1 : 0,
+          accommodationProvided: input.accommodationProvided ? 1 : 0,
+          applicationEmail: input.applicationEmail,
+          status: "published",
+        });
+        return { success: true };
+      }),
+
+    myPostings: publicProcedure
+      .query(async ({ ctx }) => {
+        if (!ctx.user) return [];
+        const db = await getDb();
+        if (!db) return [];
+        return await db
+          .select()
+          .from(jobPostings)
+          .where(eq(jobPostings.employerId, ctx.user.id));
+      }),
+
+    getPosting: publicProcedure
+      .input(z.number())
+      .query(async ({ input }) => {
+        const db = await getDb();
+        if (!db) return null;
+        const result = await db
+          .select()
+          .from(jobPostings)
+          .where(eq(jobPostings.id, input))
+          .limit(1);
+        return result[0] || null;
+      }),
+
+    updatePosting: publicProcedure
+      .input(z.object({
+        jobPostingId: z.number(),
+        title: z.string().optional(),
+        company: z.string().optional(),
+        location: z.string().optional(),
+        jobType: z.string().optional(),
+        category: z.string().optional(),
+        salaryMin: z.number().optional(),
+        salaryMax: z.number().optional(),
+        description: z.string().optional(),
+        requirements: z.string().optional(),
+        status: z.enum(["draft", "published", "closed", "archived"]).optional(),
+      }))
+      .mutation(async ({ input, ctx }) => {
+        if (!ctx.user) throw new Error("Not authenticated");
+        const db = await getDb();
+        if (!db) throw new Error("Database not available");
+        const { jobPostingId, ...data } = input;
+        await db
+          .update(jobPostings)
+          .set(data)
+          .where(eq(jobPostings.id, jobPostingId));
+        return { success: true };
+      }),
+
+    deletePosting: publicProcedure
+      .input(z.number())
+      .mutation(async ({ input: jobPostingId, ctx }) => {
+        if (!ctx.user) throw new Error("Not authenticated");
+        const db = await getDb();
+        if (!db) throw new Error("Database not available");
+        await db
+          .delete(jobPostings)
+          .where(eq(jobPostings.id, jobPostingId));
+        return { success: true };
+      }),
+
+    getApplications: publicProcedure
+      .input(z.number())
+      .query(async ({ input: jobPostingId, ctx }) => {
+        if (!ctx.user) throw new Error("Not authenticated");
+        const db = await getDb();
+        if (!db) return [];
+        return await db
+          .select()
+          .from(jobPostingApplications)
+          .where(eq(jobPostingApplications.jobPostingId, jobPostingId));
       }),
   }),
 });

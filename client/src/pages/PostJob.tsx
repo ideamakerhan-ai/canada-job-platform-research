@@ -1,396 +1,366 @@
 import { useState } from "react";
+import { useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { toast } from "sonner";
-import { useLocation } from "wouter";
+import { Checkbox } from "@/components/ui/checkbox";
 import { trpc } from "@/lib/trpc";
 import { useAuth } from "@/_core/hooks/useAuth";
-import { getLoginUrl } from "@/const";
+import { Loader2 } from "lucide-react";
 
-const categories = [
-  "Strategy & Planning",
-  "Marketing & Communications",
-  "Accounting & Finance",
-  "HR & Training",
-  "Administration & Legal",
-  "IT Development & Data",
-  "Design",
-  "Sales & Trading",
-  "Construction",
+const JOB_CATEGORIES = [
   "Healthcare",
-  "Research & Development",
-  "Education",
-  "Media & Culture",
-  "Finance & Insurance",
+  "Technology",
+  "Construction",
+  "Trades",
+  "Retail & Service",
   "Transportation",
-  "Service",
+  "Finance",
+  "Education",
   "Manufacturing",
-  "Public Service",
+  "Other"
 ];
 
-const locations = [
-  "Toronto, ON",
-  "Vancouver, BC",
-  "Calgary, AB",
-  "Montreal, QC",
-  "Edmonton, AB",
-  "Remote",
-  "Ottawa, ON",
-  "Winnipeg, MB",
-  "Halifax, NS",
-  "Quebec City, QC",
-  "Victoria, BC",
+const JOB_TYPES = [
+  "Full-time",
+  "Part-time",
+  "Contract",
+  "Temporary",
+  "Seasonal"
 ];
 
-const experienceOptions = [
-  "No experience required",
-  "Less than 1 year",
-  "1-2 years",
-  "2-3 years",
-  "3-5 years",
-  "5+ years",
-  "10+ years",
-];
-
-const accommodationOptions = [
-  "Accommodation provided",
-  "Partial accommodation",
-  "Relocation assistance",
+const CANADIAN_PROVINCES = [
+  "Alberta",
+  "British Columbia",
+  "Manitoba",
+  "New Brunswick",
+  "Newfoundland and Labrador",
+  "Northwest Territories",
+  "Nova Scotia",
+  "Nunavut",
+  "Ontario",
+  "Prince Edward Island",
+  "Quebec",
+  "Saskatchewan",
+  "Yukon"
 ];
 
 export default function PostJob() {
   const [, setLocation] = useLocation();
-  const { isAuthenticated } = useAuth();
+  const { user, isAuthenticated } = useAuth();
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [formData, setFormData] = useState({
     title: "",
     company: "",
-    description: "",
-    category: "",
     location: "",
-    salaryType: "annual",
+    jobType: "",
+    category: "",
     salaryMin: "",
     salaryMax: "",
-    jobType: "Full-time",
-    lmiaSponsorship: false,
+    description: "",
+    requirements: "",
+    applicationEmail: "",
+    lmiaAvailable: false,
     visaSponsorship: false,
-    experienceRequired: "",
-    accommodation: "",
+    accommodationProvided: false,
   });
 
-  const postJobMutation = trpc.job.postJob.useMutation({
-    onSuccess: () => {
-      toast.success("Job posted successfully!");
-      setTimeout(() => setLocation("/"), 2000);
-    },
-    onError: (error) => {
-      toast.error(error.message || "Failed to post job");
-    },
-  });
+  const createPostingMutation = trpc.employer.createPosting.useMutation();
+
+  if (!isAuthenticated) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center p-4">
+        <Card className="w-full max-w-md">
+          <CardHeader>
+            <CardTitle>Sign In Required</CardTitle>
+            <CardDescription>Please sign in to post a job</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <p className="text-sm text-muted-foreground mb-4">
+              You need to be signed in to post job listings.
+            </p>
+            <Button onClick={() => setLocation("/")} className="w-full">
+              Go Back Home
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
   };
 
   const handleSelectChange = (name: string, value: string) => {
-    setFormData((prev) => ({ ...prev, [name]: value }));
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
   };
 
   const handleCheckboxChange = (name: string, checked: boolean) => {
-    setFormData((prev) => ({ ...prev, [name]: checked }));
+    setFormData(prev => ({
+      ...prev,
+      [name]: checked
+    }));
   };
 
-  const handleSalaryChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    if (value === "" || /^\d+$/.test(value)) {
-      setFormData((prev) => ({ ...prev, [name]: value }));
-    }
-  };
-
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setIsSubmitting(true);
 
-    if (!isAuthenticated) {
-      toast.error("Please log in to post a job");
-      window.location.href = getLoginUrl();
-      return;
+    try {
+      await createPostingMutation.mutateAsync({
+        title: formData.title,
+        company: formData.company,
+        location: formData.location,
+        jobType: formData.jobType,
+        category: formData.category,
+        salaryMin: formData.salaryMin ? parseInt(formData.salaryMin) : undefined,
+        salaryMax: formData.salaryMax ? parseInt(formData.salaryMax) : undefined,
+        description: formData.description,
+        requirements: formData.requirements,
+        applicationEmail: formData.applicationEmail,
+        lmiaAvailable: formData.lmiaAvailable,
+        visaSponsorship: formData.visaSponsorship,
+        accommodationProvided: formData.accommodationProvided,
+      });
+
+      // Navigate to employer dashboard
+      setLocation("/employer/dashboard");
+    } catch (error) {
+      console.error("Failed to create job posting:", error);
+      alert("Failed to create job posting. Please try again.");
+    } finally {
+      setIsSubmitting(false);
     }
-
-    if (!formData.title || !formData.company || !formData.description || !formData.category || !formData.location) {
-      toast.error("Please fill in all required fields");
-      return;
-    }
-
-    if (!formData.salaryMin || !formData.salaryMax) {
-      toast.error("Please enter both minimum and maximum salary");
-      return;
-    }
-
-    if (!formData.lmiaSponsorship && !formData.visaSponsorship) {
-      toast.error("Please select at least one sponsorship option");
-      return;
-    }
-
-    if (!formData.experienceRequired) {
-      toast.error("Please select required experience level");
-      return;
-    }
-
-    if (!formData.accommodation) {
-      toast.error("Please select accommodation option");
-      return;
-    }
-
-    postJobMutation.mutate({
-      title: formData.title,
-      company: formData.company,
-      location: formData.location,
-      category: formData.category,
-      description: formData.description,
-      salaryType: formData.salaryType as "hourly" | "annual",
-      salaryMin: parseInt(formData.salaryMin),
-      salaryMax: parseInt(formData.salaryMax),
-      jobType: formData.jobType,
-      experienceRequired: formData.experienceRequired,
-      accommodation: formData.accommodation,
-      lmiaSponsorship: formData.lmiaSponsorship,
-      visaSponsorship: formData.visaSponsorship,
-    });
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100">
-      <header className="bg-white border-b border-slate-200 sticky top-0 z-50 shadow-sm">
-        <div className="container py-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-3xl font-bold text-slate-900">Post a Job</h1>
-              <p className="text-slate-600 mt-1">Share your job opportunity with Canadian employers</p>
-            </div>
-            <Button variant="outline" onClick={() => setLocation("/")}>
-              Back to Home
-            </Button>
-          </div>
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 py-12">
+      <div className="container max-w-2xl">
+        <div className="mb-8">
+          <h1 className="text-4xl font-bold text-slate-900 mb-2">Post a Job</h1>
+          <p className="text-slate-600">Create a new job listing to attract qualified candidates</p>
         </div>
-      </header>
 
-      <main className="container py-12">
-        <Card className="max-w-2xl mx-auto">
+        <Card>
           <CardHeader>
-            <CardTitle>Create a New Job Posting</CardTitle>
-            <CardDescription>Fill in the details about your job opening</CardDescription>
+            <CardTitle>Job Details</CardTitle>
+            <CardDescription>Fill in the information about your job opening</CardDescription>
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-6">
-              <div>
-                <label className="block text-sm font-medium text-slate-700 mb-2">Job Title *</label>
+              {/* Job Title */}
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-slate-900">Job Title *</label>
                 <Input
-                  type="text"
                   name="title"
                   placeholder="e.g., Senior Software Engineer"
                   value={formData.title}
                   onChange={handleInputChange}
-                  className="w-full"
+                  required
                 />
               </div>
 
-              <div>
-                <label className="block text-sm font-medium text-slate-700 mb-2">Company Name *</label>
+              {/* Company Name */}
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-slate-900">Company Name *</label>
                 <Input
-                  type="text"
                   name="company"
-                  placeholder="e.g., TechCorp Canada"
+                  placeholder="Your company name"
                   value={formData.company}
                   onChange={handleInputChange}
-                  className="w-full"
+                  required
                 />
               </div>
 
-              <div>
-                <label className="block text-sm font-medium text-slate-700 mb-2">Category *</label>
+              {/* Location */}
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-slate-900">Location *</label>
+                <Select value={formData.location} onValueChange={(value) => handleSelectChange("location", value)}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select a province" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {CANADIAN_PROVINCES.map((province) => (
+                      <SelectItem key={province} value={province}>
+                        {province}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {/* Job Type */}
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-slate-900">Job Type *</label>
+                <Select value={formData.jobType} onValueChange={(value) => handleSelectChange("jobType", value)}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select job type" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {JOB_TYPES.map((type) => (
+                      <SelectItem key={type} value={type}>
+                        {type}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {/* Category */}
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-slate-900">Job Category *</label>
                 <Select value={formData.category} onValueChange={(value) => handleSelectChange("category", value)}>
                   <SelectTrigger>
                     <SelectValue placeholder="Select a category" />
                   </SelectTrigger>
                   <SelectContent>
-                    {categories.map((cat) => (
-                      <SelectItem key={cat} value={cat}>
-                        {cat}
+                    {JOB_CATEGORIES.map((category) => (
+                      <SelectItem key={category} value={category}>
+                        {category}
                       </SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
               </div>
 
-              <div>
-                <label className="block text-sm font-medium text-slate-700 mb-2">Location *</label>
-                <Select value={formData.location} onValueChange={(value) => handleSelectChange("location", value)}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select a location" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {locations.map((loc) => (
-                      <SelectItem key={loc} value={loc}>
-                        {loc}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-slate-700 mb-2">Salary Type & Range *</label>
-                <div className="flex gap-4 mb-4">
-                  <label className="flex items-center gap-2 cursor-pointer">
-                    <input
-                      type="radio"
-                      name="salaryType"
-                      value="hourly"
-                      checked={formData.salaryType === "hourly"}
-                      onChange={(e) => handleSelectChange("salaryType", e.target.value)}
-                      className="w-4 h-4"
-                    />
-                    <span className="text-sm text-slate-700">Hourly Rate ($)</span>
-                  </label>
-                  <label className="flex items-center gap-2 cursor-pointer">
-                    <input
-                      type="radio"
-                      name="salaryType"
-                      value="annual"
-                      checked={formData.salaryType === "annual"}
-                      onChange={(e) => handleSelectChange("salaryType", e.target.value)}
-                      className="w-4 h-4"
-                    />
-                    <span className="text-sm text-slate-700">Annual Salary ($)</span>
-                  </label>
+              {/* Salary Range */}
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-slate-900">Salary Min (CAD)</label>
+                  <Input
+                    name="salaryMin"
+                    type="number"
+                    placeholder="e.g., 50000"
+                    value={formData.salaryMin}
+                    onChange={handleInputChange}
+                  />
                 </div>
-                <div className="flex gap-4">
-                  <div className="flex-1">
-                    <label className="block text-xs font-medium text-slate-600 mb-1">Minimum</label>
-                    <Input
-                      type="text"
-                      name="salaryMin"
-                      placeholder="e.g., 50000"
-                      value={formData.salaryMin}
-                      onChange={handleSalaryChange}
-                      className="w-full"
-                    />
-                  </div>
-                  <div className="flex-1">
-                    <label className="block text-xs font-medium text-slate-600 mb-1">Maximum</label>
-                    <Input
-                      type="text"
-                      name="salaryMax"
-                      placeholder="e.g., 120000"
-                      value={formData.salaryMax}
-                      onChange={handleSalaryChange}
-                      className="w-full"
-                    />
-                  </div>
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-slate-900">Salary Max (CAD)</label>
+                  <Input
+                    name="salaryMax"
+                    type="number"
+                    placeholder="e.g., 80000"
+                    value={formData.salaryMax}
+                    onChange={handleInputChange}
+                  />
                 </div>
               </div>
 
-              <div>
-                <label className="block text-sm font-medium text-slate-700 mb-2">Job Type</label>
-                <Select value={formData.jobType} onValueChange={(value) => handleSelectChange("jobType", value)}>
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="Full-time">Full-time</SelectItem>
-                    <SelectItem value="Part-time">Part-time</SelectItem>
-                    <SelectItem value="Contract">Contract</SelectItem>
-                    <SelectItem value="Temporary">Temporary</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-slate-700 mb-2">Required Experience *</label>
-                <Select value={formData.experienceRequired} onValueChange={(value) => handleSelectChange("experienceRequired", value)}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select required experience" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {experienceOptions.map((exp) => (
-                      <SelectItem key={exp} value={exp}>
-                        {exp}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-slate-700 mb-2">Accommodation *</label>
-                <Select value={formData.accommodation} onValueChange={(value) => handleSelectChange("accommodation", value)}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select accommodation option" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {accommodationOptions.map((acc) => (
-                      <SelectItem key={acc} value={acc}>
-                        {acc}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-slate-700 mb-3">Sponsorship Options *</label>
-                <div className="space-y-3">
-                  <label className="flex items-center gap-3 cursor-pointer">
-                    <input
-                      type="checkbox"
-                      checked={formData.lmiaSponsorship}
-                      onChange={(e) => handleCheckboxChange("lmiaSponsorship", e.target.checked)}
-                      className="w-4 h-4 rounded"
-                    />
-                    <span className="text-sm text-slate-700">LMIA Sponsorship Available</span>
-                  </label>
-                  <label className="flex items-center gap-3 cursor-pointer">
-                    <input
-                      type="checkbox"
-                      checked={formData.visaSponsorship}
-                      onChange={(e) => handleCheckboxChange("visaSponsorship", e.target.checked)}
-                      className="w-4 h-4 rounded"
-                    />
-                    <span className="text-sm text-slate-700">Visa Sponsorship Available</span>
-                  </label>
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-slate-700 mb-2">Job Description *</label>
+              {/* Description */}
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-slate-900">Job Description *</label>
                 <Textarea
                   name="description"
-                  placeholder="Describe the job, responsibilities, and requirements..."
+                  placeholder="Describe the job, responsibilities, and what you're looking for..."
                   value={formData.description}
                   onChange={handleInputChange}
-                  className="w-full h-40"
+                  rows={6}
+                  required
                 />
               </div>
 
-              <div className="flex gap-4">
-                <Button 
-                  type="submit" 
-                  className="bg-blue-600 hover:bg-blue-700"
-                  disabled={postJobMutation.isPending}
+              {/* Requirements */}
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-slate-900">Requirements</label>
+                <Textarea
+                  name="requirements"
+                  placeholder="List required qualifications, experience, skills, etc."
+                  value={formData.requirements}
+                  onChange={handleInputChange}
+                  rows={4}
+                />
+              </div>
+
+              {/* Application Email */}
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-slate-900">Application Email *</label>
+                <Input
+                  name="applicationEmail"
+                  type="email"
+                  placeholder="where@company.com"
+                  value={formData.applicationEmail}
+                  onChange={handleInputChange}
+                  required
+                />
+              </div>
+
+              {/* Benefits */}
+              <div className="space-y-3 border-t pt-4">
+                <label className="text-sm font-medium text-slate-900">Benefits & Sponsorship</label>
+                <div className="space-y-2">
+                  <div className="flex items-center gap-2">
+                    <Checkbox
+                      id="visaSponsorship"
+                      checked={formData.visaSponsorship}
+                      onCheckedChange={(checked) => handleCheckboxChange("visaSponsorship", checked as boolean)}
+                    />
+                    <label htmlFor="visaSponsorship" className="text-sm cursor-pointer">
+                      Visa Sponsorship Available
+                    </label>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Checkbox
+                      id="lmiaAvailable"
+                      checked={formData.lmiaAvailable}
+                      onCheckedChange={(checked) => handleCheckboxChange("lmiaAvailable", checked as boolean)}
+                    />
+                    <label htmlFor="lmiaAvailable" className="text-sm cursor-pointer">
+                      LMIA Approved
+                    </label>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Checkbox
+                      id="accommodationProvided"
+                      checked={formData.accommodationProvided}
+                      onCheckedChange={(checked) => handleCheckboxChange("accommodationProvided", checked as boolean)}
+                    />
+                    <label htmlFor="accommodationProvided" className="text-sm cursor-pointer">
+                      Accommodation Provided
+                    </label>
+                  </div>
+                </div>
+              </div>
+
+              {/* Submit Buttons */}
+              <div className="flex gap-3 pt-4 border-t">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => setLocation("/")}
+                  disabled={isSubmitting}
                 >
-                  {postJobMutation.isPending ? "Posting..." : "Post Job"}
-                </Button>
-                <Button type="button" variant="outline" onClick={() => setLocation("/")}>
                   Cancel
+                </Button>
+                <Button
+                  type="submit"
+                  disabled={isSubmitting}
+                  className="flex-1"
+                >
+                  {isSubmitting ? (
+                    <>
+                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                      Posting...
+                    </>
+                  ) : (
+                    "Post Job"
+                  )}
                 </Button>
               </div>
             </form>
           </CardContent>
         </Card>
-      </main>
+      </div>
     </div>
   );
 }
