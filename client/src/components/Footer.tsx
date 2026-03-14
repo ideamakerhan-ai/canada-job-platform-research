@@ -14,24 +14,11 @@ export function Footer() {
             <p className="text-slate-400 text-sm mb-4">
               Connecting job seekers with employers across Canada.
             </p>
-            <div className="space-y-2 text-sm text-slate-400">
-              <div className="flex items-center gap-2">
-                <Mail className="w-4 h-4" />
-                <a href="mailto:support@canadajobboard.ca" className="hover:text-slate-100">
-                  support@canadajobboard.ca
-                </a>
-              </div>
-              <div className="flex items-center gap-2">
-                <Phone className="w-4 h-4" />
-                <a href="tel:+14165551234" className="hover:text-slate-100">
-                  +1 (416) 555-1234
-                </a>
-              </div>
-              <div className="flex items-start gap-2">
-                <MapPin className="w-4 h-4 mt-1 flex-shrink-0" />
-                <span>Toronto, Ontario, Canada</span>
-              </div>
-            </div>
+            <p className="text-slate-400 text-sm">
+              <Link href="/contact" className="hover:text-slate-100 underline">
+                Contact us
+              </Link>
+            </p>
           </div>
 
           {/* For Job Seekers */}
