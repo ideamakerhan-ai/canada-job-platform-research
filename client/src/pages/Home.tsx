@@ -38,7 +38,7 @@ const sampleJobs: JobListing[] = [
     salary: "$120,000 - $150,000",
     jobType: "Full-time",
     description: "Looking for experienced software engineer with 5+ years in backend development.",
-    postedDate: "2 days ago",
+    postedDate: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toLocaleDateString('en-CA'),
     category: "IT Development & Data",
     lmiaAvailable: true,
     visaSponsorshipAvailable: true,
@@ -52,7 +52,7 @@ const sampleJobs: JobListing[] = [
     salary: "$65,000 - $85,000",
     jobType: "Full-time",
     description: "Seeking compassionate nurses for our emergency department.",
-    postedDate: "1 day ago",
+    postedDate: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toLocaleDateString('en-CA'),
     category: "Healthcare",
     lmiaAvailable: true,
     visaSponsorshipAvailable: true,
@@ -66,7 +66,7 @@ const sampleJobs: JobListing[] = [
     salary: "$80,000 - $110,000",
     jobType: "Full-time",
     description: "Lead construction projects from conception to completion.",
-    postedDate: "3 days ago",
+    postedDate: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toLocaleDateString('en-CA'),
     category: "Construction",
     lmiaAvailable: false,
     visaSponsorshipAvailable: true,
@@ -319,43 +319,6 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Filter Section */}
-      <section className="bg-white border-b border-slate-200 py-6">
-        <div className="container">
-          <div className="flex flex-wrap gap-4">
-            {/* Job Type Filter */}
-            <div className="flex items-center gap-2">
-              <span className="text-sm font-medium text-slate-700">Job Type:</span>
-              <div className="flex gap-2">
-                {['Full-time', 'Part-time', 'Contract'].map((type) => (
-                  <button
-                    key={type}
-                    onClick={() => {
-                      if (selectedJobType.includes(type)) {
-                        setSelectedJobType(selectedJobType.filter(t => t !== type));
-                      } else {
-                        setSelectedJobType([...selectedJobType, type]);
-                      }
-                    }}
-                    className={`px-3 py-1 rounded-full text-sm font-medium transition ${
-                      selectedJobType.includes(type)
-                        ? 'bg-red-600 text-white'
-                        : 'bg-slate-200 text-slate-700 hover:bg-slate-300'
-                    }`}
-                  >
-                    {type}
-                  </button>
-                ))}
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-
-
-
-
       {/* Featured Jobs */}
       <section className="bg-slate-50 py-12">
         <div className="container">
@@ -387,12 +350,6 @@ export default function Home() {
                     <Briefcase className="w-4 h-4" />
                     <span>{job.jobType}</span>
                   </div>
-                  <p className="text-sm text-slate-600 line-clamp-2">{job.description}</p>
-                  <div className="flex flex-wrap gap-2 pt-2">
-                    {job.lmiaAvailable && (
-                      <Badge variant="outline" className="text-red-600 border-red-600">LMIA</Badge>
-                    )}
-                  </div>
                   <Button
                     onClick={(e) => handleApply(job.id, e)}
                     className="w-full bg-red-600 hover:bg-red-700 text-white mt-4"
@@ -423,7 +380,7 @@ export default function Home() {
                       <div className="flex-1">
                         <h3 className="text-lg font-semibold text-slate-900 mb-1">{job.title}</h3>
                         <p className="text-slate-600 mb-3">{job.company}</p>
-                        <div className="flex flex-wrap gap-4 text-sm text-slate-600 mb-3">
+                        <div className="flex flex-wrap gap-4 text-sm text-slate-600">
                           <span className="flex items-center gap-1">
                             <MapPin className="w-4 h-4" /> {job.location}
                           </span>
@@ -431,13 +388,8 @@ export default function Home() {
                             <DollarSign className="w-4 h-4" /> {job.salary}
                           </span>
                           <span className="flex items-center gap-1">
-                            <Clock className="w-4 h-4" /> {job.postedDate}
+                            <Briefcase className="w-4 h-4" /> {job.jobType}
                           </span>
-                        </div>
-                        <div className="flex flex-wrap gap-2">
-                          {job.lmiaAvailable && (
-                            <Badge variant="outline" className="text-red-600 border-red-600">LMIA</Badge>
-                          )}
                         </div>
                       </div>
                       <Heart className="w-6 h-6 text-slate-300 hover:text-red-600 transition" />

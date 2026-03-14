@@ -4,7 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import { MapPin, DollarSign, Briefcase, Clock, Heart, Share2, ArrowLeft, CheckCircle, Mail } from "lucide-react";
 import { useState, useEffect } from "react";
 import { toast } from "sonner";
-import { ResumeModal } from "@/components/ResumeModal";
+
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 
@@ -112,7 +112,6 @@ export default function JobDetail() {
   const [, navigate] = useWouterLocation();
   const [isSaved, setIsSaved] = useState(false);
   const [isApplied, setIsApplied] = useState(false);
-  const [showResumeModal, setShowResumeModal] = useState(false);
   const [showEmailModal, setShowEmailModal] = useState(false);
 
 
@@ -162,7 +161,6 @@ export default function JobDetail() {
 
   const handleApplySuccess = () => {
     setIsApplied(true);
-    setShowResumeModal(false);
     setShowEmailModal(false);
     toast.success("Application submitted successfully");
     // Open email client with pre-filled email
