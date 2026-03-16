@@ -31,6 +31,18 @@ export const appRouter = router({
         success: true,
       } as const;
     }),
+    updateRole: publicProcedure
+      .input(z.enum(["job_seeker", "employer", "admin"]))
+      .mutation(async ({ input, ctx }) => {
+        if (!ctx.user) throw new Error("Not authenticated");
+        const db = await getDb();
+        if (!db) throw new Error("Database connection failed");
+        await db
+          .update(users)
+          .set({ role: input })
+          .where(eq(users.id, ctx.user.id));
+        return { success: true, role: input };
+      }),
   }),
 
   job: router({

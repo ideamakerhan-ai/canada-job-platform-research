@@ -73,8 +73,8 @@ export async function upsertUser(user: InsertUser): Promise<void> {
       values.role = 'admin';
       updateSet.role = 'admin';
     } else {
-      // 새 사용자는 기본값으로 'user' 역할을 가짐
-      values.role = 'user';
+      // 새 사용자는 기본값으로 'job_seeker' 역할을 가짐
+      values.role = 'job_seeker';
     }
 
     if (!values.lastSignedIn) {

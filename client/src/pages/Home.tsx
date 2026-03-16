@@ -11,6 +11,7 @@ import { getLoginUrl } from "@/const";
 import { trpc } from "@/lib/trpc";
 import { toast } from "sonner";
 import { Footer } from "@/components/Footer";
+import { RoleSelectionModal } from "@/components/RoleSelectionModal";
 
 interface JobListing {
   id: number;
@@ -88,7 +89,32 @@ export default function Home() {
   const [allJobs, setAllJobs] = useState<JobListing[]>([]);
   const [selectedFilters, setSelectedFilters] = useState<string[]>([]);
   const [selectedJobTitle, setSelectedJobTitle] = useState<string | null>(null);
+  const [showRoleModal, setShowRoleModal] = useState(false);
+  const updateRoleMutation = trpc.auth.updateRole.useMutation();
   
+  // 로그인 후 역할이 없으면 역할 선택 모달 표시
+  useEffect(() => {
+    if (isAuthenticated && user && !user.role) {
+      setShowRoleModal(true);
+    }
+  }, [isAuthenticated, user]);
+
+  const handleRoleSelect = async (role: "job_seeker" | "employer") => {
+    try {
+      await updateRoleMutation.mutateAsync(role);
+      setShowRoleModal(false);
+      
+      // 역할에 따라 리다이렉트
+      if (role === "employer") {
+        navigate("/employer/dashboard");
+      } else {
+        navigate("/");
+      }
+    } catch (error) {
+      toast.error("Failed to update role");
+    }
+  };
+
   // 데이터베이스에서 공고 로드
   const { data: dbJobs = [] } = trpc.job.search.useQuery({});
 
@@ -408,6 +434,9 @@ export default function Home() {
 
       {/* Footer */}
       <Footer />
+
+      {/* Role Selection Modal */}
+      <RoleSelectionModal open={showRoleModal} onSelectRole={handleRoleSelect} />
     </div>
   );
 }
