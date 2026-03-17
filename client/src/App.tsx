@@ -18,6 +18,7 @@ import PaymentCheckout from "./pages/PaymentCheckout";
 import Terms from "./pages/Terms";
 import Privacy from "./pages/Privacy";
 import Contact from "./pages/Contact";
+import { ProtectedRoute } from "./components/ProtectedRoute";
 
 function Router() {
   // make sure to consider if you need authentication for certain routes
@@ -26,13 +27,37 @@ function Router() {
       <Route path={"/"} component={Home} />
           <Route path={"/job/:id"} component={JobDetail} />
       <Route path={"/profile"} component={Profile} />
-      <Route path={"/my-profile"} component={ProfilePage} />
-      <Route path={"/post-job-compliance"} component={PostJobCompliance} />
-      <Route path={"/post-job"} component={PostJob} />
+      <Route path={"/my-profile"}>
+        <ProtectedRoute requiredRole="job_seeker">
+          <ProfilePage />
+        </ProtectedRoute>
+      </Route>
+      <Route path={"/post-job-compliance"}>
+        <ProtectedRoute requiredRole="employer">
+          <PostJobCompliance />
+        </ProtectedRoute>
+      </Route>
+      <Route path={"/post-job"}>
+        <ProtectedRoute requiredRole="employer">
+          <PostJob />
+        </ProtectedRoute>
+      </Route>
       <Route path={"/occupations"} component={Occupations} />
-      <Route path={"/admin"} component={AdminDashboard} />
-      <Route path={"/employer/dashboard"} component={EmployerDashboard} />
-      <Route path={"/payment/checkout"} component={PaymentCheckout} />
+      <Route path={"/admin"}>
+        <ProtectedRoute requiredRole="admin">
+          <AdminDashboard />
+        </ProtectedRoute>
+      </Route>
+      <Route path={"/employer/dashboard"}>
+        <ProtectedRoute requiredRole="employer">
+          <EmployerDashboard />
+        </ProtectedRoute>
+      </Route>
+      <Route path={"/payment/checkout"}>
+        <ProtectedRoute requiredRole="employer">
+          <PaymentCheckout />
+        </ProtectedRoute>
+      </Route>
       <Route path={"/terms"} component={Terms} />
       <Route path={"/privacy"} component={Privacy} />
       <Route path={"/contact"} component={Contact} />
